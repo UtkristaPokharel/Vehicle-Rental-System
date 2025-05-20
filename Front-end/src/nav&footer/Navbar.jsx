@@ -1,0 +1,47 @@
+import {useState,useRef} from 'react'
+import { IoMenu, IoClose } from "react-icons/io5";
+
+
+export default function Navbar() {
+    const [isOpen, setIsOpen] = useState(false);
+    const menuref = useRef(null);
+
+    
+    const handleToggle = () => {
+        setIsOpen(prev=> !prev);
+      };
+
+  return (
+   <>
+    <nav className='w-full h-16 bg-gray-800 flex justify-between items-center px-5 md:px-10'>
+        <div><span className='text-white text-2xl font-bold'>EasyWheels</span></div>
+        <div>
+            <ul className='hidden md:flex space-x-9'>
+                <li><a href="#" className='text-white hover:text-gray-400'>Home</a></li>
+                <li><a href="#" className='text-white hover:text-gray-400'>About us</a></li>
+                <li><a href="#" className='text-white hover:text-gray-400'>Vehicles</a></li>
+                <li><a href="#" className='text-white hover:text-gray-400'>Contact</a></li>
+            </ul>
+
+        <button  className='md:hidden text-white' onClick={handleToggle}> 
+             {isOpen ? <IoClose className="ham-menu text-3xl" /> : <IoMenu className="ham-menu text-3xl" />} 
+        </button>
+
+         
+        <div 
+        ref ={menuref}
+         className={` md:hidden text-white absolute top-16 right-0 bg-gray-600 w-30
+          h-30 list-none pl-5 transition-all duration-300 ease-in-out 
+            ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
+                <li><a href="#" className='text-white hover:text-gray-400'>Home</a></li>
+                <li><a href="#" className='text-white hover:text-gray-400'>About us</a></li>
+                <li><a href="#" className='text-white hover:text-gray-400'>Vehicles</a></li>
+                <li><a href="#" className='text-white hover:text-gray-400'>Contact</a></li>
+            </div> 
+            
+            
+        </div>
+    </nav>
+   </>
+  )
+}
