@@ -1,4 +1,4 @@
-import {useState,useRef} from 'react'
+import {useState,useRef,useEffect} from 'react'
 import { IoMenu, IoClose } from "react-icons/io5";
 
 
@@ -6,7 +6,22 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const menuref = useRef(null);
 
-    
+useEffect(()=>{
+
+  const  handleClickOutside =(event)=>{
+    const target = event.target ;
+
+    if (menuref.current && !menuref.current.contains(target)){
+        setIsOpen(false);
+    }
+  };
+    document.addEventListener('mousedown',handleClickOutside);
+    return () => {
+        document.removeEventListener('mousedown',handleClickOutside);
+    }
+  
+},[isOpen]);
+
     const handleToggle = () => {
         setIsOpen(prev=> !prev);
       };
