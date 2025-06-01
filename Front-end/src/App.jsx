@@ -8,7 +8,8 @@ export default function App() {
   return (
     <>
       <Navbar />
-      <div className='w-full h-screen bg-gray-400 text-3xl bold '>
+      
+      <div className='w-full h-screen bg-gray-100 text-3xl bold '>
         <LandingPage />
       </div>
       <Footer/>

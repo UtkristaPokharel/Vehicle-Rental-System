@@ -29,7 +29,7 @@ useEffect(()=>{
 
   return (
    <>
-    <nav className='w-full h-16 bg-gray-800 flex justify-between items-center px-3 xl:px-10 '>
+    <nav className=' relative w-full h-16 bg-gray-800 flex justify-between items-center px-3 xl:px-10 z-10'>
         <div><span className='text-white text-2xl font-bold'>EasyWheels</span></div>
         <div className='flex gap-6 items-center text-white '>
             <ul className='hidden xl:flex space-x-9'>
