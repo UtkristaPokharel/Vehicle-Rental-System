@@ -29,7 +29,7 @@ useEffect(()=>{
 
   return (
    <>
-    <nav className='w-full h-16 bg-gray-800 flex justify-between items-center px-3 xl:px-10 '>
+    <nav className='w-full h-16 bg-cyan-800 flex justify-between items-center px-3 xl:px-10 '>
         <div><span className='text-white text-2xl font-bold'>EasyWheels</span></div>
         <div className='flex gap-6 items-center text-white '>
             <ul className='hidden xl:flex space-x-9'>
@@ -39,7 +39,7 @@ useEffect(()=>{
                 <li><a href="#" className=' hover:text-gray-400'>Contact</a></li>
             </ul>
 
-         <button className=' border px-2 py-1  rounded-xl hover:cursor-pointer hover:scale-105  '  > Become a host</button>
+         <button className=' border px-2 py-1 bg-red-800 rounded-xl hover:cursor-pointer hover:scale-109  '  > Become a host</button>
         <div className='profile-icon  '>
             <img src={profile} className='w-9'  alt="" />
              </div>
