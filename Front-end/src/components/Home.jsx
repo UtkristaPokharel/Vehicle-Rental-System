@@ -1,5 +1,5 @@
-import Footer from '../nav&footer/Footer.jsx'
-import Navbar from '../nav&footer/Navbar.jsx'
+import Footer from './Footer.jsx'
+import Navbar from './Navbar.jsx'
 import { RiMotorbikeFill , RiEBike2Fill , RiTruckFill} from "react-icons/ri";
 import { FaCar,FaBus } from "react-icons/fa";
 import { PiTruckTrailerFill } from "react-icons/pi";
