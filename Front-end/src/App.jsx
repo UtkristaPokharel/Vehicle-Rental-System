@@ -1,17 +1,17 @@
 import React from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router';
 import './App.css'
-import Navbar from './nav&footer/Navbar.jsx'
-import LandingPage from './components/LandingPage.jsx'
-import Footer from './nav&footer/Footer.jsx'
+import Home from './components/Home.jsx'
+import VehicleTypePage from './components/VehicleTypePage';
+
 
 export default function App() {
   return (
-    <>
-      <Navbar />
-      <div className='w-full h-screen bg-gray-400 text-3xl bold '>
-        <LandingPage />
-      </div>
-      <Footer/>
-    </>
+     <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/vehicles/:type" element={<VehicleTypePage />} />
+      </Routes>
+    </Router>
   )
 }
