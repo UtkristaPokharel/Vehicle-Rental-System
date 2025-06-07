@@ -3,7 +3,7 @@ import Navbar from './Navbar.jsx'
 import { RiMotorbikeFill , RiEBike2Fill , RiTruckFill} from "react-icons/ri";
 import { FaCar,FaBus } from "react-icons/fa";
 import { PiTruckTrailerFill } from "react-icons/pi";
-
+import { useNavigate } from 'react-router';
 
 
 function Home() {
@@ -23,7 +23,7 @@ function Home() {
    <div className="  h-[100px] w-[300px]  z-100 text-3xl font-bold text-center mt-2 text-white"> Most Convenient Platform For Vehicle Rental</div>
   <img src="src\images\main-page-removebg.png" className=" max-w-[1100px] w-[80vw] min-w-[400px]  z-5  overflow-hidden " />
     </div> */}
-        <div className="vehicle-browse flex justify-center items-center flex-col mt-4 p-3">
+        {/* <div className="vehicle-browse flex justify-center items-center flex-col mt-4 p-3">
           <h2 className="text-3xl font-bold text-center m-12">
             Browse Our Vehicles
           </h2>
@@ -39,8 +39,8 @@ function Home() {
         
           </div>
 
-
-        </div>
+        </div> */}
+        <VehicleBrowse/>
         
         {/* info-boxes */}
         <div className="info-section p-10  flex justify-center flex-row items-center flex-wrap lg:flex-nowrap  gap-10">
@@ -67,5 +67,46 @@ function Home() {
     </>
   );
 }
+
+
+const vehicleTypes = [
+  { name: 'Bike', icon: <RiMotorbikeFill /> },
+  { name: 'Scooter', icon: <RiEBike2Fill /> },
+  { name: 'Truck', icon: <RiTruckFill /> },
+  { name: 'CargoTruck', icon: <PiTruckTrailerFill /> },
+  { name: 'Car', icon: <FaCar /> },
+  { name: 'Bus', icon: <FaBus /> },
+];
+
+export const VehicleBrowse = () => {
+  const navigate = useNavigate();
+
+  const handleClick = (type) => {
+    navigate(`/vehicles/${type}`);
+  };
+
+  return (
+    <div className="vehicle-browse flex justify-center items-center flex-col mt-4 p-3">
+      <h2 className="text-3xl font-bold text-center m-12">
+        Browse Our Vehicles
+      </h2>
+
+      <ul className="flex flex-wrap justify-center items-center gap-20 list-none mb-4 text-2xl">
+        {vehicleTypes.map((vehicle, index) => (
+          <li
+            key={index}
+            className="text-center cursor-pointer"
+            onClick={() => handleClick(vehicle.name)}
+          >
+            {vehicle.icon}
+            <h1 className="mt-1 text-sm font-bold">{vehicle.name}</h1>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+
 
 export default Home;
