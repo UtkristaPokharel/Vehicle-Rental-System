@@ -39,7 +39,7 @@ useEffect(()=>{
                 <li><a href="#" className=' hover:text-gray-400'>Contact</a></li>
             </ul>
 
-         <button className=' border px-2 py-1  rounded-xl hover:cursor-pointer hover:scale-105  '  > Become a host</button>
+         <button className=' border px-2 py-1 rounded-xl hover:cursor-pointer hover:scale-109  '  > Become a host</button>
         <div className='profile-icon  '>
             <img src={profile} className='w-9'  alt="" />
              </div>
