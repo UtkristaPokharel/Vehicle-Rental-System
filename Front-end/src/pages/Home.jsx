@@ -1,10 +1,10 @@
-import Footer from './Footer.jsx'
-import Navbar from './Navbar.jsx'
+import Footer from "../components/Footer.jsx"
+import Navbar from '../components/Navbar.jsx'
 import { RiMotorbikeFill , RiEBike2Fill , RiTruckFill} from "react-icons/ri";
 import { FaCar,FaBus } from "react-icons/fa";
 import { PiTruckTrailerFill } from "react-icons/pi";
 import { useNavigate } from 'react-router';
-import LandingPage from './LandingPage.jsx';
+import LandingPage from '../components/LandingPage.jsx';
 
 
 function Home() {
