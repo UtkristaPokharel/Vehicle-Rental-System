@@ -3,13 +3,14 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router';
 import './App.css'
 import Home from './pages/Home.jsx'
 import VehicleTypePage from './components/VehicleTypePage';
-
+import AuthForm from './pages/Login.jsx';
 
 export default function App() {
   return (
      <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<AuthForm/>}/>
         <Route path="/vehicles/:type" element={<VehicleTypePage />} />
       </Routes>
     </Router>
