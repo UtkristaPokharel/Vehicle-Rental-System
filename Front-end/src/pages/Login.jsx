@@ -7,7 +7,7 @@ import { auth, provider, signInWithPopup } from "../../src/firebase";
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
 
-  // 👉 Google login handler
+  //  Google login handler
   const handleGoogleLogin = () => {
     signInWithPopup(auth, provider)
       .then((result) => {
