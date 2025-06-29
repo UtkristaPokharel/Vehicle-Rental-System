@@ -33,7 +33,7 @@ function LandingPage() {
   }, []);
 
   return (
-    <div className="flex flex-wrap-reverse items-center justify-center gap-[4vw] w-full px-6 py-12 bg-[#f6f6f6] font-sans">
+    <div className="flex flex-wrap-reverse items-center justify-center gap-[4vw] w-full px-6 py-12 pt-24 bg-[#f6f6f6] font-sans">
 
       {/* TEXT SECTION */}
       <div className="w-full md:max-w-[600px] flex justify-center items-center flex-col animate-fade-up text-center">
@@ -49,7 +49,7 @@ function LandingPage() {
         <p className="text-[16px] md:text-[22px] text-[#555] mb-4 md:mb-6">
           Best worldwide VEHICLE hire deals!!!!!
         </p>
-        <button className="bg-black text-white text-[16px] md:text-[20px] px-6 py-3 hover:bg-red-600 transition">
+        <button className="bg-black text-white text-[16px] md:text-[20px] px-6 py-3 hover:bg-red-600 transition hover:scale-109">
           Contact Now
         </button>
       </div>

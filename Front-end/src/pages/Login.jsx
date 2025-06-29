@@ -7,7 +7,7 @@ import { auth, provider, signInWithPopup } from "../../src/firebase";
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
 
-  // 👉 Google login handler
+  //  Google login handler
   const handleGoogleLogin = () => {
     signInWithPopup(auth, provider)
       .then((result) => {
@@ -46,7 +46,7 @@ export default function AuthForm() {
         <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md sm:w-[90%] mt-16">
           {/* Heading */}
           <h2 className="text-2xl font-bold text-center text-gray-900 mt-2">
-            {isLogin ? "Welcome Back" : "Let's Start Learning"}
+            {isLogin ? "Welcome Back" : "Let's Start Driving"}
           </h2>
           <p className="text-center text-sm text-gray-500 mb-6">
             Please login or sign up to continue
