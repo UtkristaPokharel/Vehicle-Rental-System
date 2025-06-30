@@ -101,17 +101,17 @@ export default Home;
 export function FeatureSection() {
   const features = [
     {
-      icon: <FaCarSide className="text-3xl text-blue-600" />,
+      icon: <FaCarSide className="text-3xl text-red-600" />,
       title: "Exclusive web benefits",
       description: "Fast Track priority, Premium Cover, Pets Friendly Pack and much more!",
     },
     {
-      icon: <FaRegHandshake className="text-3xl text-blue-600" />,
+      icon: <FaRegHandshake className="text-3xl text-red-600" />,
       title: "Free cancellation",
       description: "Modify or cancel your booking free of charge with Premium or Standard rate",
     },
     {
-      icon: <FaGift className="text-3xl text-blue-600" />,
+      icon: <FaGift className="text-3xl text-red-600" />,
       title: "Upgraded fleet every year",
       description: "Take a break from routine with the latest vehicle models on the market",
     },
