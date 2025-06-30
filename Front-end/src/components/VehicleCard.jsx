@@ -118,7 +118,6 @@ export default function Vehicle() {
 
     <VehicleCard vehicle={vehicle} key={vehicle.id} />
     
-
     
   ))}
   
