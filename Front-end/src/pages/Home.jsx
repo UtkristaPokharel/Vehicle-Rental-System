@@ -149,7 +149,7 @@ const PopularDest = () => {
         {destinations[selectedPlace].map((location, index) => (
           <div
             key={index}
-            className="w-64 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+            className="w-64 bg-[#fffafa] rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
           >
             <img
               src={location.image}
