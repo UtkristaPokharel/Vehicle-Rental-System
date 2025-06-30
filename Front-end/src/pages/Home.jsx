@@ -7,6 +7,8 @@ import { RiMotorbikeFill, RiEBike2Fill, RiTruckFill } from "react-icons/ri";
 import { FaCar, FaBus } from "react-icons/fa";
 import { PiTruckTrailerFill } from "react-icons/pi";
 import { useNavigate } from 'react-router';
+import { FaCarSide, FaRegHandshake, FaGift } from "react-icons/fa";
+
 
 
 function Home() {
@@ -23,7 +25,9 @@ function Home() {
         <LandingPage />
         <VehicleBrowse />
         <PopularDest />
+        <FeatureSection/>
         <SubscriptionForm />
+
         {/* info-boxes */}
         <div className="info-section p-10  flex justify-center flex-row items-center flex-wrap lg:flex-nowrap  gap-10">
 
@@ -91,3 +95,42 @@ export const VehicleBrowse = () => {
 
 
 export default Home;
+
+
+
+export function FeatureSection() {
+  const features = [
+    {
+      icon: <FaCarSide className="text-3xl text-blue-600" />,
+      title: "Exclusive web benefits",
+      description: "Fast Track priority, Premium Cover, Pets Friendly Pack and much more!",
+    },
+    {
+      icon: <FaRegHandshake className="text-3xl text-blue-600" />,
+      title: "Free cancellation",
+      description: "Modify or cancel your booking free of charge with Premium or Standard rate",
+    },
+    {
+      icon: <FaGift className="text-3xl text-blue-600" />,
+      title: "Upgraded fleet every year",
+      description: "Take a break from routine with the latest vehicle models on the market",
+    },
+  ];
+
+  return (
+    <section className=" my-20 px-10 w-full">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+        {features.map((feature, index) => (
+          <div
+            key={index}
+            className="bg-white rounded-lg border-1 border-gray-200 shadow-sm p-6 text-center hover:shadow-md transition-shadow"
+          >
+            <div className="flex justify-center mb-4">{feature.icon}</div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{feature.title}</h3>
+            <p className="text-sm text-gray-600">{feature.description}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
