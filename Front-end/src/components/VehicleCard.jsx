@@ -6,8 +6,7 @@ import { Link } from "react-router";
 export const  VehicleCard =({vehicle})=>{
   return(
     <Link to={`/vehicle/${vehicle.id}`}>
-                {console.log(vehicle)}
-
+                {/* {console.log(vehicle)} */}
     <div key={vehicle.id} className="vehicle-card w-full rounded-xl bg-white border border-gray-300 shadow-xl">
       <div className="img-container relative">
         <img
@@ -44,6 +43,7 @@ export const  VehicleCard =({vehicle})=>{
 
 
 export default function Vehicle() {
+
   const vehicles = [
   {
     name: "Toyota Fortuner",

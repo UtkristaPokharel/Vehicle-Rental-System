@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { IoMenu, IoClose } from "react-icons/io5";
 import profile from "../../public/whiteprofile.svg"
+// import logo from"../../public/logo.png"
 
 
 export default function Navbar() {
@@ -29,17 +30,20 @@ export default function Navbar() {
 
     return (
         <>
-            <nav className=' fixed w-full h-18 bg-amber-600 flex justify-around items-center gap-10 px-3 xl:px-10 z-10'>
-                <div><span className='text-white text-2xl font-bold'>EasyWheels</span></div>
-                <div className='flex gap-10 items-center text-white '>
+            <nav className=' fixed w-full h-18 bg-black flex justify-around items-center gap-10 px-3 xl:px-10 z-10'>
+                <div> <img src="/logo.png" alt="EasyWheels Logo" className="h-30" /></div>
+                <div className='flex gap-10 items-center text-white text-lg '>
                     <ul className='hidden xl:flex space-x-9'>
-                        <li><a href="#" className=" hover:text-gray-400">Home</a></li>
-                        <li><a href="#" className=' hover:text-gray-400'>About us</a></li>
-                        <li><a href="#" className=' hover:text-gray-400'>Vehicles</a></li>
-                        <li><a href="#" className=' hover:text-gray-400'>Contact</a></li>
+                        <li><a href="#" className=' hover:decoration-[#70dbf8] decoration-3 hover:underline hover:underline-offset-8'>Home</a></li>
+                        <li><a href="#" className=' hover:decoration-[#70dbf8] decoration-3 hover:underline hover:underline-offset-8'>About us</a></li>
+                        <li><a href="#" className=' hover:decoration-[#70dbf8] decoration-3 hover:underline hover:underline-offset-8'>Vehicles</a></li>
+                        <li><a href="#" className=' hover:decoration-[#70dbf8] decoration-3 hover:underline hover:underline-offset-8'>Contact</a></li>
                     </ul>
 
-                    <button className=' border px-2 py-1 bg-red-800 rounded-xl hover:cursor-pointer hover:scale-109  '  > Become a host</button>
+                    <button className="border-0 px-4 py-2 bg-red-600 text-white text-sm md:text-base rounded-2xl hover:cursor-pointer hover:scale-110 transition-transform duration-200">
+                        Become a host
+                    </button>
+
                     <div className='profile-icon  '>
                         <img src={profile} className='w-9' alt="" />
                     </div>
