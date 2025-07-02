@@ -1,12 +1,23 @@
 import { FaRegHeart } from "react-icons/fa6";
 import { FaStar } from "react-icons/fa";
 import { Link } from "react-router";
+import vehicleData from "../assets/Sample.json"
 
-
-export const  VehicleCard =({vehicle})=>{
+export const  VehicleCard =({vehicle,type})=>{
   return(
-    <Link to={`/vehicle/${vehicle.id}`}>
-                {/* {console.log(vehicle)} */}
+  
+    <Link 
+     to={`/vehicle/${type}/${vehicle.id}`}
+     state={{
+      id:vehicle.id,
+      name:vehicle.name,
+      image:vehicle.image,
+      dateRange:vehicle.dateRange,
+      price:vehicle.price,
+     }}
+    
+    >
+
     <div key={vehicle.id} className="vehicle-card w-full rounded-xl bg-white border border-gray-300 shadow-xl">
       <div className="img-container relative">
         <img
@@ -42,81 +53,16 @@ export const  VehicleCard =({vehicle})=>{
 
 
 
-export default function Vehicle() {
+export default function Vehicle({type}) {
 
-  const vehicles = [
-  {
-    name: "Toyota Fortuner",
-    id:1,
-    rating: 4.5,
-    dateRange: "July 3 - 29",
-    price: "रु 5000",
-    image: "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg",
-  },
-  {
-    name: "Jeep Wrangler",
-    id:2,
-    rating: 4.8,
-    dateRange: "Aug 1 - 15",
-    price: "रु 7000",
-    image: "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg",
-  },
-  {
-    name: "Hyundai Creta",
-    id:3,
-    rating: 4.2,
-    dateRange: "Sept 5 - 22",
-    price: "रु 5500",
-    image: "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg",
-  },
-  {
-    name: "Mahindra Scorpio",
-    id:4,
-    rating: 4.7,
-    dateRange: "Oct 1 - 10",
-    price: "रु 6000",
-    image: "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg",
-  },
-  {
-    name: "Suzuki Swift",
-    id:5,
-    rating: 4.3,
-    dateRange: "Oct 15 - Nov 2",
-    price: "रु 5200",
-    image: "https://images.pexels.com/photos/210019/pexels-photo-210019.jpeg",
-  },
-  {
-    name: "Hyundai Santro",
-    id:6,
-    rating: 4.6,
-    dateRange: "Nov 10 - Dec 1",
-    price: "रु 7500",
-    image: "https://images.pexels.com/photos/114905/pexels-photo-114905.jpeg",
-  },
-  {
-    name: "Land Cruser",
-    id:7,
-    rating: 4.4,
-    dateRange: "Dec 5 - 20",
-    price: "रु 6800",
-    image: "https://images.pexels.com/photos/210019/pexels-photo-210019.jpeg",
-  },
-  {
-    name: "Range Rover",
-    id:8,
-    rating: 4.9,
-    dateRange: "Jan 1 - 12",
-    price: "रु 9500",
-    image: "https://images.pexels.com/photos/164634/pexels-photo-164634.jpeg",
-  },
-];
-
+  const vehicles= vehicleData;
+ 
   return (
     <>
  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
   {vehicles.map((vehicle) => (
 
-    <VehicleCard vehicle={vehicle} key={vehicle.id} />
+    <VehicleCard  type={type} vehicle={vehicle} key={vehicle.id} />
     
     
   ))}

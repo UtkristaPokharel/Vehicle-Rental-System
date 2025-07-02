@@ -4,6 +4,7 @@ import './App.css'
 import Home from './pages/Home.jsx'
 import VehicleTypePage from './components/VehicleTypePage';
 import AuthForm from './pages/Login.jsx';
+import VehicleDetails from './pages/VehicleDetails.jsx';
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<AuthForm/>}/>
         <Route path="/vehicles/:type" element={<VehicleTypePage />} />
+        <Route path="/vehicle/:type/:id" element={<VehicleDetails/>}/>
       </Routes>
     </Router>
   )
