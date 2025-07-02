@@ -3,9 +3,7 @@ import Navbar from "../components/Navbar";
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { FaStar } from "react-icons/fa6";
 import { useState, useEffect } from "react";
-import { FaPen } from "react-icons/fa"; 
-
-
+import { FaPen } from "react-icons/fa";
 
 function VehicleDetails() {
   const location = useLocation();
@@ -13,19 +11,27 @@ function VehicleDetails() {
   return (
     <>
       <Navbar />
-      <div className="detail-page flex justify-center item-center">
-        <div className=" h-screen w-full md:w-[85vw] lg:w-[80vw] px-10 ">
+      <div className="detail-page flex justify-center item-center ">
+        <div className=" h-screen w-full md:w-[85vw] lg:w-[80vw] px-10  ">
           <div className=" py-5  flex justify-center items-center ">
             <img className="lg:w-[650px]" src={image} alt={name} />
           </div>
 
-          <div className="flex flex-wrap ">
-            <div className=" lg:w-[60%] w-full ">
-              <BasicFeatures name={name}/>
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 w-full">
+            {/* Left Column on large screens */}
+            <div className="lg:col-span-3 row-span-2 space-y-4 order-1 lg:order-1">
+              <BasicFeatures name={name} />
               <VehicleDescription />
             </div>
-            <div className=" lg:w-[40%] w-full ">
+
+            {/* Booking Section (Right on lg, second overall on mobile) */}
+            <div className="lg:col-span-2 row-span-3 space-y-4 order-2 lg:order-2">
               <BookingSection price={price} />
+            </div>
+
+            {/* Vehicle Features (Below everything) */}
+            <div className="lg:col-span-3 row-span-3 order-3 lg:order-3">
+              <VehicleFeatures features={features} />
             </div>
           </div>
         </div>
@@ -36,44 +42,43 @@ function VehicleDetails() {
 
 export default VehicleDetails;
 
+export const BasicFeatures = ({ name }) => {
+  return (
+    <>
+      <section className="w-full   p-6">
+        <h1 className="text-3xl font-bold">{name}</h1>
+        <p className="text-gray-500"></p>
 
-export const BasicFeatures =({name})=>{
-  return(
-  <>
-   <section className="w-full   p-6">
-                <h1 className="text-3xl font-bold">{name}</h1>
-                <p className="text-gray-500"></p>
+        <div className="flex items-center gap-2 mt-2 text-sm">
+          <span className="font-bold text-lg text-black">5.0</span>
+          <span className="text-blue-600">
+            <FaStar />
+          </span>
+          <span className="text-gray-600">(21 trips)</span>
+        </div>
 
-                <div className="flex items-center gap-2 mt-2 text-sm">
-                  <span className="font-bold text-lg text-black">5.0</span>
-                  <span className="text-blue-600">
-                    <FaStar />
-                  </span>
-                  <span className="text-gray-600">(21 trips)</span>
-                </div>
-
-                <div className="flex flex-wrap gap-3 mt-4">
-                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-200 rounded">
-                    <span>👤</span>
-                    <span>5 seats</span>
-                  </div>
-                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-200 rounded">
-                    <span>⛽</span>
-                    <span>Gas (Regular)</span>
-                  </div>
-                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-200 rounded">
-                    <span>🧳</span>
-                    <span>20 MPG</span>
-                  </div>
-                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-200 rounded">
-                    <span>⚙️</span>
-                    <span>Automatic transmission</span>
-                  </div>
-                </div>
-              </section>
-  </>
-  )
-}
+        <div className="flex flex-wrap gap-3 mt-4">
+          <div className="flex items-center gap-2 px-3 py-2 bg-gray-200 rounded">
+            <span>👤</span>
+            <span>5 seats</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-2 bg-gray-200 rounded">
+            <span>⛽</span>
+            <span>Gas (Regular)</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-2 bg-gray-200 rounded">
+            <span>🧳</span>
+            <span>20 MPG</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-2 bg-gray-200 rounded">
+            <span>⚙️</span>
+            <span>Automatic transmission</span>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+};
 
 export const VehicleDescription = () => {
   const [expanded, setExpanded] = useState(false);
@@ -107,14 +112,17 @@ export const VehicleDescription = () => {
   );
 };
 
-
-
 //Booking section
 
 const getTodayDate = () => new Date().toISOString().split("T")[0];
-const getCurrentTime = () => new Date().toTimeString().split(":").slice(0, 2).join(":");
+const getCurrentTime = () =>
+  new Date().toTimeString().split(":").slice(0, 2).join(":");
 
-export const BookingSection = ({ price = "$3,116", originalPrice = "$5,079", onBookingChange }) => {
+export const BookingSection = ({
+  price = "$3,116",
+  originalPrice = "$5,079",
+  onBookingChange,
+}) => {
   const [booking, setBooking] = useState({
     startDate: getTodayDate(),
     startTime: getCurrentTime(),
@@ -137,15 +145,16 @@ export const BookingSection = ({ price = "$3,116", originalPrice = "$5,079", onB
         <div className="mb-4 md:mb-6">
           <h3 className="font-semibold text-lg mb-2">Your trip</h3>
 
-            <div className="md:flex items-center justify-between max-w-lg   hidden">
-          <div>
-            <p className="text-sm text-gray-400 line-through">{originalPrice}</p>
-            <p className="text-lg font-bold text-black">{price} total</p>
-            <p className="text-xs text-gray-500">Before taxes</p>
+          <div className="md:flex items-center justify-between max-w-lg   hidden">
+            <div>
+              <p className="text-sm text-gray-400 line-through">
+                {originalPrice}
+              </p>
+              <p className="text-lg font-bold text-black">{price} total</p>
+              <p className="text-xs text-gray-500">Before taxes</p>
+            </div>
           </div>
-            
-          </div>
-           <hr className="my-4 md:block hidden" />
+          <hr className="my-4 md:block hidden" />
 
           <label className="text-sm text-gray-700">Trip start</label>
           <div className="flex gap-2 mt-1 mb-3">
@@ -185,7 +194,9 @@ export const BookingSection = ({ price = "$3,116", originalPrice = "$5,079", onB
         {/* Location */}
         <div className="flex justify-between items-center">
           <div>
-            <p className="font-medium text-sm text-gray-700">Pickup & return location</p>
+            <p className="font-medium text-sm text-gray-700">
+              Pickup & return location
+            </p>
             <p className="text-sm text-black">Lihue, HI 96766</p>
           </div>
           <button className="p-2 hover:bg-gray-100 rounded-full">
@@ -212,7 +223,9 @@ export const BookingSection = ({ price = "$3,116", originalPrice = "$5,079", onB
       <div className="fixed bottom-0 left-0 right-0 bg-white shadow-inner md:hidden md:mt-6 p-4 border-t md:border-none z-50">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <div>
-            <p className="text-sm text-gray-400 line-through">{originalPrice}</p>
+            <p className="text-sm text-gray-400 line-through">
+              {originalPrice}
+            </p>
             <p className="text-lg font-bold text-black">{price} total</p>
             <p className="text-xs text-gray-500">Before taxes</p>
           </div>
@@ -224,3 +237,52 @@ export const BookingSection = ({ price = "$3,116", originalPrice = "$5,079", onB
     </div>
   );
 };
+
+const features = [
+  {
+    category: "Safety",
+    items: [
+      "Adaptive cruise control",
+      "All-wheel drive",
+      "Backup camera",
+      "Blind spot warning",
+      "Brake assist",
+    ],
+  },
+  {
+    category: "Device connectivity",
+    items: [
+      "Android Auto",
+      "Apple CarPlay",
+      "AUX input",
+      "Bluetooth",
+      "USB charger",
+      "USB input",
+    ],
+  },
+  {
+    category: "Additional features",
+    items: ["Must be 25+ to book", "Child seat", "Sunroof"],
+  },
+];
+
+export function VehicleFeatures({ features }) {
+  return (
+    <div className=" md:w-full lg:w-[60%] py-6 ">
+      <h2 className="text-2xl font-bold mb-4">Vehicle features</h2>
+
+      <div className="grid sm:grid-cols-2 gap-8">
+        {features.map((group) => (
+          <div key={group.category}>
+            <h3 className="font-semibold text-lg mb-2">{group.category}</h3>
+            <ul className="space-y-1 text-gray-700 text-sm font-semibold">
+              {group.items.map((item) => (
+                <li key={item}>• {item}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
