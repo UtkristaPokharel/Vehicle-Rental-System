@@ -1,14 +1,66 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, unique: true },
-  password: String,
-  googleId : String,
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
+  },
+  password: {
+    type: String,
+    required: function() {
+      return !this.isGoogleUser;
+    },
+  },
+  googleId: {
+    type: String,
+    sparse: true, // Allows multiple null values
+  },
+  isGoogleUser: {
+    type: Boolean,
+    default: false,
+  },
+  profileImage: {
+    type: String,
+    default: null,
+  },
+  phone: {
+    type: String,
+    default: null,
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
+  lastLogin: {
+    type: Date,
+    default: Date.now,
+  },
   createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
     type: Date,
     default: Date.now,
   },
 });
 
-module.exports = mongoose.model("User", userSchema);
+// Update the updatedAt field before saving
+userSchema.pre('save', function(next) {
+  this.updatedAt = Date.now();
+  next();
+});
+
+// Create indexes
+userSchema.index({ email: 1 });
+userSchema.index({ googleId: 1 });
+
+module.exports = mongoose.model('User', userSchema);
