@@ -61,7 +61,7 @@ export default function AuthForm() {
           email: form.email,
           password: form.password,
         });
-        
+
         const { user, token } = response.data;
         localStorage.setItem("token", token);
         console.log("User logged in:", user);
@@ -102,11 +102,16 @@ export default function AuthForm() {
   return (
     <div className="min-h-screen bg-gray-100 relative">
       <div className="flex items-center justify-between px-6 py-4 absolute top-0 left-0 w-full z-10">
-        <div className="absolute top-6 left-6 z-20 text-orange-500 font-bold text-3xl">
-          EasyWheels
+        <div className="absolute top-0 left-6 z-20">
+          <img
+            src="blacklogo.png"
+            alt="EasyWheels Logo"
+            className="w-60 h-auto"
+          />
         </div>
-        <div className="absolute top-6 right-6 z-20 flex items-center gap-4">
-          <button className="text-gray-600 hover:text-orange-500 transition">
+
+        <div className="absolute top-11 right-12 z-20 flex items-center gap-4">
+          <button className="text-gray-600 hover:text-red-500 transition">
             <FiPhone size={30} />
           </button>
           <button className="text-green-500 hover:text-green-600 transition">
@@ -135,7 +140,7 @@ export default function AuthForm() {
                 placeholder="you@example.com"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-400 focus:outline-none"
                 required
               />
 
@@ -147,13 +152,13 @@ export default function AuthForm() {
                 placeholder="••••••••"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-400 focus:outline-none"
                 required
               />
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-semibold transition-colors mb-6 mt-6 disabled:opacity-50"
+                className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg font-semibold transition-colors mb-6 mt-6 disabled:opacity-50"
               >
                 {loading ? "Logging in..." : "Login"}
               </button>
@@ -169,7 +174,7 @@ export default function AuthForm() {
                 placeholder="John Doe"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-400 focus:outline-none"
                 required
               />
 
@@ -181,7 +186,7 @@ export default function AuthForm() {
                 placeholder="you@example.com"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-400 focus:outline-none"
                 required
               />
 
@@ -193,7 +198,7 @@ export default function AuthForm() {
                 placeholder="••••••••"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-400 focus:outline-none"
                 required
               />
 
@@ -207,14 +212,14 @@ export default function AuthForm() {
                 onChange={(e) =>
                   setForm({ ...form, confirmPassword: e.target.value })
                 }
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-400 focus:outline-none"
                 required
               />
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-semibold transition-colors mb-6 disabled:opacity-50"
+                className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg font-semibold transition-colors mb-6 disabled:opacity-50"
               >
                 {loading ? "Signing up..." : "Signup"}
               </button>
@@ -234,7 +239,7 @@ export default function AuthForm() {
             {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
             <button
               onClick={() => setIsLogin(!isLogin)}
-              className="text-orange-500 hover:underline font-medium"
+              className="text-red-500 hover:underline font-medium"
             >
               {isLogin ? "Register now" : "Login here"}
             </button>

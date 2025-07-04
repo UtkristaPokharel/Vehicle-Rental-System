@@ -51,7 +51,7 @@ export const BasicFeatures = ({ name }) => {
 
         <div className="flex items-center gap-2 mt-2 text-sm">
           <span className="font-bold text-lg text-black">5.0</span>
-          <span className="text-blue-600">
+          <span className="text-red-600">
             <FaStar />
           </span>
           <span className="text-gray-600">(21 trips)</span>
@@ -211,9 +211,9 @@ export const BookingSection = ({
           <p className="font-semibold text-md mb-1">Trip Savings</p>
           <div className="flex justify-between bg-gray-200 p-4 rounded-md text-md">
             <span>1-month discount</span>
-            <span className="text-green-600 font-semibold">$1,964</span>
+            <span className="text-green-600 font-semibold">रु 5000</span>
           </div>
-          <button className=" w-full my-5 hidden md:block  bg-[#5d3bee] text-white font-semibold py-2 px-5 rounded-xl hover:bg-[#4725d2] transition">
+          <button className=" w-full my-5 hidden md:block  bg-[#ee3b3b] text-white font-semibold py-2 px-5 rounded-xl hover:bg-[#d22525] transition">
             Continue
           </button>
         </div>
