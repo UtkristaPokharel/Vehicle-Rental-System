@@ -88,11 +88,10 @@ export const VehicleDescription = () => {
   return (
     <div className="w-[90%] px-5 relative mt-6  ">
       <div
-        className={`relative text-gray-700 text-sm leading-relaxed transition-all duration-300 ${
-          expanded
+        className={`relative text-gray-700 text-sm leading-relaxed transition-all duration-300 ${expanded
             ? "line-clamp-none max-h-full"
             : "line-clamp-5 max-h-[7.5rem]"
-        }`}
+          }`}
       >
         {description}
 
@@ -119,8 +118,8 @@ const getCurrentTime = () =>
   new Date().toTimeString().split(":").slice(0, 2).join(":");
 
 export const BookingSection = ({
-  price = "$3,116",
-  originalPrice = "$5,079",
+  price = "रु3,116",
+  originalPrice = "रु5,079",
   onBookingChange,
 }) => {
   const [booking, setBooking] = useState({
