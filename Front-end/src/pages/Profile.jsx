@@ -1,5 +1,5 @@
 import { Link } from "react-router"
-import { FaHeart, FaDownload, FaLanguage, FaMapMarkerAlt, FaTrashAlt, FaHistory } from "react-icons/fa";
+import { FaHeart, FaDownload, FaLanguage, FaMapMarkerAlt, FaTrashAlt, FaHistory, FaChevronCircleDown, FaChevronRight, FaSignOutAlt } from "react-icons/fa";
 import { MdSubscriptions } from "react-icons/md";
 
 
@@ -65,6 +65,7 @@ const menuItems = [
   { label: "Subscription", to: "/subscription", icon: MdSubscriptions },
   { label: "Clear cache", to: "/clear-cache", icon: FaTrashAlt },
   { label: "Clear history", to: "/clear-history", icon: FaHistory },
+  { label: "Logout", to: "/logout", icon: FaSignOutAlt },
 ];
 
 export function SettingsMenu() {
