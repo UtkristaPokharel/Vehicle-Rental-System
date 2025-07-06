@@ -7,6 +7,7 @@ import {
   FaMapMarkerAlt,
   FaTrashAlt,
   FaHistory,
+  FaSignOutAlt
 } from "react-icons/fa";
 import { MdSubscriptions } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
