@@ -1,21 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FiPhone } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import { auth, provider, signInWithPopup } from "../../src/firebase";
 import { useNavigate } from "react-router";
+import { useUserContext } from "../context/UserContext";
 import axios from "axios";
 
-// Create axios instance with base URL
+// Create axios instance with credentials enabled for cookies
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'http://localhost:3001/api',
   timeout: 10000,
+  withCredentials: true, // This is crucial for cookies
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
 export default function AuthForm() {
+  const {setUser} = useUserContext ();
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({
     name: "",
@@ -24,7 +27,26 @@ export default function AuthForm() {
     confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
+
+  // Check if user is already authenticated on component mount
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
+  const checkAuthStatus = async () => {
+    try {
+      const response = await api.get('/auth/check');
+      if (response.data.authenticated) {
+        setIsAuthenticated(true);
+        navigate('/'); // Redirect to dashboard if already logged in
+      }
+    } catch (error) {
+      console.log('Not authenticated ' ,error);
+      setIsAuthenticated(false);
+    }
+  };
 
   const handleGoogleLogin = () => {
     signInWithPopup(auth, provider)
@@ -34,19 +56,26 @@ export default function AuthForm() {
           name: user.displayName,
           email: user.email,
           googleId: user.uid,
+          imgUrl: user.photoURL,
         })
           .then((response) => {
             const { user: userData, token } = response.data;
+            setUser(userData);
+
+            // Optional: Still store token in localStorage for backward compatibility
             localStorage.setItem("token", token);
-            console.log("Google user logged in:", userData);
+            
+            setIsAuthenticated(true);
             navigate("/");
           })
           .catch((error) => {
             console.error("Google Sign-In Error:", error);
+            alert("Google sign-in failed. Please try again.");
           });
       })
       .catch((error) => {
         console.error("Google Sign-In Error:", error);
+        alert("Google sign-in failed. Please try again.");
       });
   };
 
@@ -62,9 +91,13 @@ export default function AuthForm() {
           password: form.password,
         });
 
-        const { user, token } = response.data;
+        const { userData, token } = response.data;
+         setUser(userData)        
+
+        // Optional: Still store token in localStorage for backward compatibility
         localStorage.setItem("token", token);
-        console.log("User logged in:", user);
+        
+        setIsAuthenticated(true);
         navigate("/");
       } else {
         // Signup
@@ -80,9 +113,14 @@ export default function AuthForm() {
           password: form.password,
         });
 
-        const { user, token } = response.data;
+        const { userData, token } = response.data;
+          setUser(userData);
+        
+        
+        // Optional: Still store token in localStorage for backward compatibility
         localStorage.setItem("token", token);
-        console.log("User signed up:", user);
+      
+        setIsAuthenticated(true);
         navigate("/");
       }
     } catch (error) {
@@ -98,6 +136,46 @@ export default function AuthForm() {
       setLoading(false);
     }
   };
+
+
+  const handleLogout = async () => {
+    try {
+      await api.post('/auth/logout');
+      localStorage.removeItem('token');
+      setIsAuthenticated(false);
+      navigate('/auth');
+      setUser("")
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  // If user is already authenticated, show logout option
+  if (isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+          <h2 className="text-2xl font-bold text-center text-gray-900 mb-4">
+            You are already logged in
+          </h2>
+          <div className="space-y-4">
+            <button
+              onClick={() => navigate('/')}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-semibold transition-colors"
+            >
+              Go to Dashboard
+            </button>
+            <button
+              onClick={handleLogout}
+              className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg font-semibold transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 relative">

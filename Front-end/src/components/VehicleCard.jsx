@@ -1,76 +1,75 @@
-import { FaRegHeart } from "react-icons/fa6";
+import { FaRegHeart, FaHeart } from "react-icons/fa6";
 import { FaStar } from "react-icons/fa";
 import { Link } from "react-router";
-import vehicleData from "../assets/Sample.json"
+import vehicleData from "../assets/Sample.json";
+import { useState } from "react";
 
-export const  VehicleCard =({vehicle,type})=>{
-  return(
-  
-    <Link 
-     to={`/vehicle/${type}/${vehicle.id}`}
-     state={{
-      id:vehicle.id,
-      name:vehicle.name,
-      image:vehicle.image,
-      dateRange:vehicle.dateRange,
-      price:vehicle.price,
-     }}
-    
+// VEHICLE CARD
+export const VehicleCard = ({ vehicle, type }) => {
+  const [liked, setLiked] = useState(false);
+
+  return (
+    <Link
+      to={`/vehicle/${type}/${vehicle.id}`}
+      state={{
+        id: vehicle.id,
+        name: vehicle.name,
+        image: vehicle.image,
+        dateRange: vehicle.dateRange,
+        price: vehicle.price,
+      }}
     >
+      <div className="vehicle-card group w-full rounded-2xl bg-white border border-gray-200 hover:shadow-2xl transition-shadow duration-300 overflow-hidden">
+        <div className="relative">
+          <img
+            className="w-full h-48 sm:h-52 object-cover object-center transition-transform duration-300 group-hover:scale-105"
+            src={vehicle.image}
+            alt={vehicle.name}
+          />
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              setLiked(!liked);
+            }}
+            className="absolute top-3 right-3 bg-white/90 hover:bg-white text-red-500 p-2 rounded-full shadow-md transition-all"
+          >
+            {liked ? <FaHeart /> : <FaRegHeart />}
+          </button>
+        </div>
 
-    <div key={vehicle.id} className="vehicle-card w-full rounded-xl bg-white border border-gray-300 shadow-xl">
-      <div className="img-container relative">
-        <img
-          className="w-full h-40 rounded-t-xl object-cover object-center"
-          src={vehicle.image}
-          alt={vehicle.name}
-        />
-        <div className="fav-btn absolute top-2 right-2 w-8 bg-gray-100 rounded p-2">
-          <FaRegHeart />
+        <div className="p-4 flex flex-col justify-between h-[160px]">
+          <div className="flex flex-col gap-1">
+            <h3 className="text-lg font-semibold text-gray-800 truncate">{vehicle.name}</h3>
+
+            <div className="flex items-center gap-1 text-yellow-500 text-sm font-medium">
+              <FaStar className="text-base" /> 4.5
+            </div>
+
+            <div className="text-gray-500 text-sm">{vehicle.dateRange}</div>
+          </div>
+
+          <div className="mt-2 text-right">
+            <p className="text-base font-semibold text-gray-800">{vehicle.price} total</p>
+            <p className="text-sm text-gray-400">Before taxes</p>
+          </div>
         </div>
       </div>
+    </Link>
+  );
+};
 
-      <div className="detail-container">
-        <div className="detail px-4 pt-3 text-start">
-          <h3 className="text-xl font-bold">{vehicle.name}</h3>
-          <div className="flex flex-row items-center gap-1 font-bolder">
-            4.5 <FaStar />
-          </div>
-          <div className="dates text-sm">{vehicle.dateRange}</div>
-        </div>
+// VEHICLE GRID
+export default function Vehicle({ type }) {
+  const vehicles = vehicleData;
 
-        <div className="pricing flex flex-col items-end mb-3 mr-3">
-          <span className="font-bold underline">{vehicle.price} total</span>
-          <span className="text-sm text-gray-500">Before taxes</span>
-        </div>
+  return (
+    <div className="p-4 sm:p-6 lg:p-10 bg-gray-50 min-h-screen">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Explore Vehicles</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {vehicles.map((vehicle) => (
+          <VehicleCard type={type} vehicle={vehicle} key={vehicle.id} />
+        ))}
       </div>
     </div>
-    
-    </Link>
-  )
-
-}
-
-
-
-export default function Vehicle({type}) {
-
-  const vehicles= vehicleData;
- 
-  return (
-    <>
- <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
-  {vehicles.map((vehicle) => (
-
-    <VehicleCard  type={type} vehicle={vehicle} key={vehicle.id} />
-    
-    
-  ))}
-  
-</div>
-
-    </>
   );
 }
-
-

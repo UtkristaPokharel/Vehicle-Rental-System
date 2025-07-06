@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { IoMenu, IoClose } from "react-icons/io5";
 import profile from "../../public/whiteprofile.svg"
-// import logo from"../../public/logo.png"
-
+import {useUserContext} from "../context/UserContext"
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const menuref = useRef(null);
+    const {user}= useUserContext();
+
+    const imgUrl = user?.imgUrl || profile ;
 
     useEffect(() => {
 
@@ -37,7 +39,7 @@ export default function Navbar() {
                         <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Home</a></li>
                         <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>About us</a></li>
                         <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Vehicles</a></li>
-                        <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Contact</a></li>
+                        <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Contact us</a></li>
                     </ul>
 
                     <button className="border-0 px-4 py-2 bg-red-600 text-white text-sm md:text-base rounded-2xl hover:cursor-pointer hover:scale-110 transition-transform duration-200">
@@ -45,7 +47,7 @@ export default function Navbar() {
                     </button>
 
                     <div className='profile-icon  '>
-                        <img src={profile} className='w-9' alt="" />
+                        <img src={imgUrl} className='w-10 rounded-full' alt="" />
                     </div>
 
                     <button className='xl:hidden text-white' onClick={handleToggle}>
@@ -61,7 +63,7 @@ export default function Navbar() {
                         <li><a href="#" className='text-white hover:text-gray-400'>Home</a></li>
                         <li><a href="#" className='text-white hover:text-gray-400'>About us</a></li>
                         <li><a href="#" className='text-white hover:text-gray-400'>Vehicles</a></li>
-                        <li><a href="#" className='text-white hover:text-gray-400'>Contact</a></li>
+                        <li><a href="#" className='text-white hover:text-gray-400'>Contact us</a></li>
                     </div>
 
 
