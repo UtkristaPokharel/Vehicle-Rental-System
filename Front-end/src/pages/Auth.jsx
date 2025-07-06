@@ -9,7 +9,7 @@ import axios from "axios";
 
 // Create axios instance with credentials enabled for cookies
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'http://localhost:3001/api',
   timeout: 10000,
   withCredentials: true, // This is crucial for cookies
   headers: {
