@@ -160,6 +160,7 @@ const menuItems = [
   { label: "Subscription", to: "/subscription", icon: MdSubscriptions },
   { label: "Clear cache", to: "/clear-cache", icon: FaTrashAlt },
   { label: "Clear history", to: "/clear-history", icon: FaHistory },
+  { label: "Logout", to: "/logout", icon: FaSignOutAlt },
 ];
 
 export function SettingsMenu() {
