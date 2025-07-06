@@ -29,7 +29,7 @@ export default function App() {
           <Route path="/vehicle/:type/:id" element={<VehicleDetails />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/logout" element={<Logout />} />
-
+          
           <Route path="/vehicle/:type/:id" element={<VehicleDetails />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/faq" element={<FAQPage />} />

@@ -137,7 +137,6 @@ export default function AuthForm() {
     }
   };
 
-
   const handleLogout = async () => {
     try {
       await api.post('/auth/logout');
