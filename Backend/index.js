@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 // Import User model
@@ -14,11 +15,12 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(cors({
   origin: ['http://localhost:3000', 'http://localhost:5173'], 
-  credentials: true,
+  credentials: true, // This is crucial for cookies
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
+app.use(cookieParser()); // Add cookie parser middleware
 
 // Testing route
 app.get('/api/test', (req, res) => {
@@ -41,6 +43,19 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 // Helper function to generate JWT token
 const generateToken = (userId) => {
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' });
+};
+
+// Helper function to set auth cookies
+const setAuthCookies = (res, token, email) => {
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // true in production
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+  };
+
+  res.cookie('token', token, cookieOptions);
+  res.cookie('email', email, cookieOptions);
 };
 
 // Auth Routes
@@ -74,10 +89,13 @@ app.post('/api/auth/signup', async (req, res) => {
 
     await newUser.save();
 
-    // Generate JWT token
+    // Generate JWT token with user ID
     const token = generateToken(newUser._id);
 
-    // Return user data (without password) and token
+    // Set auth cookies
+    setAuthCookies(res, token, email);
+
+    // Return user data (without password)
     res.status(201).json({
       message: 'User created successfully',
       user: {
@@ -86,7 +104,7 @@ app.post('/api/auth/signup', async (req, res) => {
         email: newUser.email,
         createdAt: newUser.createdAt,
       },
-      token,
+      token, // Still return token for localStorage compatibility
     });
   } catch (error) {
     console.error('Signup error:', error);
@@ -116,8 +134,11 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Generate JWT token
+    // Generate JWT token with user ID
     const token = generateToken(user._id);
+
+    // Set auth cookies
+    setAuthCookies(res, token, email);
 
     // Return user data and token
     res.json({
@@ -128,7 +149,7 @@ app.post('/api/auth/login', async (req, res) => {
         email: user.email,
         createdAt: user.createdAt,
       },
-      token,
+      token, // Still return token for localStorage compatibility
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -139,7 +160,7 @@ app.post('/api/auth/login', async (req, res) => {
 // Google OAuth route
 app.post('/api/auth/google', async (req, res) => {
   try {
-    const { name, email, googleId } = req.body;
+    const { name, email, googleId, imgUrl } = req.body;
 
     // Check if user already exists
     let user = await User.findOne({ email });
@@ -148,6 +169,7 @@ app.post('/api/auth/google', async (req, res) => {
       // Update Google ID if not set
       if (!user.googleId) {
         user.googleId = googleId;
+        if (imgUrl) user.imgUrl = imgUrl;
         await user.save();
       }
     } else {
@@ -156,13 +178,17 @@ app.post('/api/auth/google', async (req, res) => {
         name,
         email,
         googleId,
+        imgUrl,
         isGoogleUser: true,
       });
       await user.save();
     }
 
-    // Generate JWT token
+    // Generate JWT token with user ID
     const token = generateToken(user._id);
+
+    // Set auth cookies
+    setAuthCookies(res, token, email);
 
     res.json({
       message: 'Google authentication successful',
@@ -170,9 +196,10 @@ app.post('/api/auth/google', async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        imgUrl: user.imgUrl,
         createdAt: user.createdAt,
       },
-      token,
+      token, // Still return token for localStorage compatibility
     });
   } catch (error) {
     console.error('Google auth error:', error);
@@ -180,34 +207,91 @@ app.post('/api/auth/google', async (req, res) => {
   }
 });
 
-// Middleware to verify JWT token
+// Middleware to verify JWT token (supports both cookies and headers)
 const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  // First try to get token from cookies
+  let token = req.cookies.token;
+  
+  // If no cookie token, try Authorization header
+  if (!token) {
+    const authHeader = req.headers['authorization'];
+    token = authHeader && authHeader.split(' ')[1];
+  }
 
   if (!token) {
     return res.status(401).json({ message: 'Access token required' });
   }
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
       return res.status(403).json({ message: 'Invalid token' });
     }
-    req.user = user;
+    req.user = decoded;
     next();
   });
 };
 
-// Protected route example
+// Protected route to get current user profile
 app.get('/api/auth/profile', authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.json(user);
+    res.json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        imgUrl: user.imgUrl,
+        createdAt: user.createdAt,
+      }
+    });
   } catch (error) {
     console.error('Profile error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Check authentication status
+app.get('/api/auth/check', authenticateToken, (req, res) => {
+  res.json({ 
+    authenticated: true, 
+    email: req.cookies.email || null 
+  });
+});
+
+// Logout route
+app.post('/api/auth/logout', (req, res) => {
+  res.clearCookie('token');
+  res.clearCookie('email');
+  res.json({ message: 'Logged out successfully' });
+});
+
+// Example protected route for fetching user-specific data
+app.get('/api/user/dashboard', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Example: Return user dashboard data
+    res.json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        imgUrl: user.imgUrl,
+      },
+      dashboardData: {
+        totalBookings: 0, // Replace with actual data
+        activeBookings: 0, // Replace with actual data
+        completedBookings: 0, // Replace with actual data
+      }
+    });
+  } catch (error) {
+    console.error('Dashboard error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
