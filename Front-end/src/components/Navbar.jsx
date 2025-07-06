@@ -1,11 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { IoMenu, IoClose } from "react-icons/io5";
 import profile from "../../public/whiteprofile.svg"
-
+import {useUserContext} from "../context/UserContext"
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const menuref = useRef(null);
+    const {user}= useUserContext();
+
+    const imgUrl = user?.imgUrl || profile ;
 
     useEffect(() => {
 
@@ -44,7 +47,7 @@ export default function Navbar() {
                     </button>
 
                     <div className='profile-icon  '>
-                        <img src={profile} className='w-9' alt="" />
+                        <img src={imgUrl} className='w-10 rounded-full' alt="" />
                     </div>
 
                     <button className='xl:hidden text-white' onClick={handleToggle}>
