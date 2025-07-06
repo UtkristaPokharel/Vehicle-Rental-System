@@ -8,7 +8,6 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const menuref = useRef(null);
     const {user}= useUserContext();
-
     const imgUrl = user?.imgUrl || profile ;
 
     useEffect(() => {
@@ -49,11 +48,7 @@ export default function Navbar() {
                     </button>
 
                     <div className='profile-icon  '>
-
-                        <img src={imgUrl} className='w-10 rounded-full' alt="" />
-
-                        <a href="/profile"><img src={profile} className='w-9' alt="" /></a>
-
+                        <a href="/profile"><img src={imgUrl} className='w-10 rounded-full' alt="" /></a>
                     </div>
 
                     <button className='xl:hidden text-white' onClick={handleToggle}>
