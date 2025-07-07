@@ -11,12 +11,14 @@ import {
 } from "react-icons/fa";
 import { MdSubscriptions } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
+import Navbar from '../components/Navbar.jsx'
 
 function Profile() {
   const [isEdit, SetIsEdit] = useState(false);
 
   return (
     <>
+    <Navbar/>
       <div className="w-120 z-50">
         <div
           className="w-full relative
