@@ -1,6 +1,4 @@
-import React from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import React, { useState } from 'react';
 
 const faqs = [
   {
@@ -36,24 +34,42 @@ const faqs = [
 ];
 
 function FAQPage() {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const toggleFAQ = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
   return (
     <>
-      <Navbar />
       <div className="px-6 py-12 max-w-5xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-12">Frequently Asked Questions</h1>
-        <div className="space-y-6">
-          {faqs.map((faq, index) => (
-            <div
-              key={index}
-              className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition"
-            >
-              <h2 className="text-xl font-semibold mb-2">{faq.question}</h2>
-              <p className="text-gray-700">{faq.answer}</p>
-            </div>
-          ))}
-        </div>
+        <section id="faq-section" className="py-5">
+          <h2 className="text-4xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <div
+                key={index}
+                className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition"
+              >
+                <button
+                  className="w-full text-left px-6 py-4 flex justify-between items-center focus:outline-none"
+                  onClick={() => toggleFAQ(index)}
+                >
+                  <h3 className="text-xl font-semibold">{faq.question}</h3>
+                  <span className="text-2xl">
+                    {openIndex === index ? '-' : '+'}
+                  </span>
+                </button>
+                {openIndex === index && (
+                  <div className="px-6 pb-4">
+                    <p className="text-gray-700">{faq.answer}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
-      <Footer />
     </>
   );
 }

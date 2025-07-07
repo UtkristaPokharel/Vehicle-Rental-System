@@ -3,7 +3,8 @@ import LandingPage from '../components/LandingPage.jsx';
 import PopularDest from "../components/Destination.jsx";
 import SubscriptionForm from "../components/SubscriptionPage.jsx";
 import Footer from "../components/Footer.jsx"
-import { RiMotorbikeFill, RiEBike2Fill, RiTruckFill } from "react-icons/ri";
+import FAQPage from './FAQPage.jsx';
+import { RiMotorbikeFill, RiTruckFill } from "react-icons/ri";
 import { FaCar, FaBus } from "react-icons/fa";
 import { PiTruckTrailerFill } from "react-icons/pi";
 import { useNavigate } from 'react-router';
@@ -16,17 +17,9 @@ function Home() {
     <>
       <Navbar />
       <div className="Home-page flex justify-center flex-col items-center">
-        {/* <div className=" w-full h-screen flex justify-center items-center bg-gradient-to-b  from-amber-300 to-amber-600">
-          <h1 className="w-full text-white text-4xl font-bold text-center ">
-            {" "}
-            Here will be image for EasyWheel
-          </h1>
-        </div> */}
         <LandingPage />
         <VehicleBrowse />
         <PopularDest />
-        <FeatureSection/>
-        <SubscriptionForm />
 
         {/* info-boxes */}
         <div className="info-section p-10  flex justify-center flex-row items-center flex-wrap lg:flex-nowrap  gap-10">
@@ -49,6 +42,9 @@ function Home() {
         </div>
 
       </div>
+        <FeatureSection/>
+        <FAQPage />
+        <SubscriptionForm />
       <Footer />
     </>
   );
@@ -57,10 +53,9 @@ function Home() {
 
 const vehicleTypes = [
   { name: 'Bike', icon: <RiMotorbikeFill /> },
-  { name: 'Scooter', icon: <RiEBike2Fill /> },
-  { name: 'Truck', icon: <RiTruckFill /> },
-  { name: 'CargoTruck', icon: <PiTruckTrailerFill /> },
   { name: 'Car', icon: <FaCar /> },
+  { name: 'Pickup', icon: <RiTruckFill /> },
+  { name: 'Truck', icon: <PiTruckTrailerFill /> },
   { name: 'Bus', icon: <FaBus /> },
 ];
 
@@ -72,7 +67,7 @@ export const VehicleBrowse = () => {
   };
 
   return (
-    <div className="vehicle-browse flex justify-center items-center flex-col mt-4 p-3">
+    <div className="vehicle-browse flex justify-center items-center flex-col my-10 p-3">
       <h2 className="text-3xl font-bold text-center m-12">
         Browse Our Vehicles
       </h2>
@@ -92,9 +87,6 @@ export const VehicleBrowse = () => {
     </div>
   );
 };
-
-
-export default Home;
 
 
 
@@ -118,7 +110,7 @@ export function FeatureSection() {
   ];
 
   return (
-    <section className=" my-20 px-10 w-full">
+    <section className=" my-10 px-10 w-full">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
         {features.map((feature, index) => (
           <div
@@ -134,3 +126,6 @@ export function FeatureSection() {
     </section>
   );
 }
+
+
+export default Home;
