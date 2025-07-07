@@ -1,14 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
 import { IoMenu, IoClose } from "react-icons/io5";
 import profile from "../../public/whiteprofile.svg"
-import {useUserContext} from "../context/UserContext"
-
+import { useNavigate } from 'react-router';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const menuref = useRef(null);
-    const {user}= useUserContext();
-    const imgUrl = user?.imgUrl || profile ;
+   const profileImg = localStorage.getItem("profileImg")
+    const imgUrl = profileImg || profile ;
+
+    const navigate = useNavigate();
 
     useEffect(() => {
 
@@ -30,6 +31,17 @@ export default function Navbar() {
         setIsOpen(prev => !prev);
     };
 
+    const handleProfileClick =()=>{
+        const token = localStorage.getItem("token")
+
+       if(token){
+        navigate("/profile")
+       } else {
+        navigate("/login")
+       }
+
+    }
+
     return (
         <>
             <nav className='static w-full h-18 bg-black flex justify-around items-center gap-10 px-3 xl:px-10 z-10'>
@@ -47,9 +59,9 @@ export default function Navbar() {
                         Become a host
                     </button>
 
-                    <div className='profile-icon  '>
-                        <a href="/profile"><img src={imgUrl} className='w-10 rounded-full' alt="" /></a>
-                    </div>
+                    <button className='profile-icon ' onClick={handleProfileClick}>
+                        <img src={imgUrl} className='w-10 rounded-full' alt="" />
+                    </button>
 
                     <button className='xl:hidden text-white' onClick={handleToggle}>
                         {isOpen ? <IoClose className="ham-menu text-3xl" /> : <IoMenu className="ham-menu text-3xl" />}

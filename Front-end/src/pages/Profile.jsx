@@ -11,9 +11,16 @@ import {
 } from "react-icons/fa";
 import { MdSubscriptions } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
+import { LuCloudUpload } from "react-icons/lu";
+
 
 function Profile() {
   const [isEdit, SetIsEdit] = useState(false);
+  const userName= localStorage.getItem("name");
+  const userEmail =localStorage.getItem("email")
+
+
+
 
   return (
     <>
@@ -50,13 +57,15 @@ function Profile() {
         <hr className="w-full bg-gray-500" />
 
         {isEdit ? (
-          <div className="flex justify-center items-center flex-col">
+          <div className="flex justify-center items-center flex-col relative">
             {/* Profile pic */}
             <img
               src="https://imgs.search.brave.com/IFrfkTDeXEOdpuqS16cJ_cTvFuk1-ZBdrEqFBjnL-SM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9weXhp/cy5ueW1hZy5jb20v/djEvaW1ncy8xYzQv/NjQ1L2NmZWJmZWE2/M2UxMDgyMWRhNzk4/ZDQzYTNhY2VhYWEy/MGYtdGhlLWJlYXIt/amVyZW15LWFsbGVu/LXdoaXRlLWxlZGUu/cnZlcnRpY2FsLnc1/NzAuanBn"
               alt="Profile pic"
               className="w-22 h-22 rounded-full object-cover  bg-amber-400 m-5"
             />
+
+            <input type="file" className=" absolute top-27 text-2xl " /><LuCloudUpload/>
             <ProfileEditMenu />
           </div>
         ) : (
@@ -70,7 +79,7 @@ function Profile() {
               />
               <div className="my-6">
                 <h2 className="text-xl  text-gray-600 font-bold">
-                  Bhuwan Muji
+                  {userName}
                 </h2>
                 <p className="text-md text-gray-500 font-semibold ">
                   Chutiya
@@ -105,6 +114,8 @@ const fieldItem = [
 export function ProfileEditMenu() {
   return (
     <>
+      <form className="w-full px-5 flex flex-col">
+
       {fieldItem.map((item, index) => (
         <ProfileEdit
           labelName={item.labelName}
@@ -113,16 +124,15 @@ export function ProfileEditMenu() {
           fieldValue={item.fieldValue}
         />
       ))}
+
+      </form>
     </>
   );
 }
 
 export function ProfileEdit({ labelName, type, fieldValue }) {
   return (
-    <div
-      className="w-full px-5 flex flex-col
-        "
-    >
+      <>
       <label className="text-xl font-semibold w-full px-3 mb-2">
         {labelName}
       </label>
@@ -134,8 +144,8 @@ export function ProfileEdit({ labelName, type, fieldValue }) {
            "
         placeholder={fieldValue}
       />
-    </div>
-  );
+</>
+    );
 }
 
 export function SettingsItem({ icon: Icon, label, to }) {
