@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { useState } from "react";
+import Navbar from '../components/Navbar.jsx'
 import {
   FaHeart,
   FaDownload,
@@ -25,6 +26,7 @@ function Profile() {
 
   return (
     <>
+    <Navbar />
       <div className="w-120 z-50">
         <div
           className="w-full relative
