@@ -60,10 +60,14 @@ export default function AuthForm() {
         })
           .then((response) => {
             const { user: userData, token } = response.data;
-            setUser(userData);
+            const{ imgUrl, email , name ,} = userData;
+
 
             // Optional: Still store token in localStorage for backward compatibility
             localStorage.setItem("token", token);
+            localStorage.setItem("profileImg",imgUrl);
+            localStorage.setItem("name",name);
+            localStorage.setItem("email",email);
             
             setIsAuthenticated(true);
             navigate("/");

@@ -18,7 +18,11 @@ function Logout() {
       const handleLogout = async () => {
     try {
       await api.post('/auth/logout');
+      localStorage.removeItem("profileImg")
       localStorage.removeItem('token');
+      localStorage.removeItem('email');
+      localStorage.removeItem("name");
+      localStorage.removeItem("none");
       
       navigate('/');
     } catch (error) {
