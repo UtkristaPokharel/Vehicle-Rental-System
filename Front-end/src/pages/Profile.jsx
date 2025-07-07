@@ -7,10 +7,18 @@ import {
   FaMapMarkerAlt,
   FaTrashAlt,
   FaHistory,
-  FaSignOutAlt,
+  FaSignOutAlt
 } from "react-icons/fa";
 import { MdSubscriptions } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
+import { LuCloudUpload } from "react-icons/lu";
+
+
+  const userName= localStorage.getItem("name") || "";
+  const userEmail =localStorage.getItem("email") || "";
+  const profileImg= localStorage.getItem("profileImg");
+
+
 
 function Profile() {
   const [isEdit, SetIsEdit] = useState(false);
@@ -50,13 +58,15 @@ function Profile() {
         <hr className="w-full bg-gray-500" />
 
         {isEdit ? (
-          <div className="flex justify-center items-center flex-col">
+          <div className="flex justify-center items-center flex-col relative">
             {/* Profile pic */}
             <img
-              src="https://imgs.search.brave.com/IFrfkTDeXEOdpuqS16cJ_cTvFuk1-ZBdrEqFBjnL-SM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9weXhp/cy5ueW1hZy5jb20v/djEvaW1ncy8xYzQv/NjQ1L2NmZWJmZWE2/M2UxMDgyMWRhNzk4/ZDQzYTNhY2VhYWEy/MGYtdGhlLWJlYXIt/amVyZW15LWFsbGVu/LXdoaXRlLWxlZGUu/cnZlcnRpY2FsLnc1/NzAuanBn"
+              src={profileImg}
               alt="Profile pic"
-              className="w-22 h-22 rounded-full object-cover  bg-amber-400 m-5"
+              className="w-22 h-22 rounded-full object-cover bg-amber-400 m-5"
             />
+
+            <input type="file" className=" absolute top-27 text-2xl " /><LuCloudUpload/>
             <ProfileEditMenu />
           </div>
         ) : (
@@ -64,16 +74,16 @@ function Profile() {
             {/* Profile pic && name section */}
             <div className="w-full flex  flex-row  ">
               <img
-                src="https://imgs.search.brave.com/IFrfkTDeXEOdpuqS16cJ_cTvFuk1-ZBdrEqFBjnL-SM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9weXhp/cy5ueW1hZy5jb20v/djEvaW1ncy8xYzQv/NjQ1L2NmZWJmZWE2/M2UxMDgyMWRhNzk4/ZDQzYTNhY2VhYWEy/MGYtdGhlLWJlYXIt/amVyZW15LWFsbGVu/LXdoaXRlLWxlZGUu/cnZlcnRpY2FsLnc1/NzAuanBn"
-                alt="Profile pic"
+              src={profileImg}           
+              alt="Profile pic"
                 className="w-25 h-25 rounded-full object-cover  bg-amber-400 m-5"
               />
               <div className="my-6">
                 <h2 className="text-xl  text-gray-600 font-bold">
-                  Bhuwan Kathayat
+                  {userName}
                 </h2>
                 <p className="text-md text-gray-500 font-semibold ">
-                  bhuwan214
+               {userEmail.split("@")[0]}
                 </p>
 
                 <button
@@ -96,45 +106,53 @@ function Profile() {
 
 export default Profile;
 
-const fieldItem = [
-  { labelName: "UserName", type: "text", fieldValue: "BHuwan kathayat" },
-  { labelName: "Email", type: "Email", fieldValue: "Bhuwan@kathayat.com" },
-  { labelName: "Password", type: "password", fieldValue: "......." },
-];
+
 
 export function ProfileEditMenu() {
+
+  const fieldItem = [
+  { labelName: "UserName", type: "text", fieldValue:userName },
+  { labelName: "Email", type: "email", fieldValue:userEmail},
+  { labelName: "Password", type: "password", fieldValue: "......." , disabled:true },
+];
+
   return (
     <>
+      <form className="w-full px-5 flex flex-col">
+
       {fieldItem.map((item, index) => (
-        <ProfileEdit
-          labelName={item.labelName}
-          index={index}
-          type={item.type}
-          fieldValue={item.fieldValue}
-        />
+         <ProfileEdit
+            key={index}
+            labelName={item.labelName}
+            type={item.type}
+            fieldValue={item.fieldValue}
+            disabled={item.disabled}
+          />
       ))}
+
+      </form>
     </>
   );
 }
 
-export function ProfileEdit({ labelName, type, fieldValue }) {
+
+export function ProfileEdit({ labelName, type, fieldValue, disabled }) {
+  const [value, setValue] = useState(fieldValue);
+
   return (
-    <div
-      className="w-full px-5 flex flex-col
-        "
-    >
+    <>
       <label className="text-xl font-semibold w-full px-3 mb-2">
         {labelName}
       </label>
-
       <input
         type={type}
-        value={fieldValue}
-        className="bg-gray-200  text-lg text-gray-700 rounded-xl py-2 px-4 mb-4
-           "
-        placeholder={fieldValue}
+        value={value}
+        disabled={disabled}
+        onChange={(e) => setValue(e.target.value)}
+        className="bg-gray-200 text-lg text-gray-700 rounded-xl py-2 px-4 mb-4"
+        placeholder={labelName}
       />
-    </div>
+    </>
   );
 }
 
