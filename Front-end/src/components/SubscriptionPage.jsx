@@ -2,7 +2,7 @@ import React from 'react';
 
 const SubscriptionForm = () => {
 	return (
-		<div className="bg-indigo-50 p-6 flex flex-col md:flex-col items-center justify-between w-full max-w-7xl mx-auto text-indigo-900 ">
+		<div className="bg-indigo-50 p-6 flex flex-col md:flex-col items-center justify-between w-full max-w-7xl mx-auto mt-10 mb-10 text-indigo-900  ">
 			<div className='flex gap-10'>
 				<div className="mb-4 md:mb-0">
 					<h2 className="text-2xl font-bold">Unique offers with the best discounts</h2>
