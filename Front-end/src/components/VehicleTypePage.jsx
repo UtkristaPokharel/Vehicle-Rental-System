@@ -1,4 +1,4 @@
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 import { useState } from 'react';
 import Navbar from './Navbar';
 import VehicleCard from './VehicleCard';

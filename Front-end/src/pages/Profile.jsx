@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 import {FaHeart,FaDownload,FaLanguage,FaMapMarkerAlt,FaTrashAlt,FaHistory,FaSignOutAlt,} from "react-icons/fa";
 import { MdSubscriptions } from "react-icons/md";

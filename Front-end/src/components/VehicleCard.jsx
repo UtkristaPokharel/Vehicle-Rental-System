@@ -1,6 +1,6 @@
 import { FaRegHeart, FaHeart } from "react-icons/fa6";
 import { FaStar } from "react-icons/fa";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 
 const VehicleCard = ({ vehicle, type }) => {

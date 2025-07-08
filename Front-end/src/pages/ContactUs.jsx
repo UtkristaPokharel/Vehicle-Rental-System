@@ -1,5 +1,4 @@
 import { FaPhoneAlt, FaMapMarkerAlt, FaEnvelope } from "react-icons/fa";
-import { FaViber } from "react-icons/fa6";
 import { FaWhatsapp } from "react-icons/fa6";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";

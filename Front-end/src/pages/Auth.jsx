@@ -3,7 +3,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FiPhone } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import { auth, provider, signInWithPopup } from "../../src/firebase";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../context/UserContext";
 import axios from "axios";
 
