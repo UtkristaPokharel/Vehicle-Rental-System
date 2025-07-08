@@ -73,7 +73,7 @@
   },
   {
     "id": 9,
-    "type": "bike",
+    "type": "two-wheeler",
     "name": "Yamaha R15",
     "rating": 4.5,
     "dateRange": "July 3 - 29",
@@ -82,7 +82,7 @@
   },
   {
     "id": 10,
-    "type": "bike",
+    "type": "two-wheeler",
     "name": "KTM Duke",
     "rating": 4.8,
     "dateRange": "Aug 1 - 15",
@@ -91,7 +91,7 @@
   },
   {
     "id": 11,
-    "type": "bike",
+    "type": "two-wheeler",
     "name": "Honda CBR",
     "rating": 4.2,
     "dateRange": "Sept 5 - 22",
@@ -100,7 +100,7 @@
   },
   {
     "id": 12,
-    "type": "bike",
+    "type": "two-wheeler",
     "name": "Bajaj Pulsar",
     "rating": 4.7,
     "dateRange": "Oct 1 - 10",
