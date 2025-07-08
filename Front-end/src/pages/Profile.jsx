@@ -1,32 +1,21 @@
 import { Link } from "react-router";
-import { useState } from "react";
-import Navbar from '../components/Navbar.jsx'
-import {
-  FaHeart,
-  FaDownload,
-  FaLanguage,
-  FaMapMarkerAlt,
-  FaTrashAlt,
-  FaHistory,
-  FaSignOutAlt
-} from "react-icons/fa";
+import Navbar from "../components/Navbar.jsx";
+import {FaHeart,FaDownload,FaLanguage,FaMapMarkerAlt,FaTrashAlt,FaHistory,FaSignOutAlt,} from "react-icons/fa";
 import { MdSubscriptions } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
-import { LuCloudUpload } from "react-icons/lu";
+import ProfileImageUpload from "../context/ProfileUpload.jsx";
+import { useState } from "react";
 
-
-  const userName= localStorage.getItem("name") || "";
-  const userEmail =localStorage.getItem("email") || "";
-  const profileImg= localStorage.getItem("profileImg");
-
-
+const userName = localStorage.getItem("name") || "";
+const userEmail = localStorage.getItem("email") || "";
+const profileImg = localStorage.getItem("profileImg");
 
 function Profile() {
   const [isEdit, SetIsEdit] = useState(false);
 
   return (
     <>
-    <Navbar />
+      <Navbar />
       <div className="w-120 z-50">
         <div
           className="w-full relative
@@ -39,10 +28,7 @@ function Profile() {
           </h1>
         </div>
         {isEdit ? (
-          <div
-            className=" text-3xl absolute left-105 top-4.5
-      "
-          >
+          <div className=" text-3xl absolute left-105 top-4.5">
             <button
               className="  p-2
         "
@@ -67,8 +53,7 @@ function Profile() {
               alt="Profile pic"
               className="w-22 h-22 rounded-full object-cover bg-amber-400 m-5"
             />
-
-            <input type="file" className=" absolute top-27 text-2xl " /><LuCloudUpload/>
+            <ProfileImageUpload/>
             <ProfileEditMenu />
           </div>
         ) : (
@@ -76,16 +61,14 @@ function Profile() {
             {/* Profile pic && name section */}
             <div className="w-full flex  flex-row  ">
               <img
-              src={profileImg}           
-              alt="Profile pic"
+                src={profileImg}
+                alt="Profile pic"
                 className="w-25 h-25 rounded-full object-cover  bg-amber-400 m-5"
               />
               <div className="my-6">
-                <h2 className="text-xl  text-gray-600 font-bold">
-                  {userName}
-                </h2>
+                <h2 className="text-xl  text-gray-600 font-bold">{userName}</h2>
                 <p className="text-md text-gray-500 font-semibold ">
-               {userEmail.split("@")[0]}
+                  {userEmail.split("@")[0]}
                 </p>
 
                 <button
@@ -108,42 +91,38 @@ function Profile() {
 
 export default Profile;
 
-
-
 export function ProfileEditMenu() {
-
   const fieldItem = [
-  { labelName: "UserName", type: "text", fieldValue:userName },
-  { labelName: "Email", type: "email", fieldValue:userEmail},
-  { labelName: "Password", type: "password", fieldValue: "......." , disabled:true },
-];
+    { labelName: "UserName", type: "text", fieldValue: userName },
+    { labelName: "Email", type: "email", fieldValue: userEmail },
+    { labelName: "Password",  type: "password", fieldValue: ".......",disabled: true, },
+  ];
 
   return (
     <>
-      <form className="w-full px-5 flex flex-col">
-
-      {fieldItem.map((item, index) => (
-         <ProfileEdit
+      <form className="w-full px-5 flex flex-col justify-center items-center ">
+        {fieldItem.map((item, index) => (
+          <ProfileEdit
             key={index}
             labelName={item.labelName}
             type={item.type}
             fieldValue={item.fieldValue}
             disabled={item.disabled}
           />
-      ))}
+        ))}
 
+          <input type="submit"  value="Save" className="bg-red-600 w-25 py-3 text-white rounded-xl"  />
       </form>
     </>
   );
 }
-
 
 export function ProfileEdit({ labelName, type, fieldValue, disabled }) {
   const [value, setValue] = useState(fieldValue);
 
   return (
     <>
-      <label className="text-xl font-semibold w-full px-3 mb-2">
+      <label className="text-xl font-semibold  px-3 mb-2 text-start w-90">
         {labelName}
       </label>
       <input
@@ -151,7 +130,7 @@ export function ProfileEdit({ labelName, type, fieldValue, disabled }) {
         value={value}
         disabled={disabled}
         onChange={(e) => setValue(e.target.value)}
-        className="bg-gray-200 text-lg text-gray-700 rounded-xl py-2 px-4 mb-4"
+        className="bg-gray-200 text-lg text-gray-700 rounded-xl py-2 px-4 mb-4 w-90"
         placeholder={labelName}
       />
     </>
@@ -198,3 +177,4 @@ export function SettingsMenu() {
     </div>
   );
 }
+
