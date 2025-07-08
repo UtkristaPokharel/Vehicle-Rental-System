@@ -2,6 +2,7 @@ import { useNavigate } from "react-router";
 import { RiMotorbikeFill} from "react-icons/ri";
 import { FaCar, FaBus } from "react-icons/fa";
 import { PiTruckTrailerFill } from "react-icons/pi";
+import { PiTruckFill } from "react-icons/pi";
 import VehicleCard from "../components/VehicleCard";
 import vehicleData from '../assets/Sample.json';
 import { useRef } from "react";
@@ -10,9 +11,10 @@ import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
 const vehicleTypes = [
   { name: 'Two-Wheeler', icon: <RiMotorbikeFill /> },
+  {name: 'Pickup', icon: <PiTruckFill /> },
   { name: 'Car', icon: <FaCar /> },
   { name: 'Truck', icon: <PiTruckTrailerFill /> },
-  { name: 'Mini-Bus', icon: <FaBus /> },
+  { name: 'Bus', icon: <FaBus /> },
 ];
 
  export default function VehicleBrowse()  {
