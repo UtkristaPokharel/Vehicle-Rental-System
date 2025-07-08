@@ -39,8 +39,7 @@ export default function PopularDest() {
 	   Our Most Popular Destinations
 	 </h2>
 
-	 {/* Tabs */}
-	 <div className="flex justify-center flex-wrap gap-4 mb-8">
+	 <div className="flex p-10 justify-center flex-wrap gap-4 mb-8">
 	   {Object.keys(destinations).map((place) => (
 		<button
 		  key={place}
@@ -55,7 +54,6 @@ export default function PopularDest() {
 	   ))}
 	 </div>
 
-	 {/* Destination Cards */}
 	 <div className="flex flex-wrap justify-center gap-6 px-4">
 	   {destinations[selectedPlace].map((location, index) => (
 		<div
@@ -69,7 +67,6 @@ export default function PopularDest() {
 		  />
 		  <div className="p-4 text-center">
 		    <h3 className="font-semibold text-lg">{location.name}</h3>
-		    {/* <p className="text-sm text-gray-500">· {selectedPlace}</p> */}
 		  </div>
 		</div>
 	   ))}

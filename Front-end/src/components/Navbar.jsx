@@ -59,7 +59,7 @@ export default function Navbar() {
                         <li><a href="/" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Home</a></li>
                         <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>About us</a></li>
                         <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Vehicles</a></li>
-                        <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Contact us</a></li>
+                        <li><a href="/contact" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Contact us</a></li>
                         <li>
                             <button
                                 onClick={handleFAQClick}
@@ -91,7 +91,7 @@ export default function Navbar() {
                         <li><a href="/" className='text-white hover:text-gray-400'>Home</a></li>
                         <li><a href="#" className='text-white hover:text-gray-400'>About us</a></li>
                         <li><a href="#" className='text-white hover:text-gray-400'>Vehicles</a></li>
-                        <li><a href="#" className='text-white hover:text-gray-400'>Contact us</a></li>
+                        <li><a href="/contact" className='text-white hover:text-gray-400'>Contact us</a></li>
                         <li>
                             <button onClick={handleFAQClick} className="text-white hover:text-gray-400">
                                 FAQ
