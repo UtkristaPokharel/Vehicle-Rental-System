@@ -4,6 +4,9 @@ import { FaCar, FaBus } from "react-icons/fa";
 import { PiTruckTrailerFill } from "react-icons/pi";
 import VehicleCard from "../components/VehicleCard";
 import vehicleData from '../assets/Sample.json';
+import { useRef } from "react";
+import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+
 
 const vehicleTypes = [
   { name: 'Two-Wheeler', icon: <RiMotorbikeFill /> },
@@ -46,32 +49,63 @@ const vehicleTypes = [
 }; 
 
 
-export const  SuggestedVehicle=()=>{
-    const Vehicle = vehicleData;
+export const SuggestedVehicle = () => {
+  const scrollRef = useRef(null);
+  const Vehicle = vehicleData;
 
-  function generateUniqueRandomNumbers(){
-    const numbers =new Set();
-
-    while(numbers.size<6){
-        const randomNum =Math.floor(Math.random()*24)+1;
-        numbers.add(randomNum);
+  function generateUniqueRandomNumbers() {
+    const numbers = new Set();
+    while (numbers.size < 6) {
+      const randomNum = Math.floor(Math.random() * 24) + 1;
+      numbers.add(randomNum);
     }
     return Array.from(numbers);
   }
-  const randomIds =generateUniqueRandomNumbers();
-  const filteredVehicles = Vehicle.filter(
-    Vehicle => randomIds.includes(Vehicle.id)
-    )
 
+  const randomIds = generateUniqueRandomNumbers();
+  const filteredVehicles = Vehicle.filter((vehicle) =>
+    randomIds.includes(vehicle.id)
+  );
 
-  return(
-        <>
-        
-        <div className="grid  sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-            {filteredVehicles.map((vehicle)=>
-         <VehicleCard  vehicle={vehicle} key={vehicle.id} />)}
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const scrollAmount = 300;
+      scrollRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
 
-        </div>
-        </>
-    )
-}
+  return (
+    <div className="relative w-full mt-8">
+      {/* Left Arrow */}
+      <button
+        onClick={() => scroll("left")}
+        className="absolute left-2 top-1/2 z-10 -translate-y-1/2 bg-white shadow-md p-2 rounded-full hover:bg-gray-100"
+      >
+        <IoChevronBack size={24} />
+      </button>
+
+      {/* Scrollable Carousel */}
+      <div
+        ref={scrollRef}
+        className="flex gap-6 overflow-x-auto scroll-smooth px-10 py-4 hide-scrollbar"
+      >
+        {filteredVehicles.map((vehicle) => (
+          <div key={vehicle.id} className="min-w-[300px]">
+            <VehicleCard vehicle={vehicle} />
+          </div>
+        ))}
+      </div>
+
+      {/* Right Arrow */}
+      <button
+        onClick={() => scroll("right")}
+        className="absolute right-2 top-1/2 z-10 -translate-y-1/2 bg-white shadow-md p-2 rounded-full hover:bg-gray-100"
+      >
+        <IoChevronForward size={24} />
+      </button>
+    </div>
+  );
+};
