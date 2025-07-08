@@ -73,27 +73,27 @@ const ContactUs = () => {
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<div>
 									<label className="text-sm">Name <span className="text-red-500">*</span></label>
-									<input type="text" placeholder="Full Name" className="w-full px-4 py-2 mt-1 border rounded bg-white" />
+									<input type="text" placeholder="Full Name" className="w-full px-4 py-2 mt-1 border-0 rounded bg-white" />
 								</div>
 								<div>
 									<label className="text-sm">Email <span className="text-red-500">*</span></label>
-									<input type="email" placeholder="Your Email" className="w-full px-4 py-2 mt-1 border rounded bg-white" />
+									<input type="email" placeholder="Your Email" className="w-full px-4 py-2 mt-1 border-0 rounded bg-white" />
 								</div>
 								<div>
 									<label className="text-sm">Your Address <span className="text-red-500">*</span></label>
-									<input type="text" placeholder="Address" className="w-full px-4 py-2 mt-1 border rounded bg-white" />
+									<input type="text" placeholder="Address" className="w-full px-4 py-2 mt-1 border-0 rounded bg-white" />
 								</div>
 								<div>
 									<label className="text-sm">Phone</label>
 									<div className="flex items-center">
-										<span className="px-3 py-2 border bg-gray-100 text-gray-600 rounded-l">🇳🇵</span>
-										<input type="tel" placeholder="Your Phone" className="w-full px-4 py-2 border rounded-r bg-white" />
+										<span className="px-3 py-2 border-0 bg-white text-gray-600 rounded-l">🇳🇵</span>
+										<input type="tel" placeholder="Your Phone" className="w-full px-4 py-2 border-0 rounded-r bg-white" />
 									</div>
 								</div>
 							</div>
 							<div>
 								<label className="text-sm">Message <span className="text-red-500">*</span></label>
-								<textarea rows="4" className="w-full px-4 py-2 mt-1 border rounded bg-white" placeholder="Your Message" />
+								<textarea rows="4" className="w-full px-4 py-2 mt-1 border-0 rounded bg-white" placeholder="Your Message" />
 							</div>
 							<button type="submit" className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">
 								Submit
