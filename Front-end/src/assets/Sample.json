@@ -72,7 +72,7 @@
     "image": "https://images.pexels.com/photos/164634/pexels-photo-164634.jpeg"
   },
   {
-    "id": 1,
+    "id": 9,
     "type": "bike",
     "name": "Yamaha R15",
     "rating": 4.5,
@@ -81,7 +81,7 @@
     "image": "https://images.pexels.com/photos/164634/pexels-photo-164634.jpeg"
   },
   {
-    "id": 2,
+    "id": 10,
     "type": "bike",
     "name": "KTM Duke",
     "rating": 4.8,
@@ -90,7 +90,7 @@
     "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
   },
   {
-    "id": 3,
+    "id": 11,
     "type": "bike",
     "name": "Honda CBR",
     "rating": 4.2,
@@ -99,7 +99,7 @@
     "image": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
   },
   {
-    "id": 4,
+    "id": 12,
     "type": "bike",
     "name": "Bajaj Pulsar",
     "rating": 4.7,
@@ -108,7 +108,7 @@
     "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
   },
   {
-    "id": 1,
+    "id": 13,
     "type": "pickup",
     "name": "Tata Xenon",
     "rating": 4.5,
@@ -117,7 +117,7 @@
     "image": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg"
   },
   {
-    "id": 2,
+    "id": 14,
     "type": "pickup",
     "name": "Mahindra Bolero",
     "rating": 4.8,
@@ -126,7 +126,7 @@
     "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
   },
   {
-    "id": 3,
+    "id": 15,
     "type": "pickup",
     "name": "Isuzu D-Max",
     "rating": 4.2,
@@ -135,7 +135,7 @@
     "image": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
   },
   {
-    "id": 4,
+    "id": 16,
     "type": "pickup",
     "name": "Toyota Hilux",
     "rating": 4.7,
@@ -144,7 +144,7 @@
     "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
   },
   {
-    "id": 1,
+    "id": 17,
     "type": "truck",
     "name": "Tata 407",
     "rating": 4.5,
@@ -153,7 +153,7 @@
     "image": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg"
   },
   {
-    "id": 2,
+    "id": 18,
     "type": "truck",
     "name": "Ashok Leyland Dost",
     "rating": 4.8,
@@ -162,7 +162,7 @@
     "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
   },
   {
-    "id": 3,
+    "id":19,
     "type": "truck",
     "name": "Mahindra Bolero Pik-Up",
     "rating": 4.2,
@@ -171,7 +171,7 @@
     "image": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
   },
   {
-    "id": 4,
+    "id": 20,
     "type": "truck",
     "name": "Eicher Pro",
     "rating": 4.7,
@@ -180,7 +180,7 @@
     "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
   },
   {
-    "id": 1,
+    "id": 21,
     "type": "bus",
     "name": "Tata Starbus",
     "rating": 4.5,
@@ -189,7 +189,7 @@
     "image": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg"
   },
   {
-    "id": 2,
+    "id": 22,
     "type": "bus",
     "name": "Ashok Leyland Lynx",
     "rating": 4.8,
@@ -198,7 +198,7 @@
     "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
   },
   {
-    "id": 3,
+    "id": 23,
     "type": "bus",
     "name": "Volvo B7R",
     "rating": 4.2,
@@ -207,7 +207,7 @@
     "image": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
   },
   {
-    "id": 4,
+    "id": 24,
     "type": "bus",
     "name": "Mercedes-Benz Sprinter",
     "rating": 4.7,

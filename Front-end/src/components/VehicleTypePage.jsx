@@ -41,7 +41,7 @@ const VehicleTypePage = () => {
           <h1 className="text-3xl font-bold mb-2 sm:mb-0 text-center sm:text-left">
             Vehicles of type: {type}
           </h1>
-          <div className="relative w-60">
+          <div className="  relative w-60">
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}

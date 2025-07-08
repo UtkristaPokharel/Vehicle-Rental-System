@@ -52,7 +52,7 @@ export default function Navbar() {
 
     return (
         <>
-            <nav className='fixed w-full h-18 bg-black flex justify-around items-center gap-10 px-3 xl:px-10 z-10'>
+            <nav className='sticky top-0 left-0 w-full h-18 bg-black flex justify-around items-center gap-10 px-3 xl:px-10 z-10'>
                 <div> <img src="/logo.png" alt="EasyWheels Logo" className="h-30" /></div>
                 <div className='flex gap-10 items-center text-white text-lg '>
                     <ul className='hidden xl:flex space-x-9'>

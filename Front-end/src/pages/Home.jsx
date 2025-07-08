@@ -3,11 +3,8 @@ import LandingPage from '../components/LandingPage.jsx';
 import PopularDest from "../components/Destination.jsx";
 import SubscriptionForm from "../components/SubscriptionPage.jsx";
 import Footer from "../components/Footer.jsx"
+import VehicleBrowse from './Browse.jsx';
 import FAQPage from './FAQPage.jsx';
-import { RiMotorbikeFill, RiTruckFill } from "react-icons/ri";
-import { FaCar, FaBus } from "react-icons/fa";
-import { PiTruckTrailerFill } from "react-icons/pi";
-import { useNavigate } from 'react-router';
 import { FaCarSide, FaRegHandshake, FaGift } from "react-icons/fa";
 
 
@@ -49,44 +46,6 @@ function Home() {
     </>
   );
 }
-
-
-const vehicleTypes = [
-  { name: 'Bike', icon: <RiMotorbikeFill /> },
-  { name: 'Car', icon: <FaCar /> },
-  { name: 'Pickup', icon: <RiTruckFill /> },
-  { name: 'Truck', icon: <PiTruckTrailerFill /> },
-  { name: 'Bus', icon: <FaBus /> },
-];
-
-export const VehicleBrowse = () => {
-  const navigate = useNavigate();
-
-  const handleClick = (type) => {
-    navigate(`/vehicles/${type}`);
-  };
-
-  return (
-    <div className="vehicle-browse flex justify-center items-center flex-col my-10 p-3">
-      <h2 className="text-3xl font-bold text-center m-12">
-        Browse Our Vehicles
-      </h2>
-
-      <ul className="flex flex-wrap justify-center items-center gap-20 list-none mb-4 text-2xl">
-        {vehicleTypes.map((vehicle, index) => (
-          <li
-            key={index}
-            className="text-center cursor-pointer"
-            onClick={() => handleClick(vehicle.name)}
-          >
-            {vehicle.icon}
-            <h1 className="mt-1 text-sm font-bold">{vehicle.name}</h1>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
 
 
 
