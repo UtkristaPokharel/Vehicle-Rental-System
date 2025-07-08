@@ -17,7 +17,7 @@ const VehicleCard = ({ vehicle, type }) => {
         price: vehicle.price,
       }}
     >
-      <div className="vehicle-card group w-full rounded-2xl bg-white border border-gray-200 hover:shadow-2xl transition-shadow duration-300 overflow-hidden">
+      <div className="vehicle-card group w-full rounded-2xl bg-white border border-gray-200 hover:shadow-2xl transition-shadow-md duration-300 overflow-hidden">
         <div className="relative">
           <img
             className="w-full h-48 sm:h-52 object-cover object-center transition-transform duration-300 group-hover:scale-105"
