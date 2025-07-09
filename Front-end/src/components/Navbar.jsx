@@ -63,6 +63,27 @@ export default function Navbar() {
 
         setIsOpen(false);
     };
+    const handleContactUsClick = () => {
+        const isHome = window.location.pathname === '/';
+
+        if (isHome) {
+            const ContactUsSection = document.getElementById('contactus-section');
+            if (ContactUsSection) {
+                ContactUsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        } else {
+            navigate('/', { state: { scrollToContactUs: true } });
+
+            setTimeout(() => {
+                const ContactUsSection = document.getElementById('contactus-section');
+                if (ContactUsSection) {
+                    ContactUsSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 500);
+        }
+
+        setIsOpen(false);
+    };
 
     return (
         <>
@@ -73,7 +94,15 @@ export default function Navbar() {
                         <li><a href="/" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Home</a></li>
                         <li><a href="/about" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>About us</a></li>
                         <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Vehicles</a></li>
-                        <li><a href="/contact" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Contact us</a></li>
+                        {/* <li><a href="/contact" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Contact us</a></li> */}
+                        <li>
+                            <button
+                                onClick={handleContactUsClick}
+                                className="hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8"
+                            >
+                                Contact Us
+                            </button>
+                        </li>
                         <li>
                             <button
                                 onClick={handleFAQClick}

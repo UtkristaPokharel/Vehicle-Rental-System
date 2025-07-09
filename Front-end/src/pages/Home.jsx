@@ -4,6 +4,7 @@ import PopularDest from "../components/Destination.jsx";
 import SubscriptionForm from "../components/SubscriptionPage.jsx";
 import Footer from "../components/Footer.jsx"
 import VehicleBrowse from './Browse.jsx';
+import ContactUs from './ContactUs.jsx';
 import FAQPage from './FAQPage.jsx';
 import { FaCarSide, FaRegHandshake, FaGift } from "react-icons/fa";
 
@@ -40,6 +41,7 @@ function Home() {
 
       </div>
         <FeatureSection/>
+        <ContactUs/>
         <FAQPage />
         <SubscriptionForm />
       <Footer />
