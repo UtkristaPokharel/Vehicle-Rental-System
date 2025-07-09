@@ -39,9 +39,9 @@ function Home() {
         </div>
 
       </div>
-        <FeatureSection/>
-        <FAQPage />
-        <SubscriptionForm />
+      <FeatureSection />
+      <FAQPage />
+      <SubscriptionForm />
       <Footer />
     </>
   );

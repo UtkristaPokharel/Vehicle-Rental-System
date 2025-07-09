@@ -89,8 +89,8 @@ export const VehicleDescription = () => {
     <div className="w-[90%] px-5 relative mt-6  ">
       <div
         className={`relative text-gray-700 text-sm leading-relaxed transition-all duration-300 ${expanded
-            ? "line-clamp-none max-h-full"
-            : "line-clamp-5 max-h-[7.5rem]"
+          ? "line-clamp-none max-h-full"
+          : "line-clamp-5 max-h-[7.5rem]"
           }`}
       >
         {description}

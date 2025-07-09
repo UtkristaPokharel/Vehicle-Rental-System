@@ -52,9 +52,8 @@ function LandingPage() {
         </h1>
 
         <div
-          className={`transition-transform duration-500 ease-in-out ${
-            textSlide ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-100'
-          }`}
+          className={`transition-transform duration-500 ease-in-out ${textSlide ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-100'
+            }`}
         >
           <h2 className="text-[24px] md:text-[36px] font-black text-[#111] my-2 whitespace-pre-line">
             {texts[textIndex]}
@@ -74,9 +73,8 @@ function LandingPage() {
         <img
           src={vehicles[vehicleIndex]}
           alt="Vehicle"
-          className={`w-full h-auto max-h-[300px] md:max-h-[400px] object-contain transition-all duration-500 ease-in-out ${
-            vehicleSlide ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
-          }`}
+          className={`w-full h-auto max-h-[300px] md:max-h-[400px] object-contain transition-all duration-500 ease-in-out ${vehicleSlide ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+            }`}
           style={{ height: '400px' }}
         />
       </div>

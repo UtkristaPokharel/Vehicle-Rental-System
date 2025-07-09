@@ -18,7 +18,7 @@ const api = axios.create({
 });
 
 export default function AuthForm() {
-  const {setUser} = useUserContext ();
+  const { setUser } = useUserContext();
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({
     name: "",
@@ -43,7 +43,7 @@ export default function AuthForm() {
         navigate('/'); // Redirect to dashboard if already logged in
       }
     } catch (error) {
-      console.log('Not authenticated ' ,error);
+      console.log('Not authenticated ', error);
       setIsAuthenticated(false);
     }
   };
@@ -60,15 +60,15 @@ export default function AuthForm() {
         })
           .then((response) => {
             const { user: userData, token } = response.data;
-            const{ imgUrl, email , name ,} = userData;
+            const { imgUrl, email, name, } = userData;
 
 
             // Optional: Still store token in localStorage for backward compatibility
             localStorage.setItem("token", token);
-            localStorage.setItem("profileImg",imgUrl);
-            localStorage.setItem("name",name);
-            localStorage.setItem("email",email);
-            
+            localStorage.setItem("profileImg", imgUrl);
+            localStorage.setItem("name", name);
+            localStorage.setItem("email", email);
+
             setIsAuthenticated(true);
             navigate("/");
           })
@@ -96,11 +96,11 @@ export default function AuthForm() {
         });
 
         const { userData, token } = response.data;
-         setUser(userData)        
+        setUser(userData)
 
         // Optional: Still store token in localStorage for backward compatibility
         localStorage.setItem("token", token);
-        
+
         setIsAuthenticated(true);
         navigate("/");
       } else {
@@ -118,12 +118,12 @@ export default function AuthForm() {
         });
 
         const { userData, token } = response.data;
-          setUser(userData);
-        
-        
+        setUser(userData);
+
+
         // Optional: Still store token in localStorage for backward compatibility
         localStorage.setItem("token", token);
-      
+
         setIsAuthenticated(true);
         navigate("/");
       }
