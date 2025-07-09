@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import { IoMenu, IoClose } from "react-icons/io5";
 import profile from "../../public/whiteprofile.svg"
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const menuref = useRef(null);
     const profileImg = localStorage.getItem("profileImg")
-    const imgUrl = profileImg || profile;
+    const imgUrl = profileImg || profile;   
 
     const navigate = useNavigate();
 
@@ -42,13 +42,27 @@ export default function Navbar() {
 
     }
 
-    const handleFAQClick = () => {
-        const faqSection = document.getElementById('faq-section');
-        if (faqSection) {
-            faqSection.scrollIntoView({ behavior: 'smooth' });
-        }
-        setIsOpen(false); // Close mobile menu after clicking FAQ
-    };
+   const handleFAQClick = () => {
+  const isHome = window.location.pathname === '/';
+
+  if (isHome) {
+    const faqSection = document.getElementById('faq-section');
+    if (faqSection) {
+      faqSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  } else {
+    navigate('/', { state: { scrollToFAQ: true } });
+
+    setTimeout(() => {
+      const faqSection = document.getElementById('faq-section');
+      if (faqSection) {
+        faqSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 500); 
+  }
+
+  setIsOpen(false);
+};
 
     return (
         <>

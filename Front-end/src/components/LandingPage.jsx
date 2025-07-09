@@ -62,7 +62,7 @@ function LandingPage() {
         </div>
 
         <p className="text-[16px] md:text-[22px] text-[#555] mb-4 md:mb-6">
-          Best worldwide VEHICLE hire deals!!!!!
+          Best VEHICLE rental deals!!!!!
         </p>
         <button className="bg-black text-white text-[16px] md:text-[20px] px-6 py-3 hover:bg-red-600 transition hover:scale-109">
           Contact Now
