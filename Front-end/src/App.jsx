@@ -6,6 +6,7 @@ import VehicleTypePage from './components/VehicleTypePage';
 import AuthForm from './pages/Auth.jsx';
 import VehicleDetails from './pages/VehicleDetails.jsx';
 import Profile from './pages/Profile.jsx';
+import AboutUs from './pages/AboutUs.jsx';
 import ContactUs from './pages/ContactUs.jsx';
 
 import Logout from './pages/Api/logout.jsx';
@@ -30,12 +31,14 @@ export default function App() {
           <Route path="/vehicle/:type/:id" element={<VehicleDetails />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/logout" element={<Logout />} />
-          
+
           <Route path="/vehicle/:type/:id" element={<VehicleDetails />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/faq" element={<FAQPage />} />
 
           <Route path="/contact" element={<ContactUs />} />
+          <Route path="/about" element={<AboutUs />} />
+          {/* Fallback route for 404 */}
         </Routes>
       </Router>
 

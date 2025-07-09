@@ -7,7 +7,7 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const menuref = useRef(null);
     const profileImg = localStorage.getItem("profileImg")
-    const imgUrl = profileImg || profile;   
+    const imgUrl = profileImg || profile;
 
     const navigate = useNavigate();
 
@@ -42,27 +42,27 @@ export default function Navbar() {
 
     }
 
-   const handleFAQClick = () => {
-  const isHome = window.location.pathname === '/';
+    const handleFAQClick = () => {
+        const isHome = window.location.pathname === '/';
 
-  if (isHome) {
-    const faqSection = document.getElementById('faq-section');
-    if (faqSection) {
-      faqSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  } else {
-    navigate('/', { state: { scrollToFAQ: true } });
+        if (isHome) {
+            const faqSection = document.getElementById('faq-section');
+            if (faqSection) {
+                faqSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        } else {
+            navigate('/', { state: { scrollToFAQ: true } });
 
-    setTimeout(() => {
-      const faqSection = document.getElementById('faq-section');
-      if (faqSection) {
-        faqSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 500); 
-  }
+            setTimeout(() => {
+                const faqSection = document.getElementById('faq-section');
+                if (faqSection) {
+                    faqSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 500);
+        }
 
-  setIsOpen(false);
-};
+        setIsOpen(false);
+    };
 
     return (
         <>
@@ -71,7 +71,7 @@ export default function Navbar() {
                 <div className='flex gap-10 items-center text-white text-lg '>
                     <ul className='hidden xl:flex space-x-9'>
                         <li><a href="/" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Home</a></li>
-                        <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>About us</a></li>
+                        <li><a href="/about" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>About us</a></li>
                         <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Vehicles</a></li>
                         <li><a href="/contact" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Contact us</a></li>
                         <li>
@@ -103,7 +103,7 @@ export default function Navbar() {
           h-35 list-none pl-5 transition-all duration-300 ease-in-out 
             ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
                         <li><a href="/" className='text-white hover:text-gray-400'>Home</a></li>
-                        <li><a href="#" className='text-white hover:text-gray-400'>About us</a></li>
+                        <li><a href="/about" className='text-white hover:text-gray-400'>About us</a></li>
                         <li><a href="#" className='text-white hover:text-gray-400'>Vehicles</a></li>
                         <li><a href="/contact" className='text-white hover:text-gray-400'>Contact us</a></li>
                         <li>
