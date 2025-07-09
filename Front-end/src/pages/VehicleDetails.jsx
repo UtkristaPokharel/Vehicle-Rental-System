@@ -1,4 +1,4 @@
-import { useLocation } from "react-router";
+import { useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { FaStar } from "react-icons/fa6";
@@ -11,8 +11,8 @@ function VehicleDetails() {
   return (
     <>
       <Navbar />
-      <div className="detail-page flex justify-center item-center md:mb-5 mb-30  ">
-        <div className="  w-full md:w-[85vw] lg:w-[80vw] px-10  ">
+      <div className="detail-page flex justify-center item-center md:mb-5 mb-30 ">
+        <div className="  w-full md:w-[85vw] lg:w-[80vw] px-10 mt-15 ">
           <div className=" py-5  flex justify-center items-center  ">
             <img className="lg:w-[650px]" src={image} alt={name} />
           </div>

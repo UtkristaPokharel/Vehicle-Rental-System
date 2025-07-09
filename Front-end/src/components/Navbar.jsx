@@ -6,8 +6,8 @@ import { useNavigate } from 'react-router';
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const menuref = useRef(null);
-   const profileImg = localStorage.getItem("profileImg")
-    const imgUrl = profileImg || profile ;
+    const profileImg = localStorage.getItem("profileImg")
+    const imgUrl = profileImg || profile;   
 
     const navigate = useNavigate();
 
@@ -31,28 +31,57 @@ export default function Navbar() {
         setIsOpen(prev => !prev);
     };
 
-    const handleProfileClick =()=>{
+    const handleProfileClick = () => {
         const token = localStorage.getItem("token")
 
-       if(token){
-        navigate("/profile")
-       } else {
-        navigate("/login")
-       }
+        if (token) {
+            navigate("/profile")
+        } else {
+            navigate("/login")
+        }
 
     }
 
+   const handleFAQClick = () => {
+  const isHome = window.location.pathname === '/';
+
+  if (isHome) {
+    const faqSection = document.getElementById('faq-section');
+    if (faqSection) {
+      faqSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  } else {
+    navigate('/', { state: { scrollToFAQ: true } });
+
+    setTimeout(() => {
+      const faqSection = document.getElementById('faq-section');
+      if (faqSection) {
+        faqSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 500); 
+  }
+
+  setIsOpen(false);
+};
+
     return (
         <>
-            <nav className='static w-full h-18 bg-black flex justify-around items-center gap-10 px-3 xl:px-10 z-10'>
+            <nav className='sticky top-0 left-0 w-full h-18 bg-black flex justify-around items-center gap-10 px-3 xl:px-10 z-10'>
                 <div> <img src="/logo.png" alt="EasyWheels Logo" className="h-30" /></div>
                 <div className='flex gap-10 items-center text-white text-lg '>
                     <ul className='hidden xl:flex space-x-9'>
                         <li><a href="/" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Home</a></li>
                         <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>About us</a></li>
                         <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Vehicles</a></li>
-                        <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Contact us</a></li>
-                        <li><a href="/faq" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>FAQ</a></li>
+                        <li><a href="/contact" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Contact us</a></li>
+                        <li>
+                            <button
+                                onClick={handleFAQClick}
+                                className="hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8"
+                            >
+                                FAQ
+                            </button>
+                        </li>
                     </ul>
 
                     <button className="flex border-0 px-4 py-2 bg-red-600 text-white text-sm md:text-base rounded-2xl hover:cursor-pointer hover:scale-110 transition-transform duration-200">
@@ -76,11 +105,13 @@ export default function Navbar() {
                         <li><a href="/" className='text-white hover:text-gray-400'>Home</a></li>
                         <li><a href="#" className='text-white hover:text-gray-400'>About us</a></li>
                         <li><a href="#" className='text-white hover:text-gray-400'>Vehicles</a></li>
-                        <li><a href="#" className='text-white hover:text-gray-400'>Contact us</a></li>
-                        <li><a href="/faq" className='text-white hover:text-gray-400'>FAQ</a></li>
+                        <li><a href="/contact" className='text-white hover:text-gray-400'>Contact us</a></li>
+                        <li>
+                            <button onClick={handleFAQClick} className="text-white hover:text-gray-400">
+                                FAQ
+                            </button>
+                        </li>
                     </div>
-
-
                 </div>
             </nav>
         </>

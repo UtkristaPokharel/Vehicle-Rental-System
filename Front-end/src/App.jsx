@@ -1,11 +1,12 @@
 import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css'
 import Home from './pages/Home.jsx'
 import VehicleTypePage from './components/VehicleTypePage';
 import AuthForm from './pages/Auth.jsx';
 import VehicleDetails from './pages/VehicleDetails.jsx';
 import Profile from './pages/Profile.jsx';
+import ContactUs from './pages/ContactUs.jsx';
 
 import Logout from './pages/Api/logout.jsx';
 import { UserProvider } from "./context/UserContext.jsx"
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/faq" element={<FAQPage />} />
 
+          <Route path="/contact" element={<ContactUs />} />
         </Routes>
       </Router>
 

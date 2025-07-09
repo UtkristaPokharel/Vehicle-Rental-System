@@ -1,11 +1,9 @@
 import { FaRegHeart, FaHeart } from "react-icons/fa6";
 import { FaStar } from "react-icons/fa";
-import { Link } from "react-router";
-import vehicleData from "../assets/Sample.json";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 
-// VEHICLE CARD
-export const VehicleCard = ({ vehicle, type }) => {
+const VehicleCard = ({ vehicle, type }) => {
   const [liked, setLiked] = useState(false);
 
   return (
@@ -19,7 +17,7 @@ export const VehicleCard = ({ vehicle, type }) => {
         price: vehicle.price,
       }}
     >
-      <div className="vehicle-card group w-full rounded-2xl bg-white border border-gray-200 hover:shadow-2xl transition-shadow duration-300 overflow-hidden">
+      <div className="vehicle-card group w-full rounded-2xl bg-white border border-gray-200 hover:shadow-2xl transition-shadow-md duration-300 overflow-hidden">
         <div className="relative">
           <img
             className="w-full h-48 sm:h-52 object-cover object-center transition-transform duration-300 group-hover:scale-105"
@@ -42,10 +40,10 @@ export const VehicleCard = ({ vehicle, type }) => {
             <h3 className="text-lg font-semibold text-gray-800 truncate">{vehicle.name}</h3>
 
             <div className="flex items-center gap-1 text-yellow-500 text-sm font-medium">
-              <FaStar className="text-base" /> 4.5
+              <FaStar className="text-base" /> {vehicle.rating || "N/A"}
             </div>
 
-            <div className="text-gray-500 text-sm">{vehicle.dateRange}</div>
+            <div className="flex items-center text-gray-500 text-sm">{vehicle.dateRange}</div>
           </div>
 
           <div className="mt-2 text-right">
@@ -58,18 +56,4 @@ export const VehicleCard = ({ vehicle, type }) => {
   );
 };
 
-// VEHICLE GRID
-export default function Vehicle({ type }) {
-  const vehicles = vehicleData;
-
-  return (
-    <div className="p-4 sm:p-6 lg:p-10 bg-gray-50 min-h-screen">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Explore Vehicles</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {vehicles.map((vehicle) => (
-          <VehicleCard type={type} vehicle={vehicle} key={vehicle.id} />
-        ))}
-      </div>
-    </div>
-  );
-}
+export default VehicleCard;

@@ -1,31 +1,35 @@
 [
   {
-    "name": "Toyota Fortuner",
     "id": 1,
+    "type": "car",
+    "name": "Toyota Fortuner",
     "rating": 4.5,
     "dateRange": "July 3 - 29",
     "price": "रु 5000",
     "image": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg"
   },
   {
-    "name": "Jeep Wrangler",
     "id": 2,
+    "type": "car",
+    "name": "Jeep Wrangler",
     "rating": 4.8,
     "dateRange": "Aug 1 - 15",
     "price": "रु 7000",
     "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
   },
   {
-    "name": "Hyundai Creta",
     "id": 3,
+    "type": "car",
+    "name": "Hyundai Creta",
     "rating": 4.2,
     "dateRange": "Sept 5 - 22",
     "price": "रु 5500",
     "image": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
   },
   {
-    "name": "Mahindra Scorpio",
     "id": 4,
+    "type": "car",
+    "name": "Mahindra Scorpio",
     "rating": 4.7,
     "dateRange": "Oct 1 - 10",
     "price": "रु 6000",
@@ -37,30 +41,178 @@
     "rating": 4.3,
     "dateRange": "Oct 15 - Nov 2",
     "price": "रु 5200",
-    "image": "https://images.pexels.com/photos/210019/pexels-photo-210019.jpeg"
+    "image": "https://images.pexels.com/photos/210019/pexels-photo-210019.jpeg",
+    "type": "car"
   },
   {
-    "name": "Hyundai Santro",
     "id": 6,
+    "type": "car",
+    "name": "Hyundai Santro",
     "rating": 4.6,
     "dateRange": "Nov 10 - Dec 1",
     "price": "रु 7500",
-    "image": "https://images.pexels.com/photos/114905/pexels-photo-114905.jpeg"
+    "image": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg"
   },
   {
-    "name": "Land Cruser",
     "id": 7,
+    "type": "car",
+    "name": "Land Cruser",
     "rating": 4.4,
     "dateRange": "Dec 5 - 20",
     "price": "रु 6800",
     "image": "https://images.pexels.com/photos/210019/pexels-photo-210019.jpeg"
   },
   {
-    "name": "Range Rover",
     "id": 8,
+    "type": "car",
+    "name": "Range Rover",
     "rating": 4.9,
     "dateRange": "Jan 1-12",
     "price": "रु 9500",
     "image": "https://images.pexels.com/photos/164634/pexels-photo-164634.jpeg"
+  },
+  {
+    "id": 9,
+    "type": "two-wheeler",
+    "name": "Yamaha R15",
+    "rating": 4.5,
+    "dateRange": "July 3 - 29",
+    "price": "रु 1500",
+    "image": "https://images.pexels.com/photos/164634/pexels-photo-164634.jpeg"
+  },
+  {
+    "id": 10,
+    "type": "two-wheeler",
+    "name": "KTM Duke",
+    "rating": 4.8,
+    "dateRange": "Aug 1 - 15",
+    "price": "रु 2000",
+    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+  },
+  {
+    "id": 11,
+    "type": "two-wheeler",
+    "name": "Honda CBR",
+    "rating": 4.2,
+    "dateRange": "Sept 5 - 22",
+    "price": "रु 1800",
+    "image": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
+  },
+  {
+    "id": 12,
+    "type": "two-wheeler",
+    "name": "Bajaj Pulsar",
+    "rating": 4.7,
+    "dateRange": "Oct 1 - 10",
+    "price": "रु 1600",
+    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+  },
+  {
+    "id": 13,
+    "type": "pickup",
+    "name": "Tata Xenon",
+    "rating": 4.5,
+    "dateRange": "July 3 - 29",
+    "price": "रु 3000",
+    "image": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg"
+  },
+  {
+    "id": 14,
+    "type": "pickup",
+    "name": "Mahindra Bolero",
+    "rating": 4.8,
+    "dateRange": "Aug 1 - 15",
+    "price": "रु 3500",
+    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+  },
+  {
+    "id": 15,
+    "type": "pickup",
+    "name": "Isuzu D-Max",
+    "rating": 4.2,
+    "dateRange": "Sept 5 - 22",
+    "price": "रु 4000",
+    "image": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
+  },
+  {
+    "id": 16,
+    "type": "pickup",
+    "name": "Toyota Hilux",
+    "rating": 4.7,
+    "dateRange": "Oct 1 - 10",
+    "price": "रु 4500",
+    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+  },
+  {
+    "id": 17,
+    "type": "truck",
+    "name": "Tata 407",
+    "rating": 4.5,
+    "dateRange": "July 3 - 29",
+    "price": "रु 6000",
+    "image": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg"
+  },
+  {
+    "id": 18,
+    "type": "truck",
+    "name": "Ashok Leyland Dost",
+    "rating": 4.8,
+    "dateRange": "Aug 1 - 15",
+    "price": "रु 7000",
+    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+  },
+  {
+    "id":19,
+    "type": "truck",
+    "name": "Mahindra Bolero Pik-Up",
+    "rating": 4.2,
+    "dateRange": "Sept 5 - 22",
+    "price": "रु 8000",
+    "image": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
+  },
+  {
+    "id": 20,
+    "type": "truck",
+    "name": "Eicher Pro",
+    "rating": 4.7,
+    "dateRange": "Oct 1 - 10",
+    "price": "रु 9000",
+    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+  },
+  {
+    "id": 21,
+    "type": "bus",
+    "name": "Tata Starbus",
+    "rating": 4.5,
+    "dateRange": "July 3 - 29",
+    "price": "रु 10000",
+    "image": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg"
+  },
+  {
+    "id": 22,
+    "type": "bus",
+    "name": "Ashok Leyland Lynx",
+    "rating": 4.8,
+    "dateRange": "Aug 1 - 15",
+    "price": "रु 12000",
+    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+  },
+  {
+    "id": 23,
+    "type": "bus",
+    "name": "Volvo B7R",
+    "rating": 4.2,
+    "dateRange": "Sept 5 - 22",
+    "price": "रु 15000",
+    "image": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
+  },
+  {
+    "id": 24,
+    "type": "bus",
+    "name": "Mercedes-Benz Sprinter",
+    "rating": 4.7,
+    "dateRange": "Oct 1 - 10",
+    "price": "रु 18000",
+    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
   }
 ]
