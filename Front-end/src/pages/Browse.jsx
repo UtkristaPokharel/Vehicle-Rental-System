@@ -81,7 +81,7 @@ export const SuggestedVehicle = () => {
 
   return (
     <div className="relative w-full mt-8">
-      {/* Left Arrow */}
+    
       <button
         onClick={() => scroll("left")}
         className="absolute left-2 top-1/2 z-10 -translate-y-1/2 bg-white shadow-md p-2 rounded-full hover:bg-gray-100"
@@ -89,7 +89,6 @@ export const SuggestedVehicle = () => {
         <IoChevronBack size={24} />
       </button>
 
-      {/* Scrollable Carousel */}
       <div
         ref={scrollRef}
         className="flex gap-6 overflow-x-auto scroll-smooth px-10 py-4 hide-scrollbar"
@@ -101,7 +100,6 @@ export const SuggestedVehicle = () => {
         ))}
       </div>
 
-      {/* Right Arrow */}
       <button
         onClick={() => scroll("right")}
         className="absolute right-2 top-1/2 z-10 -translate-y-1/2 bg-white shadow-md p-2 rounded-full hover:bg-gray-100"
