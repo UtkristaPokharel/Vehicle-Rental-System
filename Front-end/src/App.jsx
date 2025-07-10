@@ -11,6 +11,7 @@ import ContactUs from './pages/ContactUs.jsx';
 import Vehicle from './pages/Vehicles.jsx';
 import AdminLoginPage from './pages/admin/AdminLoginPage.jsx';
 import AdminPanel from './pages/admin/AdminPanel.jsx';
+import ScrollToTop from './components/ScrollToTop.jsx';
 
 import Logout from './pages/Api/logout.jsx';
 import { UserProvider } from "./context/UserContext.jsx"
@@ -25,7 +26,7 @@ export default function App() {
     <UserProvider>
 
       <Router>
-
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<AuthForm />} />
