@@ -6,7 +6,7 @@
     "rating": 4.5,
     "dateRange": "July 3 - 29",
     "price": "रु 5000",
-    "image": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg"
+    "image": "/fortuner.jpeg"
   },
   {
     "id": 2,
@@ -15,7 +15,7 @@
     "rating": 4.8,
     "dateRange": "Aug 1 - 15",
     "price": "रु 7000",
-    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+    "image": "/vehicle/jeepwrangler.jpeg"
   },
   {
     "id": 3,
@@ -24,7 +24,7 @@
     "rating": 4.2,
     "dateRange": "Sept 5 - 22",
     "price": "रु 5500",
-    "image": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
+    "image": "/vehicle/creta.avif"
   },
   {
     "id": 4,
@@ -33,7 +33,7 @@
     "rating": 4.7,
     "dateRange": "Oct 1 - 10",
     "price": "रु 6000",
-    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+    "image": "/vehicle/scorpio.webp"
   },
   {
     "name": "Suzuki Swift",
@@ -41,7 +41,7 @@
     "rating": 4.3,
     "dateRange": "Oct 15 - Nov 2",
     "price": "रु 5200",
-    "image": "https://images.pexels.com/photos/210019/pexels-photo-210019.jpeg",
+    "image": "/vehicle/suzukiswift.jpg",
     "type": "car"
   },
   {
@@ -51,16 +51,16 @@
     "rating": 4.6,
     "dateRange": "Nov 10 - Dec 1",
     "price": "रु 7500",
-    "image": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg"
+    "image": "/vehicle/santro.png"
   },
   {
     "id": 7,
     "type": "car",
-    "name": "Land Cruser",
+    "name": "Volkswagen Polo",
     "rating": 4.4,
     "dateRange": "Dec 5 - 20",
     "price": "रु 6800",
-    "image": "https://images.pexels.com/photos/210019/pexels-photo-210019.jpeg"
+    "image": "/vehicle/polo.jpeg"
   },
   {
     "id": 8,
@@ -69,7 +69,7 @@
     "rating": 4.9,
     "dateRange": "Jan 1-12",
     "price": "रु 9500",
-    "image": "https://images.pexels.com/photos/164634/pexels-photo-164634.jpeg"
+    "image": "/vehicle/rangerover.webp"
   },
   {
     "id": 9,
@@ -78,34 +78,34 @@
     "rating": 4.5,
     "dateRange": "July 3 - 29",
     "price": "रु 1500",
-    "image": "https://images.pexels.com/photos/164634/pexels-photo-164634.jpeg"
+    "image": "/vehicle/R-15.webp"
   },
   {
     "id": 10,
     "type": "two-wheeler",
-    "name": "KTM Duke",
+    "name": "KTM Duke 200",
     "rating": 4.8,
     "dateRange": "Aug 1 - 15",
     "price": "रु 2000",
-    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+    "image": "/vehicle/duke200.webp"
   },
   {
     "id": 11,
     "type": "two-wheeler",
-    "name": "Honda CBR",
+    "name": "Yamaha MT-15",
     "rating": 4.2,
     "dateRange": "Sept 5 - 22",
     "price": "रु 1800",
-    "image": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
+    "image": "/vehicle/mt15.jpg"
   },
   {
     "id": 12,
     "type": "two-wheeler",
-    "name": "Bajaj Pulsar",
+    "name": "Bajaj Pulsar Ns200",
     "rating": 4.7,
     "dateRange": "Oct 1 - 10",
     "price": "रु 1600",
-    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+    "image": "/vehicle/pulsar.jpg"
   },
   {
     "id": 13,
@@ -114,25 +114,25 @@
     "rating": 4.5,
     "dateRange": "July 3 - 29",
     "price": "रु 3000",
-    "image": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg"
+    "image": "/vehicle/xenon.jpeg"
   },
   {
     "id": 14,
     "type": "pickup",
-    "name": "Mahindra Bolero",
+    "name": "Mahindra Scorpio Pickup",
     "rating": 4.8,
     "dateRange": "Aug 1 - 15",
     "price": "रु 3500",
-    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+    "image": "/vehicle/scorpiopickup.jpg"
   },
   {
     "id": 15,
     "type": "pickup",
-    "name": "Isuzu D-Max",
+    "name": "Isuzu Hilander",
     "rating": 4.2,
     "dateRange": "Sept 5 - 22",
     "price": "रु 4000",
-    "image": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
+    "image": "/vehicle/hilander.jpg"
   },
   {
     "id": 16,
@@ -141,7 +141,7 @@
     "rating": 4.7,
     "dateRange": "Oct 1 - 10",
     "price": "रु 4500",
-    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+    "image": "/vehicle/hilux.jpg"
   },
   {
     "id": 17,
@@ -150,25 +150,25 @@
     "rating": 4.5,
     "dateRange": "July 3 - 29",
     "price": "रु 6000",
-    "image": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg"
+    "image": "/vehicle/tata.avif"
   },
   {
     "id": 18,
     "type": "truck",
-    "name": "Ashok Leyland Dost",
+    "name": "Ashok Leyland ",
     "rating": 4.8,
     "dateRange": "Aug 1 - 15",
     "price": "रु 7000",
-    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+    "image": "/vehicle/ashok.jpeg"
   },
   {
     "id":19,
     "type": "truck",
-    "name": "Mahindra Bolero Pik-Up",
+    "name": "Tata",
     "rating": 4.2,
     "dateRange": "Sept 5 - 22",
     "price": "रु 8000",
-    "image": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
+    "image": "/vehicle/tatatruck.webp"
   },
   {
     "id": 20,
@@ -177,7 +177,7 @@
     "rating": 4.7,
     "dateRange": "Oct 1 - 10",
     "price": "रु 9000",
-    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+    "image": "/vehicle/eitcher.webp"
   },
   {
     "id": 21,
@@ -186,7 +186,7 @@
     "rating": 4.5,
     "dateRange": "July 3 - 29",
     "price": "रु 10000",
-    "image": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg"
+    "image": "/vehicle/starbus.jpg"
   },
   {
     "id": 22,
@@ -195,7 +195,7 @@
     "rating": 4.8,
     "dateRange": "Aug 1 - 15",
     "price": "रु 12000",
-    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+    "image": "/vehicle/leyland.jpg"
   },
   {
     "id": 23,
@@ -204,7 +204,7 @@
     "rating": 4.2,
     "dateRange": "Sept 5 - 22",
     "price": "रु 15000",
-    "image": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
+    "image": "/vehicle/volvo.jpg"
   },
   {
     "id": 24,
@@ -213,6 +213,6 @@
     "rating": 4.7,
     "dateRange": "Oct 1 - 10",
     "price": "रु 18000",
-    "image": "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg"
+    "image": "/vehicle/benz.jpg"
   }
 ]
