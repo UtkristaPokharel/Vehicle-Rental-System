@@ -8,6 +8,7 @@ import VehicleDetails from './pages/VehicleDetails.jsx';
 import Profile from './pages/Profile.jsx';
 import AboutUs from './pages/AboutUs.jsx';
 import ContactUs from './pages/ContactUs.jsx';
+import Vehicle from './pages/Vehicles.jsx';
 
 import Logout from './pages/Api/logout.jsx';
 import { UserProvider } from "./context/UserContext.jsx"
@@ -38,6 +39,7 @@ export default function App() {
 
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/about" element={<AboutUs />} />
+          <Route path="browse" element={<Vehicle />} />
           {/* Fallback route for 404 */}
         </Routes>
       </Router>
