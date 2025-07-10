@@ -4,6 +4,7 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const adminRoutes =require("./routes/admin")
 require('dotenv').config();
 
 // Import User model
@@ -285,9 +286,9 @@ app.get('/api/user/dashboard', authenticateToken, async (req, res) => {
         imgUrl: user.imgUrl,
       },
       dashboardData: {
-        totalBookings: 0, // Replace with actual data
-        activeBookings: 0, // Replace with actual data
-        completedBookings: 0, // Replace with actual data
+        totalBookings: 0, 
+        activeBookings: 0, 
+        completedBookings: 0, 
       }
     });
   } catch (error) {
@@ -295,6 +296,11 @@ app.get('/api/user/dashboard', authenticateToken, async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+//Admin login route  logic setup
+
+app.use('/admin',adminRoutes);
+
 
 // Start server
 app.listen(PORT, () => {

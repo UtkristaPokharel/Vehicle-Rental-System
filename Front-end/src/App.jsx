@@ -9,6 +9,8 @@ import Profile from './pages/Profile.jsx';
 import AboutUs from './pages/AboutUs.jsx';
 import ContactUs from './pages/ContactUs.jsx';
 import Vehicle from './pages/Vehicles.jsx';
+import AdminLoginPage from './pages/admin/AdminLoginPage.jsx';
+import AdminPanel from './pages/admin/AdminPanel.jsx';
 
 import Logout from './pages/Api/logout.jsx';
 import { UserProvider } from "./context/UserContext.jsx"
@@ -40,6 +42,9 @@ export default function App() {
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="browse" element={<Vehicle />} />
+
+           <Route path="/admin-login" element={<AdminLoginPage />} />
+        <Route path="/admin-panel" element={<AdminPanel />} />
           {/* Fallback route for 404 */}
         </Routes>
       </Router>
