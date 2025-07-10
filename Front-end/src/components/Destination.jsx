@@ -2,31 +2,31 @@ import { useState } from "react";
 
 const destinations = {
 	Butwal: [
-		{ name: "Siddhababa Temple", image: "siddhababa.jpg" },
-		{ name: "Manimukunda Park", image: "fulbari.jpg" },
-		{ name: "Hill Park", image: "hillpark.jpg" },
-		{ name: "Jitgadi Killa", image: "jitgadi.jpg" },
+		{ name: "Siddhababa Temple", image: "destination/siddhababa.jpg" },
+		{ name: "Manimukunda Park", image: "destination/fulbari.jpg" },
+		{ name: "Hill Park", image: "destination/hillpark.jpg" },
+		{ name: "Jitgadi Killa", image: "destination/jitgadi.jpg" },
 	],
 	Kathmandu: [
-		{ name: "Pashupatinath", image: "pashupatinath.jpg" },
-		{ name: "Boudhanath", image: "bouddhanath.jpg" },
+		{ name: "Pashupatinath", image: "destination/pashupatinath.jpg" },
+		{ name: "Boudhanath", image: "destination/bouddhanath.jpg" },
 	],
 	Palpa: [
-		{ name: "Rani Mahal", image: "ranimahal.webp" },
-		{ name: "Tansen Bazaar", image: "tansen.webp" },
+		{ name: "Rani Mahal", image: "destination/ranimahal.webp" },
+		{ name: "Tansen Bazaar", image: "destination/tansen.webp" },
 	],
 	Bhairahawa: [
-		{ name: "Lumbini", image: "lumbini.jpg" },
-		{ name: "Gautam Buddha Airport", image: "gbia.jpg" },
+		{ name: "Lumbini", image: "destination/lumbini.jpg" },
+		{ name: "Gautam Buddha Airport", image: "destination/gbia.jpg" },
 	],
 	Dang: [
-		{ name: "Ghorahi", image: "ghorahi.jpg" },
-		{ name: "Tulsipur", image: "tulsipur.jpg" },
+		{ name: "Ghorahi", image: "destination/ghorahi.jpg" },
+		{ name: "Tulsipur", image: "destination/tulsipur.jpg" },
 	],
 	Pokhara: [
-		{ name: "Phewa Lake", image: "phewa.jpg" },
-		{ name: "Sarangkot", image: "sarangkot.jpg" },
-		{ name: "World Peace Pagoda", image: "worldpeace.jpg" },
+		{ name: "Phewa Lake", image: "destination/phewa.jpg" },
+		{ name: "Sarangkot", image: "destination/sarangkot.jpg" },
+		{ name: "World Peace Pagoda", image: "destination/worldpeace.jpg" },
 	],
 };
 
