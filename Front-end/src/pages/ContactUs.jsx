@@ -6,32 +6,18 @@ import { FaWhatsapp } from "react-icons/fa6";
 const ContactUs = () => {
 	return (
 		<>
-			{/* <Navbar /> */}
 			{/* <div className="bg-white min-h-screen"> */}
-			<div className="flex flex-col rounded-t-lg shadow-xl md:flex-row bg-blue-700 text-white py-10 px-4 md:px-10 mt-20 text-center md:text-left relative max-w-screen-2xl mx-auto" id="contactus-section"
+			<div className=" w-full flex flex-col justify-center items-center " id="contactus-section"
 			>
+			<div className="w-[80vw] rounded-t-lg shadow-xl md:flex-row bg-blue-700 text-white py-10 px-4 md:px-10 mt-20 text-center md:text-left relative max-w-screen-2xl mx-auto" >			
 				<div className="flex flex-col ml-10 items-center md:items-start w-full md:w-1/2">
 					<h1 className="text-3xl md:text-4xl font-bold">Contact us</h1>
 					<p className="text-base md:text-lg mt-2">Ask your queries with us for free.</p>
 				</div>
 
-			{/* <div className="absolute top-4 right-10 flex items-center space-x-2">
-						<img
-							src="utkrista.jpeg"
-							alt="Mr. Utkrista"
-							className="w-10 h-10 rounded-full"
-						/>
-						<div className="text-sm">
-							<div>Need Help? </div>
-							<div className="flex items-center space-x-2">
-								<FaWhatsapp className="text-[#0eeb4d]" />
-								<div className="font-bold">+977 9804439499</div>
-							</div>
-						</div>
-					</div> */}
 		</div >
 
-			<div className="flex flex-col md:flex-row justify-center px-4 md:px-20 py-10 space-y-10 md:space-y-0 md:space-x-10">
+			<div className="w-[80vw] flex flex-col md:flex-row justify-center px-4 md:px-20 py-10 space-y-10 md:space-y-0 md:space-x-10 bg-gray-50">
 				<div className="bg-indigo-50 p-6 rounded-lg shadow-md w-full md:w-1/3">
 					<h2 className="text-xl font-semibold text-indigo-900 mb-4">Contact Details</h2>
 					<p className="mb-4 text-sm text-indigo-900">
@@ -63,7 +49,7 @@ const ContactUs = () => {
 					</div>
 				</div>
 
-				<div className="bg-[#f6f6f6] w-full md:w-2/3 p-6 border-0 rounded-lg shadow-md">
+				<div className="bg-[#f6f6f6]  md:w-2/3 p-6 border-0 rounded-lg shadow-md">
 					<h2 className="text-xl font-semibold mb-2">
 						Get in Touch with EasyWheels!
 					</h2>
@@ -88,7 +74,11 @@ const ContactUs = () => {
 							<div>
 								<label className="text-sm">Phone</label>
 								<div className="flex items-center">
-									<span className="px-3 py-2 border-0 bg-white text-gray-600 rounded-l">🇳🇵</span>
+									<span className="px-3 py-2 border-0 bg-white text-gray-600 rounded-l"><select name="country" id="country-code" defaultValue={"Nepal"}>
+										<option value="nepal">Nepal</option>
+										<option value="india">India</option>
+											
+										</select></span>
 									<input type="tel" placeholder="Your Phone" className="w-full px-4 py-2 border-0 rounded-r bg-white" />
 								</div>
 							</div>
@@ -102,6 +92,7 @@ const ContactUs = () => {
 						</button>
 					</form>
 				</div>
+			</div>
 			</div>
 	{/* </div> */ }
 	{/* <Footer /> */ }

@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
   },
   imgUrl: {
     type: String,
-    default: null,
+    
   },
   phone: {
     type: String,
