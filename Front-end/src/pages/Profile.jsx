@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
-import { FaHeart, FaDownload, FaLanguage, FaMapMarkerAlt, FaTrashAlt, FaHistory, FaSignOutAlt, } from "react-icons/fa";
+import {FaHeart,FaDownload,FaLanguage,FaMapMarkerAlt,FaTrashAlt,FaHistory,FaSignOutAlt,} from "react-icons/fa";
 import { MdSubscriptions } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
 import ProfileImageUpload from "../context/ProfileUpload.jsx";
@@ -53,7 +53,7 @@ function Profile() {
               alt="Profile pic"
               className="w-22 h-22 rounded-full object-cover bg-amber-400 m-5"
             />
-            <ProfileImageUpload />
+            <ProfileImageUpload/>
             <ProfileEditMenu />
           </div>
         ) : (
@@ -95,7 +95,7 @@ export function ProfileEditMenu() {
   const fieldItem = [
     { labelName: "UserName", type: "text", fieldValue: userName },
     { labelName: "Email", type: "email", fieldValue: userEmail },
-    { labelName: "Password", type: "password", fieldValue: ".......", disabled: true, },
+    { labelName: "Password",  type: "password", fieldValue: ".......",disabled: true, },
   ];
 
   return (
@@ -111,7 +111,7 @@ export function ProfileEditMenu() {
           />
         ))}
 
-        <input type="submit" value="Save" className="bg-red-600 w-25 py-3 text-white rounded-xl" />
+          <input type="submit"  value="Save" className="bg-red-600 w-25 py-3 text-white rounded-xl"  />
       </form>
     </>
   );
