@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -14,14 +15,19 @@ export default function AdminPanel() {
 
   const [errors, setErrors] = useState({});
 
-  // ✅ Redirect if not logged in
-useEffect(() => {
-  const isLoggedIn = localStorage.getItem("adminLoggedIn");
-  const token = localStorage.getItem("adminToken");
-  if (!isLoggedIn || !token) {
-    navigate("/admin-login");
-  }
-}, [navigate]);
+  // ✅ Toast + Redirect if not logged in
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("adminLoggedIn");
+    const token = localStorage.getItem("adminToken");
+    if (!isLoggedIn || !token) {
+      toast.error("You must be logged in as admin. Redirecting...");
+      setTimeout(() => {
+        navigate("/admin-login");
+      }, 3000);
+    } else {
+      toast.success("Admin logged in successfully");
+    }
+  }, [navigate]);
 
   const validate = () => {
     const newErrors = {};
@@ -56,27 +62,29 @@ useEffect(() => {
       const res = await fetch("http://localhost:3001/admin/add-vehicle", {
         method: "POST",
         body: submission,
-        headers:{
-        Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         },
       });
 
       const data = await res.json();
+
       if (res.ok) {
-        alert("Vehicle added successfully");
+        toast.success("Vehicle added successfully");
         setFormData({ name: "", type: "", brand: "", price: "", location: "", image: null });
         setErrors({});
       } else {
-        alert("Error: " + data.message);
+        toast.error("Error: " + data.message);
       }
     } catch (error) {
       console.error("Error adding vehicle:", error);
-      alert("Failed to connect to backend");
+      toast.error("Something went wrong while adding vehicle");
     }
   };
 
   return (
     <div className="p-6 max-w-xl mx-auto">
+      <Toaster />
       <h2 className="text-2xl font-bold mb-4">Admin Panel – Add Vehicle</h2>
       <form onSubmit={handleAddVehicle} className="flex flex-col gap-4">
         {["name", "type", "brand", "price", "location"].map((field) => (
