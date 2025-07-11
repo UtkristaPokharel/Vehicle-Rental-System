@@ -65,11 +65,11 @@ export default function AdminPanel() {
             placeholder={field}
             value={formData[field]}
             onChange={handleChange}
-            className="border p-2"
+            className="border p-2 rounded-sm"
             required
           />
         ))}
-        <button type="submit" className="bg-green-600 text-white py-2">
+        <button type="submit" className="bg-red-600 rounded font-bold text-white py-2">
           Add Vehicle
         </button>
       </form>
