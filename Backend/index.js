@@ -10,7 +10,9 @@ require('dotenv').config();
 // Import User model
 const User = require('./models/User');
 
+
 const app = express();
+app.use('/uploads', express.static('uploads'));
 const PORT = process.env.PORT || 3001;
 
 // Middleware

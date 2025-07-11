@@ -6,7 +6,7 @@ import { auth, provider, signInWithPopup } from "../../src/firebase";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../context/UserContext";
 import axios from "axios";
-
+import toast,{Toaster} from "react-hot-toast"
 // Create axios instance with credentials enabled for cookies
 const api = axios.create({
   baseURL: 'http://localhost:3001/api',
@@ -48,98 +48,90 @@ export default function AuthForm() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const user = result.user;
-        api.post("/auth/google", {
-          name: user.displayName,
-          email: user.email,
-          googleId: user.uid,
-          imgUrl: user.photoURL,
-        })
-          .then((response) => {
-            const { user: userData, token } = response.data;
-            const { imgUrl, email, name, } = userData;
-
-
-            // Optional: Still store token in localStorage for backward compatibility
-            localStorage.setItem("token", token);
-            localStorage.setItem("profileImg", imgUrl);
-            localStorage.setItem("name", name);
-            localStorage.setItem("email", email);
-
-            setIsAuthenticated(true);
-            navigate("/");
-          })
-          .catch((error) => {
-            console.error("Google Sign-In Error:", error);
-            alert("Google sign-in failed. Please try again.");
-          });
+ const handleGoogleLogin = () => {
+  signInWithPopup(auth, provider)
+    .then((result) => {
+      const user = result.user;
+      api.post("/auth/google", {
+        name: user.displayName,
+        email: user.email,
+        googleId: user.uid,
+        imgUrl: user.photoURL,
       })
-      .catch((error) => {
-        console.error("Google Sign-In Error:", error);
-        alert("Google sign-in failed. Please try again.");
+        .then((response) => {
+          const { user: userData, token } = response.data;
+          const { imgUrl, email, name } = userData;
+
+          localStorage.setItem("token", token);
+          localStorage.setItem("profileImg", imgUrl);
+          localStorage.setItem("name", name);
+          localStorage.setItem("email", email);
+
+          setIsAuthenticated(true);
+          toast.success("Google login successful!");
+          setTimeout(() => navigate("/"), 1500);
+        })
+        .catch((error) => {
+          console.error("Google Sign-In Error:", error);
+          toast.error("Google sign-in failed. Please try again.");
+        });
+    })
+    .catch((error) => {
+      console.error("Google Sign-In Error:", error);
+      toast.error("Google sign-in failed. Please try again.");
+    });
+};
+
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+
+  try {
+    if (isLogin) {
+      const response = await api.post("/auth/login", {
+        email: form.email,
+        password: form.password,
       });
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      if (isLogin) {
-        // Login
-        const response = await api.post("/auth/login", {
-          email: form.email,
-          password: form.password,
-        });
-
-        const { userData, token } = response.data;
-        setUser(userData)
-
-        // Optional: Still store token in localStorage for backward compatibility
-        localStorage.setItem("token", token);
-
-        setIsAuthenticated(true);
-        navigate("/");
-      } else {
-        // Signup
-        if (form.password !== form.confirmPassword) {
-          alert("Passwords do not match");
-          setLoading(false);
-          return;
-        }
-
-        const response = await api.post("/auth/signup", {
-          name: form.name,
-          email: form.email,
-          password: form.password,
-        });
-
-        const { userData, token } = response.data;
-        setUser(userData);
-
-
-        // Optional: Still store token in localStorage for backward compatibility
-        localStorage.setItem("token", token);
-
-        setIsAuthenticated(true);
-        navigate("/");
+      const { userData, token } = response.data;
+      setUser(userData);
+      localStorage.setItem("token", token);
+      setIsAuthenticated(true);
+      toast.success("Login successful!");
+      setTimeout(() => navigate("/"), 1500); // delay redirect
+    } else {
+      if (form.password !== form.confirmPassword) {
+        toast.error("Passwords do not match");
+        setLoading(false);
+        return;
       }
-    } catch (error) {
-      console.error("Auth error:", error);
-      if (error.response?.data?.message) {
-        alert(error.response.data.message);
-      } else if (error.code === 'ERR_NETWORK') {
-        alert("Cannot connect to server. Please make sure the backend is running.");
-      } else {
-        alert("An error occurred. Please try again.");
-      }
-    } finally {
-      setLoading(false);
+
+      const response = await api.post("/auth/signup", {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+      });
+
+      const { userData, token } = response.data;
+      setUser(userData);
+      localStorage.setItem("token", token);
+      setIsAuthenticated(true);
+      toast.success("Signup successful! Redirecting...");
     }
-  };
+  } catch (error) {
+    console.error("Auth error:", error);
+    if (error.response?.data?.message) {
+      toast.error(error.response.data.message);
+    } else if (error.code === "ERR_NETWORK") {
+      toast.error("Cannot connect to server. Please check your connection.");
+    } else {
+      toast.error("An error occurred. Please try again.");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleLogout = async () => {
     try {
@@ -155,8 +147,9 @@ export default function AuthForm() {
 
   // If user is already authenticated, show logout option
   if (isAuthenticated) {
-    return (
+    return (<>
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <Toaster position="top-center"/>
         <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
           <h2 className="text-2xl font-bold text-center text-gray-900 mb-4">
             You are already logged in
@@ -177,6 +170,7 @@ export default function AuthForm() {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
@@ -187,7 +181,7 @@ export default function AuthForm() {
           <img
             src="blacklogo.png"
             alt="EasyWheels Logo"
-            className="w-60 h-auto"
+            className="w-20 h-auto"
           />
         </div>
 
