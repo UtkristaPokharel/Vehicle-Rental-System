@@ -8,6 +8,7 @@ const vehicleSchema = new mongoose.Schema({
   imageUrl: String,
   price: Number,
   location: String,
+  createdAt :{type:Date , default:Date.now},
   available: { type: Boolean, default: true }
 });
 

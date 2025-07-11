@@ -18,7 +18,8 @@ export default function AdminLoginPage() {
     const data = await res.json();
     if (res.ok) {
       localStorage.setItem("adminLoggedIn", "true");
-      navigate("/admin-panel");
+      localStorage.setItem("adminToken", data.token);
+      navigate("/admin-panel"); // ✅ Redirect to admin panel after login
     } else {
       setError(data.message);
     }
