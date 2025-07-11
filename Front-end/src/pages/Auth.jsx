@@ -187,7 +187,7 @@ export default function AuthForm() {
           <img
             src="blacklogo.png"
             alt="EasyWheels Logo"
-            className="w-60 h-auto"
+            className="w-20 h-auto"
           />
         </div>
 

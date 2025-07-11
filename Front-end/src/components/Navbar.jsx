@@ -4,13 +4,21 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
+    const [imgUrl, setImgUrl] = useState(""); // Dynamic profile image
     const menuref = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
 
-    const profileImg = localStorage.getItem("profileImg");
-    const profile = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
-    const imgUrl = profileImg || profile;
+    const defaultProfile = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
+
+    useEffect(() => {
+        const stored = localStorage.getItem("profileImg");
+        if (stored) {
+            setImgUrl(stored);
+        } else {
+            setImgUrl(defaultProfile);
+        }
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -63,9 +71,9 @@ export default function Navbar() {
     };
 
     return (
-        <nav className='sticky top-0 left-0 w-full h-16 bg-black flex justify-between items-center px-2 sm:px-1 xl:px-30 z-50'>
+        <nav className='sticky top-0 left-0 w-full h-16 bg-black flex justify-around md:px:10 sm:justify-between items-center px-2 sm:px-4   xl:px-10 z-50'>
             {/* Logo */}
-            <div className='h-25 w-25 sm:h-25 sm:w-20'>
+            <div className='h-20 w-20 sm:h-20 sm:w-20'>
                 <img src="/logo.png" alt="EasyWheels Logo" className="h-full w-full object-cover" />
             </div>
 
@@ -75,8 +83,8 @@ export default function Navbar() {
                     <li><Link to="/" className={getLinkClass('/')}>Home</Link></li>
                     <li><Link to="/about" className={getLinkClass('/about')}>About us</Link></li>
                     <li><Link to="/browse" className={getLinkClass('/browse')}>Vehicles</Link></li>
-                    <li><button onClick={handleContactUsClick} className="hover:underline decoration-3  hover:decoration-red-600 hover:underline-offset-8">Contact Us</button></li>
-                    <li><button onClick={handleFAQClick} className="hover:underline decoration-3  hover:decoration-red-600 hover:underline-offset-8">FAQ</button></li>
+                    <li><button onClick={handleContactUsClick} className="hover:underline decoration-3 hover:decoration-red-600 hover:underline-offset-8">Contact Us</button></li>
+                    <li><button onClick={handleFAQClick} className="hover:underline decoration-3 hover:decoration-red-600 hover:underline-offset-8">FAQ</button></li>
                 </ul>
 
                 <button className="border-0 px-4 py-2 bg-red-600 text-white text-sm rounded-2xl hover:scale-110 transition-transform duration-200">
@@ -84,14 +92,24 @@ export default function Navbar() {
                 </button>
 
                 <button className='profile-icon' onClick={handleProfileClick}>
-                    <img src={imgUrl} className='w-10 h-10 rounded-full bg-white' alt="profile" />
+                    <img
+                        src={imgUrl}
+                        onError={(e) => e.currentTarget.src = defaultProfile}
+                        className='w-10 h-10 rounded-full bg-white'
+                        alt="profile"
+                    />
                 </button>
             </div>
 
             {/* Mobile Menu Button */}
             <div className='xl:hidden flex items-center gap-3'>
                 <button className='text-white' onClick={handleProfileClick}>
-                    <img src={imgUrl} className='w-9 h-9 rounded-full bg-white' alt="profile" />
+                    <img
+                        src={imgUrl}
+                        onError={(e) => e.currentTarget.src = defaultProfile}
+                        className='w-9 h-9 rounded-full bg-white'
+                        alt="profile"
+                    />
                 </button>
 
                 <button className='text-white mr-1' onClick={handleToggle}>
