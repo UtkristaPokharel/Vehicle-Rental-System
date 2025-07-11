@@ -31,18 +31,18 @@ export default function AdminLoginPage() {
         <input
           type="text"
           placeholder="Username"
-          className="border p-2"
+          className=" border-gray-500 rounded-xl border-2 p-2"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
         <input
           type="password"
           placeholder="Password"
-          className="border p-2"
+          className="border-2 border-gray-500 p-2 rounded-xl"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button className="bg-blue-600 text-white py-2">Login</button>
+        <button className="bg-red-600 text-white font-bold py-2 rounded-xl">Login</button>
         {error && <p className="text-red-500">{error}</p>}
       </form>
     </div>
