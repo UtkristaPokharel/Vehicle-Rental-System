@@ -272,40 +272,15 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ message: 'Logged out successfully' });
 });
 
-// Example protected route for fetching user-specific data
-app.get('/api/user/dashboard', authenticateToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.userId).select('-password');
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    
-    // Example: Return user dashboard data
-    res.json({
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        imgUrl: user.imgUrl,
-      },
-      dashboardData: {
-        totalBookings: 0, 
-        activeBookings: 0, 
-        completedBookings: 0, 
-      }
-    });
-  } catch (error) {
-    console.error('Dashboard error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+
 
 //Admin login route  logic setup
 app.use('/admin',adminRoutes);
 
 app.use("/user", addVehicle);
 
-
+const fetchVehicle =require("./routes/fetchvehicle");
+app.use("api/vehicles", fetchVehicle);
 
 
 // Start server

@@ -15,6 +15,7 @@ import ScrollToTop from './components/ScrollToTop.jsx';
 
 import Logout from './pages/Api/logout.jsx';
 import { UserProvider } from "./context/UserContext.jsx"
+import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 
 import FAQPage from './pages/FAQPage.jsx';
 import AddVehicle from './pages/renter/AddVehicle.jsx';
@@ -47,6 +48,7 @@ export default function App() {
 
            <Route path="/admin-login" element={<AdminLoginPage />} />
         <Route path="/admin-panel" element={<AdminPanel />} />
+        <Route path="/dashboard" element={<AdminDashboard />} />
           {/* Fallback route for 404 */}
         </Routes>
       </Router>
