@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const adminRoutes =require("./routes/admin")
+const addVehicle =require("./routes/vehicleAdd")
 require('dotenv').config();
 
 // Import User model
@@ -300,8 +301,11 @@ app.get('/api/user/dashboard', authenticateToken, async (req, res) => {
 });
 
 //Admin login route  logic setup
-
 app.use('/admin',adminRoutes);
+
+app.use("/user", addVehicle);
+
+
 
 
 // Start server

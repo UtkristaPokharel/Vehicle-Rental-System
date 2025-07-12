@@ -17,6 +17,7 @@ import Logout from './pages/Api/logout.jsx';
 import { UserProvider } from "./context/UserContext.jsx"
 
 import FAQPage from './pages/FAQPage.jsx';
+import AddVehicle from './pages/renter/AddVehicle.jsx';
 
 
 export default function App() {
@@ -37,6 +38,8 @@ export default function App() {
           <Route path="/vehicle/:type/:id" element={<VehicleDetails />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/faq" element={<FAQPage />} />
+          <Route path="add-vehicle" element={<AddVehicle/>} />
+
 
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/about" element={<AboutUs />} />
