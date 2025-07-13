@@ -6,7 +6,7 @@ const upload = require('../middleware/upload');
 
 router.post('/add-vehicle', authMiddleware, upload.single('vehicleImage'), async (req, res) => {
   try {
-    const { name, type, brand, price, location, features } = req.body;
+    const { name, type, brand, price, location, features,description } = req.body;
     const image = req.file ? req.file.filename : null;
 
     if (!image) {
@@ -21,6 +21,7 @@ router.post('/add-vehicle', authMiddleware, upload.single('vehicleImage'), async
       location,
       features: JSON.parse(features),
       image,
+      description,
       createdBy: req.user.id, // Use req.user.id from authMiddleware
     });
 

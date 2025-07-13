@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import axios from "axios";
+import React, { useState } from 'react';
 import UsersDataComponent from "./DashboardComponent/UsersDataComponent.jsx";
 import VehicleDataComponent from './DashboardComponent/VehicleDataComponent.jsx';
 
@@ -8,6 +7,7 @@ const Sidebar = ({ selectedMenu, setSelectedMenu }) => {
     { id: 'vehicles', name: 'Vehicle Listing' },
     { id: 'users', name: 'Users' },
     { id: 'add-vehicle', name: 'Add Vehicle' },
+    {id: "vehicle-booking", name:"Vehicle Booking"},
   ];
 
   return (
@@ -32,7 +32,7 @@ const Sidebar = ({ selectedMenu, setSelectedMenu }) => {
   );
 };
 
-const VehicleListing = ({ vehicles }) => (
+const VehicleListing = () => (
   <div className="p-6">
     <h2 className="text-2xl font-bold mb-4">Vehicle Listing</h2>
     <div className="bg-white p-4 rounded-lg shadow">

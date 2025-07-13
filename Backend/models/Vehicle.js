@@ -43,8 +43,12 @@ const vehicleSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Image is required'],
   },
+  description: { 
+    type: String, 
+    required:[ true," Add description"] 
+  },
   createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: 'User',
     required: true,
   },
