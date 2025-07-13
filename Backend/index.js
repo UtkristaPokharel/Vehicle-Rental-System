@@ -279,9 +279,15 @@ app.use('/admin',adminRoutes);
 
 app.use("/user", addVehicle);
 
-const fetchVehicle =require("./routes/fetchvehicle");
 
+//Data fetching for frontend display
+
+const fetchVehicle =require("./routes/fetchvehicle");
 app.use("/api/vehicles", fetchVehicle);
+
+
+const fetchUsers = require("./routes/fetchuser");
+app.use("/api/fetch/users", fetchUsers);
 
 
 // Start server

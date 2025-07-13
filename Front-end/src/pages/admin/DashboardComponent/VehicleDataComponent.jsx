@@ -1,8 +1,16 @@
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { BsThreeDotsVertical } from "react-icons/bs";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 
-export default function DashboardComponent({ vehicles }) {
+export default function VehicleDataComponent() {
   const [showDropdown, setShowDropdown] = useState(null);
+  const [vehicles,setVehicles]=useState([]);
+    useEffect(() => {
+        axios.get("http://localhost:3001/api/vehicles")
+        .then(res => setVehicles(res.data.reverse()))
+        .catch(err => toast.error("Error fetching vehicles:", err));
+    }, []);
 
   return (
     <div className="overflow-x-auto">
