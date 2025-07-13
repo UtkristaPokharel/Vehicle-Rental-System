@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast,{ Toaster } from "react-hot-toast";
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -21,12 +21,26 @@ export default function AdminLoginPage() {
       localStorage.setItem("adminToken", data.token);
       navigate("/admin-panel"); // ✅ Redirect to admin panel after login
     } else {
-      setError(data.message);
+      toast.error(data.message); // Show error message using toast
     }
   };
 
+  const handleLogout =()=>{
+   const adminOn= localStorage.getItem("adminLoggedIn");
+   if(!adminOn){
+     toast.error("You are not logged in");
+   } else{
+     localStorage.removeItem("adminLoggedIn");
+    localStorage.removeItem("adminToken");
+    toast.success("Logged out successfully");
+   }
+   
+  }
+
   return (
-    <div className="flex flex-col items-center mt-20">
+  <>
+  <Toaster/>
+    <div className="flex flex-col items-center justify-center  mt-20">
       <h2 className="text-2xl font-bold mb-4">Admin Login</h2>
       <form onSubmit={handleLogin} className="flex flex-col gap-4 w-[300px]">
         <input
@@ -44,8 +58,15 @@ export default function AdminLoginPage() {
           onChange={(e) => setPassword(e.target.value)}
         />
         <button className="bg-red-600 text-white font-bold py-2 rounded-xl">Login</button>
-        {error && <p className="text-red-500">{error}</p>}
+       
+        {/* {error && <p className="text-red-500">{error}</p>} */}
       </form>
+
+        <div className="relative top-10 left-0 ">
+       <button onClick={()=>handleLogout()} className=" px-4 py-2 border-red-500 border-1 rounded-xl hover:bg-red-500 hover:text-white"> Logout</button>
+       </div>
     </div>
+  
+    </>
   );
 }

@@ -131,7 +131,7 @@ export default function Navbar() {
                     <Link to="/browse" onClick={handleToggle} className="hover:text-red-400">Vehicles</Link>
                     <button onClick={handleContactUsClick} className="hover:text-red-400">Contact Us</button>
                     <button onClick={handleFAQClick} className="hover:text-red-400">FAQ</button>
-                    <button onClick={() => { handleToggle(); navigate("/login"); }} className="bg-red-600 text-white px-4 py-2 rounded-xl mt-4">
+                    <button onClick={() => { handleToggle(); navigate("/add-vehicle"); }} className="bg-red-600 text-white px-4 py-2 rounded-xl mt-4">
                         Become a Host
                     </button>
                 </div>
