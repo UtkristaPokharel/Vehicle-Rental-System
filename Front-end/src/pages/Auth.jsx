@@ -60,13 +60,16 @@ export default function AuthForm() {
       })
         .then((response) => {
           const { user: userData, token } = response.data;
-          const { imgUrl, email, name } = userData;
+
+          console.log(userData);
+          const { imgUrl, email, name,id } = userData;
 
           localStorage.setItem("token", token);
           localStorage.setItem("profileImg", imgUrl);
           localStorage.setItem("name", name);
           localStorage.setItem("email", email);
-
+          localStorage.setItem("userId",id);
+          
           setIsAuthenticated(true);
           toast.success("Google login successful!");
           setTimeout(() => navigate("/"), 1500);
