@@ -29,7 +29,7 @@ const faqs = [
   {
     question: "Can I rent out my own vehicle?",
     answer:
-      "Yes! Vehicle owners can list their vehicles on EasyWheels to earn passive income. Go to the 'Become a Partner' section to get started.",
+      "Yes! Vehicle owners can list their vehicles on EasyWheels to earn passive income. Go to the 'Become a Host' section to get started.",
   },
 ];
 

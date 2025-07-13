@@ -5,6 +5,7 @@ import { MdSubscriptions } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
 import ProfileImageUpload from "../context/ProfileUpload.jsx";
 import { useState } from "react";
+import Logout from "./Api/logout.jsx";
 
 const userName = localStorage.getItem("name") || "";
 const userEmail = localStorage.getItem("email") || "";
@@ -82,6 +83,10 @@ function Profile() {
               </div>
             </div>
             <SettingsMenu />
+            <div className="flex justify-center mt-2">
+            <Logout/>
+            </div>
+            
           </div>
         )}
       </div>
@@ -138,6 +143,8 @@ export function ProfileEdit({ labelName, type, fieldValue, disabled }) {
 }
 
 export function SettingsItem({ icon: Icon, label, to }) {
+  
+    if(label!=='Logout'){
   return (
     <Link
       to={to}
@@ -152,6 +159,8 @@ export function SettingsItem({ icon: Icon, label, to }) {
   );
 }
 
+}
+
 const menuItems = [
   { label: "Favourites", to: "/favourites", icon: FaHeart },
   { label: "Downloads", to: "/downloads", icon: FaDownload },
@@ -160,7 +169,6 @@ const menuItems = [
   { label: "Subscription", to: "/subscription", icon: MdSubscriptions },
   { label: "Clear cache", to: "/clear-cache", icon: FaTrashAlt },
   { label: "Clear history", to: "/clear-history", icon: FaHistory },
-  { label: "Logout", to: "/logout", icon: FaSignOutAlt },
 ];
 
 export function SettingsMenu() {

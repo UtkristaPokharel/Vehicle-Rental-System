@@ -4,12 +4,16 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const adminRoutes =require("./routes/admin")
+const addVehicle =require("./routes/vehicleAdd")
 require('dotenv').config();
 
 // Import User model
 const User = require('./models/User');
 
+
 const app = express();
+app.use('/uploads', express.static('uploads'));
 const PORT = process.env.PORT || 3001;
 
 // Middleware
@@ -268,33 +272,23 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ message: 'Logged out successfully' });
 });
 
-// Example protected route for fetching user-specific data
-app.get('/api/user/dashboard', authenticateToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.userId).select('-password');
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    
-    // Example: Return user dashboard data
-    res.json({
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        imgUrl: user.imgUrl,
-      },
-      dashboardData: {
-        totalBookings: 0, // Replace with actual data
-        activeBookings: 0, // Replace with actual data
-        completedBookings: 0, // Replace with actual data
-      }
-    });
-  } catch (error) {
-    console.error('Dashboard error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+
+
+//Admin login route  logic setup
+app.use('/admin',adminRoutes);
+
+app.use("/user", addVehicle);
+
+
+//Data fetching for frontend display
+
+const fetchVehicle =require("./routes/fetchvehicle");
+app.use("/api/vehicles", fetchVehicle);
+
+
+const fetchUsers = require("./routes/fetchuser");
+app.use("/api/fetch/users", fetchUsers);
+
 
 // Start server
 app.listen(PORT, () => {
