@@ -4,7 +4,7 @@ const Vehicle = require('../models/Vehicle'); // adjust path
 
 // GET all vehicles
 router.get('/', async (req, res) => {
-  try {
+  try { 
     const vehicles = await Vehicle.find(); 
     res.json(vehicles);
   } catch (err) {

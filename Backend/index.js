@@ -280,7 +280,8 @@ app.use('/admin',adminRoutes);
 app.use("/user", addVehicle);
 
 const fetchVehicle =require("./routes/fetchvehicle");
-app.use("api/vehicles", fetchVehicle);
+
+app.use("/api/vehicles", fetchVehicle);
 
 
 // Start server
