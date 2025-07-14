@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '') || req.cookies.authToken;
+  const authHeader = req.header('Authorization');
+  const token = authHeader?.startsWith('Bearer ')
+    ? authHeader.split(' ')[1]
+    : req.cookies?.authToken;
 
   if (!token) {
     console.error('No token provided');
@@ -10,15 +13,20 @@ const authMiddleware = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.userId) {
-      console.error('Token missing userId:', decoded);
-      return res.status(401).json({ message: 'Invalid token: Missing user ID' });
+
+    if (decoded.userId) {
+      req.user = { id: decoded.userId, name: decoded.name };
+    } else if (decoded.adminId) {
+      req.admin = { id: decoded.adminId, name: decoded.name || 'admin' };
+    } else {
+      console.error('Token missing required identifier');
+      return res.status(401).json({ message: 'Invalid token payload' });
     }
-    req.user = { id: decoded.userId }; // Map userId to req.user.id
+
     next();
-  } catch (error) {
-    console.error('Token verification failed:', error.message);
-    res.status(401).json({ message: 'Invalid token' });
+  } catch (err) {
+    console.error('Token verification failed:', err.message);
+    return res.status(401).json({ message: 'Invalid token' });
   }
 };
 

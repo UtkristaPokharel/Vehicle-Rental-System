@@ -277,7 +277,7 @@ app.post('/api/auth/logout', (req, res) => {
 //Admin login route  logic setup
 app.use('/admin',adminRoutes);
 
-app.use("/user", addVehicle);
+app.use("/api", addVehicle);
 
 
 //Data fetching for frontend display
