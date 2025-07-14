@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function AddVehicle() {
-  const navigate = useNavigate();
+  
   const [formData, setFormData] = useState({
     name: "",
     type: "",
@@ -22,20 +21,6 @@ export default function AddVehicle() {
   const [loading, setLoading] = useState(false);
 
   // Auth check
-  useEffect(() => {
-    const name = localStorage.getItem("name");
-    const email = localStorage.getItem("email");
-    const token = localStorage.getItem("token");
-
-    if (!name || !email || !token) {
-      toast.error("You must be logged in. Redirecting to login...");
-      setTimeout(() => {
-        navigate("/login");
-      }, 3000);
-    } else {
-      toast.success(`Welcome back, ${name}!`);
-    }
-  }, [navigate]);
 
   const validate = () => {
     const newErrors = {};
@@ -118,11 +103,10 @@ export default function AddVehicle() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const name = localStorage.getItem("name") || "admin";
-    const token = localStorage.getItem("token");
-    const id = localStorage.getItem("userId");
+    const name = localStorage.getItem("name") ||localStorage.getItem("adminName");
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
 
-    if (!name || !token) {
+    if (!name || !token ) {
       toast.error("Login required.");
       return;
     }
@@ -140,9 +124,9 @@ export default function AddVehicle() {
       submission.append("description", formData.description);
       submission.append("features", JSON.stringify(formData.features));
       submission.append("vehicleImage", image);
-      submission.append("createdBy", id ? name : "admin");
+      submission.append("createdBy", name || "admin");
 
-      const res = await fetch("http://localhost:3001/user/add-vehicle", {
+      const res = await fetch("http://localhost:3001/api/add-vehicle", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

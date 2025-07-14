@@ -22,7 +22,7 @@ router.post('/add-vehicle', authMiddleware, upload.single('vehicleImage'), async
       features: JSON.parse(features),
       image,
       description,
-      createdBy: req.user.id, // Use req.user.id from authMiddleware
+      createdBy:req.body.createdBy || 'admin', // Use rq.user.id from authMiddleware
     });
 
     await vehicle.save();

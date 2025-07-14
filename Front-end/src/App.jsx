@@ -10,7 +10,6 @@ import AboutUs from './pages/AboutUs.jsx';
 import ContactUs from './pages/ContactUs.jsx';
 import Vehicle from './pages/Vehicles.jsx';
 import AdminLoginPage from './pages/admin/AdminLoginPage.jsx';
-import AdminPanel from './pages/admin/AdminPanel.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 
 import Logout from './pages/Api/logout.jsx';
@@ -18,7 +17,7 @@ import { UserProvider } from "./context/UserContext.jsx"
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 
 import FAQPage from './pages/FAQPage.jsx';
-import AddVehicle from './pages/renter/AddVehicle.jsx';
+import AddVehiclePage from './pages/renter/AddVehiclePage.jsx';
 
 
 export default function App() {
@@ -39,7 +38,7 @@ export default function App() {
           <Route path="/vehicle/:type/:id" element={<VehicleDetails />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/faq" element={<FAQPage />} />
-          <Route path="add-vehicle" element={<AddVehicle/>} />
+          <Route path="add-vehicle" element={<AddVehiclePage/>} />
 
 
           <Route path="/contact" element={<ContactUs />} />
@@ -47,8 +46,7 @@ export default function App() {
           <Route path="browse" element={<Vehicle />} />
 
            <Route path="/admin-login" element={<AdminLoginPage />} />
-        <Route path="/admin-panel" element={<AdminPanel />} />
-        <Route path="/dashboard" element={<AdminDashboard />} />
+         <Route path="/dashboard" element={<AdminDashboard />} />
           {/* Fallback route for 404 */}
         </Routes>
       </Router>

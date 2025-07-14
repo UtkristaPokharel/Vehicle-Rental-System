@@ -87,7 +87,7 @@ export default function Navbar() {
                     <li><button onClick={handleFAQClick} className="hover:underline decoration-3 hover:decoration-red-600 hover:underline-offset-8">FAQ</button></li>
                 </ul>
 
-                <button className="border-0 px-4 py-2 bg-red-600 text-white text-sm rounded-2xl hover:scale-110 transition-transform duration-200">
+                <button onClick={() => { handleToggle(); navigate("/add-vehicle")}}  className="border-0 px-4 py-2 bg-red-600 text-white text-sm rounded-2xl hover:scale-110 transition-transform duration-200">
                     Become a host
                 </button>
 

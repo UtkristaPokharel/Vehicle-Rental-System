@@ -19,7 +19,9 @@ export default function AdminLoginPage() {
     if (res.ok) {
       localStorage.setItem("adminLoggedIn", "true");
       localStorage.setItem("adminToken", data.token);
-      navigate("/admin-panel"); // ✅ Redirect to admin panel after login
+      localStorage.setItem("adminName","houlers");
+
+      navigate("/dashboard"); // ✅ Redirect to admin panel after login
     } else {
       toast.error(data.message); // Show error message using toast
     }

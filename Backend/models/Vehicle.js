@@ -49,7 +49,6 @@ const vehicleSchema = new mongoose.Schema({
   },
   createdBy: {
     type: String,
-    ref: 'User',
     required: true,
   },
   createdAt: {
