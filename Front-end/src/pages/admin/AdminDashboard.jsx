@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import UsersDataComponent from "./DashboardComponent/UsersDataComponent.jsx";
 import VehicleDataComponent from './DashboardComponent/VehicleDataComponent.jsx';
 import AddVehicleForm from '../renter/AddVehicleForm.jsx';
+import EditVehicleForm from './DashboardComponent/EditVehiclePage.jsx'; // Reusable Add/Edit form
 
 const Sidebar = ({ selectedMenu, setSelectedMenu }) => {
   const menuItems = [
@@ -59,7 +60,7 @@ const AddVehicle = () => (
   <div className="p-6">
     <h2 className="text-2xl font-bold mb-4">Add Vehicle</h2>
     <div className="bg-white p-4 rounded-lg shadow">
-      <AddVehicleForm />
+     <EditVehicleForm />
     </div>
   </div>
 );
