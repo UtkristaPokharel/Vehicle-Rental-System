@@ -8,9 +8,9 @@ const VehicleCard = ({ vehicle, type }) => {
 
   return (
     <Link
-      to={`/vehicle/${type}/${vehicle.id}`}
+      to={`/vehicle/${type}/${vehicle._id}`}
       state={{
-        id: vehicle.id,
+        id: vehicle._id,
         name: vehicle.name,
         image: vehicle.image,
         dateRange: vehicle.dateRange,
@@ -21,7 +21,7 @@ const VehicleCard = ({ vehicle, type }) => {
         <div className="relative">
           <img
             className="w-full h-48 sm:h-52 object-cover object-center transition-transform duration-300 group-hover:scale-105"
-            src={vehicle.image}
+            src={`http://localhost:3001/uploads/${vehicle.image}`}
             alt={vehicle.name}
           />
           <button

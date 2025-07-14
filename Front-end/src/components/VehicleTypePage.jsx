@@ -1,22 +1,37 @@
 import { useParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import VehicleCard from './VehicleCard';
-import vehicleData from '../assets/Sample.json';
 import { FaChevronDown } from "react-icons/fa";
 
 const VehicleTypePage = () => {
   const { type } = useParams();
+  const [vehicles, setVehicles] = useState([]);
   const [sortOption, setSortOption] = useState('default');
+  const [loading, setLoading] = useState(true);
 
-  const parsePrice = (priceStr) => {
-    const number = priceStr.replace(/[^\d]/g, ''); // removes Rs, commas, etc.
-    return parseInt(number, 10);
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const res = await fetch(`http://localhost:3001/api/vehicles/type/${type.toLowerCase()}`);
+        const data = await res.json();
+        setVehicles(data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch vehicles:", error);
+      }
+    };
+
+    fetchVehicles();
+  }, [type]);
+
+  const parsePrice = (price) => {
+    if (typeof price === "string") {
+      const number = price.replace(/[^\d]/g, '');
+      return parseInt(number, 10);
+    }
+    return price;
   };
-
-  const filteredVehicles = vehicleData.filter(
-    (v) => v.type.toLowerCase() === type.toLowerCase()
-  );
 
   const sortVehicles = (vehicles) => {
     switch (sortOption) {
@@ -31,7 +46,11 @@ const VehicleTypePage = () => {
     }
   };
 
-  const sortedVehicles = sortVehicles(filteredVehicles);
+  const sortedVehicles = sortVehicles(vehicles);
+  console.log('Vehicles:', vehicles);
+  console.log('Vehicle type param:', type);
+
+
 
   return (
     <>
@@ -41,7 +60,7 @@ const VehicleTypePage = () => {
           <h1 className="text-3xl font-bold mb-2 sm:mb-0 text-center sm:text-left">
             Vehicles of type: {type}
           </h1>
-          <div className="  relative w-60">
+          <div className="relative w-60">
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
@@ -54,15 +73,20 @@ const VehicleTypePage = () => {
             </select>
             <FaChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none" />
           </div>
-
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {sortedVehicles.map((vehicle) => (
-            <VehicleCard type={type} vehicle={vehicle} key={vehicle.id} />
-          ))}
-        </div>
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {sortedVehicles.map((vehicle) => (
+              <VehicleCard type={type} vehicle={vehicle} key={vehicle._id || vehicle.id} />
+            ))}
+          </div>
+        )}
       </div>
+      
     </>
   );
 };
