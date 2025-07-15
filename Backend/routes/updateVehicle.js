@@ -2,9 +2,10 @@
 const express = require("express");
 const router = express.Router();
 const Vehicle = require("../models/Vehicle"); // Adjust path as needed
-const verifyToken = require("../middleware/auth"); // Your auth middleware
+const verifyToken = require("../middleware/auth");
+const { isAdmin } = require("../middleware/auth");
 
-router.put("/update-vehicle", verifyToken, async (req, res) => {
+router.put("/update-vehicle", verifyToken, isAdmin, async (req, res) => {
   try {
     const { _id, name, type, brand, price, location, description, features } = req.body;
 
@@ -37,7 +38,7 @@ router.put("/update-vehicle", verifyToken, async (req, res) => {
   }
 });
 
-router.delete("/delete-vehicle/:id", verifyToken, async (req, res) => {
+router.delete("/delete-vehicle/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const deleted = await Vehicle.findByIdAndDelete(id);

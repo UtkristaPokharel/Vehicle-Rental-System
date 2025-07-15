@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User'); // adjust path
 const verifyToken = require('../middleware/auth');
+const { isAdmin } = require('../middleware/auth');
 
 // GET all vehicles
 router.get('/', async (req, res) => {
@@ -13,7 +14,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.delete('/delete-user/:id', verifyToken, async (req, res) => {
+router.delete('/delete-user/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const deleted = await User.findByIdAndDelete(id);
