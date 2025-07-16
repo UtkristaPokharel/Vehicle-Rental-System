@@ -11,6 +11,7 @@ import ContactUs from './pages/ContactUs.jsx';
 import Vehicle from './pages/Vehicles.jsx';
 import AdminLoginPage from './pages/admin/AdminLoginPage.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
+import { Toaster } from 'react-hot-toast';
 
 import Logout from './pages/Api/logout.jsx';
 import { UserProvider } from "./context/UserContext.jsx"
@@ -25,6 +26,43 @@ export default function App() {
   return (
 
     <UserProvider>
+      {/* Global toast container */}
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=""
+        containerStyle={{}}
+        toastOptions={{
+          // Define default options
+          className: '',
+          duration: 4000,
+          style: {
+            background: '#ffffff',
+            color: '#363636',
+            fontSize: '14px',
+            fontWeight: '500',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+          },
+          // Default options for specific types
+          success: {
+            duration: 3000,
+            style: {
+              background: '#10b981',
+              color: '#ffffff',
+            },
+          },
+          error: {
+            duration: 5000,
+            style: {
+              background: '#ef4444',
+              color: '#ffffff',
+            },
+          },
+        }}
+      />
 
       <Router>
         <ScrollToTop />
@@ -48,6 +86,8 @@ export default function App() {
            <Route path="/admin-login" element={<AdminLoginPage />} />
          <Route path="/dashboard" element={<AdminDashboard />} />
           {/* Fallback route for 404 */}
+
+
         </Routes>
       </Router>
 
