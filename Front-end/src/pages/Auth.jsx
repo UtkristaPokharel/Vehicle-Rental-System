@@ -75,13 +75,23 @@ export default function AuthForm() {
           setTimeout(() => navigate("/"), 1500);
         })
         .catch((error) => {
-          console.error("Google Sign-In Error:", error);
-          toast.error("Google sign-in failed. Please try again.");
+          console.error("Google Sign-In API Error:", error);
+          if (error.response?.data?.message) {
+            toast.error(error.response.data.message);
+          } else {
+            toast.error("Google sign-in failed. Please try again.");
+          }
         });
     })
     .catch((error) => {
-      console.error("Google Sign-In Error:", error);
-      toast.error("Google sign-in failed. Please try again.");
+      console.error("Google Sign-In Popup Error:", error);
+      if (error.code === 'auth/popup-closed-by-user') {
+        toast.error("Google sign-in was cancelled");
+      } else if (error.code === 'auth/popup-blocked') {
+        toast.error("Popup was blocked. Please allow popups and try again");
+      } else {
+        toast.error("Google sign-in failed. Please try again.");
+      }
     });
 };
 
@@ -92,6 +102,13 @@ const handleSubmit = async (e) => {
 
   try {
     if (isLogin) {
+      // Validate login fields
+      if (!form.email || !form.password) {
+        toast.error("Please fill in all required fields");
+        setLoading(false);
+        return;
+      }
+
       const response = await api.post("/auth/login", {
         email: form.email,
         password: form.password,
@@ -104,8 +121,21 @@ const handleSubmit = async (e) => {
       toast.success("Login successful!");
       setTimeout(() => navigate("/"), 1500); // delay redirect
     } else {
+      // Validate signup fields
+      if (!form.name || !form.email || !form.password || !form.confirmPassword) {
+        toast.error("Please fill in all required fields");
+        setLoading(false);
+        return;
+      }
+
       if (form.password !== form.confirmPassword) {
         toast.error("Passwords do not match");
+        setLoading(false);
+        return;
+      }
+
+      if (form.password.length < 6) {
+        toast.error("Password must be at least 6 characters long");
         setLoading(false);
         return;
       }
@@ -121,6 +151,7 @@ const handleSubmit = async (e) => {
       localStorage.setItem("token", token);
       setIsAuthenticated(true);
       toast.success("Signup successful! Redirecting...");
+      setTimeout(() => navigate("/"), 1500); // delay redirect
     }
   } catch (error) {
     console.error("Auth error:", error);
@@ -128,6 +159,8 @@ const handleSubmit = async (e) => {
       toast.error(error.response.data.message);
     } else if (error.code === "ERR_NETWORK") {
       toast.error("Cannot connect to server. Please check your connection.");
+    } else if (error.code === "ECONNABORTED") {
+      toast.error("Request timeout. Please try again.");
     } else {
       toast.error("An error occurred. Please try again.");
     }
@@ -152,7 +185,6 @@ const handleSubmit = async (e) => {
   if (isAuthenticated) {
     return (<>
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <Toaster position="top-center"/>
         <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
           <h2 className="text-2xl font-bold text-center text-gray-900 mb-4">
             You are already logged in
