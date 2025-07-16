@@ -3,9 +3,9 @@ const router = express.Router();
 const Vehicle = require('../models/Vehicle');
 const authMiddleware = require('../middleware/auth');
 const { isAdmin } = require('../middleware/auth');
-const upload = require('../middleware/upload');
+const { vehicleUpload } = require('../middleware/upload');
 
-router.post('/add-vehicle', authMiddleware, isAdmin, upload.single('vehicleImage'), async (req, res) => {
+router.post('/add-vehicle', authMiddleware, isAdmin, vehicleUpload.single('vehicleImage'), async (req, res) => {
   try {
     const { name, type, brand, price, location, features,description } = req.body;
     const image = req.file ? req.file.filename : null;
