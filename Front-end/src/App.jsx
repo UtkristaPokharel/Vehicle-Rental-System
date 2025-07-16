@@ -10,6 +10,7 @@ import AboutUs from './pages/AboutUs.jsx';
 import ContactUs from './pages/ContactUs.jsx';
 import Vehicle from './pages/Vehicles.jsx';
 import AdminLoginPage from './pages/admin/AdminLoginPage.jsx';
+import PaymentPage from './pages/PaymentPage.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import { Toaster } from 'react-hot-toast';
 
@@ -77,6 +78,7 @@ export default function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/faq" element={<FAQPage />} />
           <Route path="add-vehicle" element={<AddVehiclePage/>} />
+          <Route path="/payment" element={<PaymentPage/>} />
 
 
           <Route path="/contact" element={<ContactUs />} />
