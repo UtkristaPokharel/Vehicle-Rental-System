@@ -4,11 +4,12 @@ import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { FaStar } from "react-icons/fa6";
 import { useState, useEffect } from "react";
 import { FaPen } from "react-icons/fa";
+import toast,{ Toaster } from "react-hot-toast";
 
 function VehicleDetails() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { type, id } = useParams();
+  const { id } = useParams();
   
   const [vehicleData, setVehicleData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,7 +20,7 @@ function VehicleDetails() {
     startTime: '',
     endDate: '',
     endTime: '',
-    location: 'Lihue, HI 96766'
+    location: 'Butwal'
   });
 
   useEffect(() => {
@@ -60,7 +61,7 @@ function VehicleDetails() {
     
     // Basic validation
     if (!bookingData.startDate || !bookingData.startTime || !bookingData.endDate || !bookingData.endTime) {
-      alert("Please fill in all trip details before continuing.");
+      toast.error("Please fill in all trip details before continuing.");
       return;
     }
 
@@ -69,7 +70,7 @@ function VehicleDetails() {
     const endDateTime = new Date(`${bookingData.endDate}T${bookingData.endTime}`);
     
     if (endDateTime <= startDateTime) {
-      alert("End date and time must be after start date and time.");
+      toast.error("End date and time must be after start date and time.");
       return;
     }
 
@@ -217,10 +218,14 @@ export const BasicFeatures = ({ name }) => {
   );
 };
 
-export const VehicleDescription = () => {
+export const VehicleDescription = ({ vehicleData }) => {
   const [expanded, setExpanded] = useState(false);
 
-  const description = `The Range Rover is an iconic luxury SUV known for its unmatched combination of refinement, capability, and cutting-edge technology. With a powerful engine lineup, including hybrid and V8 options, it delivers both smooth on-road performance and exceptional off-road capabilities. The cabin features exquisite materials, advanced infotainment, and best-in-class comfort, making it a top choice for those who demand elegance and ruggedness in one vehicle. The 2024 model continues the legacy with even more tech, improved efficiency, and a bold design that stands out in any environment.`;
+  // Default description fallback
+  const defaultDescription = `The Range Rover is an iconic luxury SUV known for its unmatched combination of refinement, capability, and cutting-edge technology. With a powerful engine lineup, including hybrid and V8 options, it delivers both smooth on-road performance and exceptional off-road capabilities. The cabin features exquisite materials, advanced infotainment, and best-in-class comfort, making it a top choice for those who demand elegance and ruggedness in one vehicle. The 2024 model continues the legacy with even more tech, improved efficiency, and a bold design that stands out in any environment.`;
+
+  const displayDescription = vehicleData?.description || defaultDescription;
+  // console.log(vehicleData.description);
 
   return (
     <div className="w-[90%] px-5 relative mt-6  ">
@@ -230,7 +235,7 @@ export const VehicleDescription = () => {
           : "line-clamp-5 max-h-[7.5rem]"
           }`}
       >
-        {description}
+        {displayDescription}
 
         {!expanded && (
           <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent pointer-events-none" />
