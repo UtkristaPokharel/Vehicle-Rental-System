@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { FaStar } from "react-icons/fa6";
@@ -8,7 +8,10 @@ import { FaPen } from "react-icons/fa";
 function VehicleDetails() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { name, price, image, dateRange, id } = location.state || {};
+  const { type, id } = useParams();
+  
+  const [vehicleData, setVehicleData] = useState(null);
+  const [loading, setLoading] = useState(true);
   
   // Add state to track booking data
   const [bookingData, setBookingData] = useState({
@@ -19,11 +22,41 @@ function VehicleDetails() {
     location: 'Lihue, HI 96766'
   });
 
+  useEffect(() => {
+    const fetchVehicleData = async () => {
+      // If we have data from location.state, use it
+      const stateData = location.state;
+      if (stateData && stateData.name && stateData.price && stateData.image) {
+        setVehicleData(stateData);
+        setLoading(false);
+        return;
+      }
+      
+      // Otherwise, fetch from database using ID
+      if (id) {
+        try {
+          const response = await fetch(`http://localhost:3001/api/vehicles/${id}`);
+          if (response.ok) {
+            const data = await response.json();
+            setVehicleData(data);
+          } else {
+            console.error("Vehicle not found");
+          }
+        } catch (error) {
+          console.error("Error fetching vehicle data:", error);
+        }
+      }
+      setLoading(false);
+    };
+
+    fetchVehicleData();
+  }, [id, location.state]);
+
   // Function to handle continue to payment
   const handleContinueToPayment = () => {
     console.log("Continue button clicked!");
     console.log("Booking data:", bookingData);
-    console.log("Price data:", price, "Type:", typeof price); // Debug price
+    console.log("Price data:", vehicleData?.price, "Type:", typeof vehicleData?.price);
     
     // Basic validation
     if (!bookingData.startDate || !bookingData.startTime || !bookingData.endDate || !bookingData.endTime) {
@@ -43,25 +76,25 @@ function VehicleDetails() {
     // Handle different price formats
     let basePrice = 3116; // Default price
     
-    if (price) {
-      if (typeof price === 'string') {
+    if (vehicleData?.price) {
+      if (typeof vehicleData.price === 'string') {
         // If price is a string like "रु3,116" or "Rs. 3000"
-        const numericPrice = price.replace(/[^\d]/g, '');
+        const numericPrice = vehicleData.price.replace(/[^\d]/g, '');
         basePrice = parseInt(numericPrice) || 3116;
-      } else if (typeof price === 'number') {
+      } else if (typeof vehicleData.price === 'number') {
         // If price is already a number
-        basePrice = price;
+        basePrice = vehicleData.price;
       }
     }
 
-    console.log("Base price:", basePrice); // Debug
+    console.log("Base price:", basePrice);
 
     const discount = 1963;
     const serviceFee = 200;
     const taxes = 300;
     const totalPrice = basePrice - discount + serviceFee + taxes;
 
-    console.log("Total price:", totalPrice); // Debug
+    console.log("Total price:", totalPrice);
     console.log("Navigating to payment...");
 
     // Navigate to payment page with all necessary data
@@ -69,18 +102,44 @@ function VehicleDetails() {
       state: {
         bookingData: bookingData,
         vehicleData: {
-          name: name,
-          price: price,
-          image: image,
-          id: id,
-          dateRange: dateRange
+          name: vehicleData?.name,
+          price: vehicleData?.price,
+          image: vehicleData?.image,
+          id: vehicleData?._id || vehicleData?.id,
+          dateRange: vehicleData?.dateRange
         },
         totalPrice: `रु${totalPrice.toLocaleString()}`,
-        originalPrice: typeof price === 'string' ? price : `रु${basePrice.toLocaleString()}`,
+        originalPrice: typeof vehicleData?.price === 'string' ? vehicleData.price : `रु${basePrice.toLocaleString()}`,
         discount: "रु1,963"
       }
     });
   };
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="detail-page flex justify-center items-center min-h-screen">
+          <div className="text-xl">Loading...</div>
+        </div>
+      </>
+    );
+  }
+
+  if (!vehicleData) {
+    return (
+      <>
+        <Navbar />
+        <div className="detail-page flex justify-center items-center min-h-screen">
+          <div className="text-xl">Vehicle not found</div>
+        </div>
+      </>
+    );
+  }
+
+  const imageUrl = vehicleData.image?.startsWith('http') 
+    ? vehicleData.image 
+    : `http://localhost:3001/uploads/${vehicleData.image}`;
 
   return (
     <>
@@ -88,20 +147,20 @@ function VehicleDetails() {
       <div className="detail-page flex justify-center item-center md:mb-5 mb-30 ">
         <div className="  w-full md:w-[85vw] lg:w-[80vw] px-10 mt-15 ">
           <div className=" py-5  flex justify-center items-center  ">
-            <img className="lg:w-[650px]" src={image} alt={name} />
+            <img className="lg:w-[650px]" src={imageUrl} alt={vehicleData.name} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 w-full">
             {/* Left Column on large screens */}
             <div className="lg:col-span-3 row-span-2 space-y-4 order-1 lg:order-1">
-              <BasicFeatures name={name} />
+              <BasicFeatures name={vehicleData.name} />
               <VehicleDescription />
             </div>
 
             {/* Booking Section (Right on lg, second overall on mobile) */}
             <div className="lg:col-span-2 row-span-3 space-y-4 order-2 lg:order-2">
               <BookingSection 
-                price={price} 
+                price={vehicleData.price} 
                 onBookingChange={setBookingData}
                 onContinue={handleContinueToPayment}
               />

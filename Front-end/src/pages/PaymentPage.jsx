@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { FaLock, FaArrowLeft, FaCheck, FaCreditCard, FaPaypal, FaApplePay, FaGooglePay } from "react-icons/fa";
 import { MdSecurity, MdInfo } from "react-icons/md";
@@ -25,6 +25,29 @@ function PaymentPage() {
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [currentVehicleData, setCurrentVehicleData] = useState(vehicleData);
+
+  // Fetch vehicle data if not available in location.state
+  useEffect(() => {
+    const fetchVehicleData = async () => {
+      if (!vehicleData && location.state?.vehicleId) {
+        setLoading(true);
+        try {
+          const response = await fetch(`http://localhost:3001/api/vehicles/${location.state.vehicleId}`);
+          if (response.ok) {
+            const data = await response.json();
+            setCurrentVehicleData(data);
+          }
+        } catch (error) {
+          console.error("Error fetching vehicle data:", error);
+        }
+        setLoading(false);
+      }
+    };
+
+    fetchVehicleData();
+  }, [vehicleData, location.state?.vehicleId]);
 
   // Format card number with spaces
   const formatCardNumber = (value) => {
@@ -98,7 +121,7 @@ function PaymentPage() {
       navigate("/booking-confirmation", {
         state: {
           bookingData,
-          vehicleData,
+          vehicleData: currentVehicleData,
           totalPrice,
           paymentMethod,
           transactionId: "TXN" + Date.now(),
@@ -134,6 +157,24 @@ function PaymentPage() {
       setErrors(prev => ({ ...prev, [field]: "" }));
     }
   };
+
+  // Handle image URL
+  const getImageUrl = (image) => {
+    if (!image) return "/api/placeholder/80/60";
+    if (image.startsWith('http')) return image;
+    return `http://localhost:3001/uploads/${image}`;
+  };
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-xl">Loading...</div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -466,12 +507,12 @@ function PaymentPage() {
                 <div className="mb-6">
                   <div className="flex items-center space-x-3 mb-3">
                     <img
-                      src={vehicleData?.image || "/api/placeholder/80/60"}
-                      alt={vehicleData?.name || "Vehicle"}
+                      src={getImageUrl(currentVehicleData?.image)}
+                      alt={currentVehicleData?.name || "Vehicle"}
                       className="w-16 h-12 object-cover rounded"
                     />
                     <div>
-                      <h3 className="font-medium">{vehicleData?.name || "Range Rover"}</h3>
+                      <h3 className="font-medium">{currentVehicleData?.name || "Range Rover"}</h3>
                       <p className="text-sm text-gray-600">5 seats • Automatic</p>
                     </div>
                   </div>
