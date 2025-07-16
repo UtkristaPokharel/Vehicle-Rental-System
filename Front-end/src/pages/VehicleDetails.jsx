@@ -61,6 +61,7 @@ function VehicleDetails() {
     
     // Basic validation
     if (!bookingData.startDate || !bookingData.startTime || !bookingData.endDate || !bookingData.endTime) {
+
       toast.error("Please fill in all trip details before continuing.");
       return;
     }
