@@ -22,6 +22,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
 
   useEffect(() => {
     if (initialData) {
+      console.log("Initial vehicle data:", initialData); // Debug log
       setFormData({
         name: initialData.name || "",
         type: initialData.type || "",
@@ -36,8 +37,10 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         },
       });
 
-      if (initialData.vehicleImage) {
-        setImagePreview(`http://localhost:3001/${initialData.vehicleImage}`);
+      if (initialData.image) {
+        const imageUrl = `http://localhost:3001/${initialData.image}`;
+        console.log("Setting image preview to:", imageUrl); // Debug log
+        setImagePreview(imageUrl);
       }
     }
   }, [initialData]);
@@ -253,6 +256,31 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
             )}
           </div>
 
+          {/* Current Vehicle Info Display */}
+          {initialData && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <h3 className="text-lg font-semibold text-blue-800 mb-2">Editing Vehicle</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                  <span className="font-medium text-gray-600">Name:</span>
+                  <p className="text-gray-800">{initialData.name}</p>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600">Type:</span>
+                  <p className="text-gray-800">{initialData.type}</p>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600">Brand:</span>
+                  <p className="text-gray-800">{initialData.brand}</p>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600">Price:</span>
+                  <p className="text-gray-800">Rs. {initialData.price}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {["name", "type", "brand", "price", "location"].map((field) => (
@@ -296,10 +324,19 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
                         src={imagePreview}
                         alt="Vehicle preview"
                         className="object-contain w-full h-full"
+                        onError={(e) => {
+                          console.error("Failed to load image:", imagePreview);
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'block';
+                        }}
+                        onLoad={() => {
+                          console.log("Image loaded successfully:", imagePreview);
+                        }}
                       />
                     ) : (
                       <span className="text-gray-400 text-sm">No image selected</span>
                     )}
+                    <span className="text-red-400 text-sm hidden">Failed to load image</span>
                   </div>
                   <input
                     type="file"

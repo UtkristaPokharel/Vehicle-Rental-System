@@ -4,23 +4,36 @@ import axios from "axios";
 import toast,{ Toaster } from "react-hot-toast";
 // UserDetailModal component
 function UserDetailModal({ user, onClose }) {
+  const defaultProfileImg = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
+  
   if (!user) return null;
+  
+  // Handle different image URL formats
+  const getImageUrl = (imgUrl) => {
+    if (!imgUrl) return defaultProfileImg;
+    if (imgUrl.startsWith('http')) return imgUrl;
+    return `http://localhost:3001/${imgUrl}`;
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
       <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-md relative">
         <button onClick={onClose} className="absolute top-2 right-4 text-2xl text-gray-400 hover:text-gray-700">&times;</button>
         <div className="flex flex-col items-center gap-4">
-          {user.imgUrl ? (
-            <img src={user.imgUrl} alt={user.name} className="w-32 h-32 rounded-full object-cover border-2 border-gray-200" />
-          ) : (
-            <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center text-4xl text-gray-400">?</div>
-          )}
+          <img 
+            src={getImageUrl(user.imgUrl)} 
+            alt={user.name} 
+            className="w-32 h-32 rounded-full object-cover border-2 border-gray-200"
+            onError={(e) => {
+              e.target.src = defaultProfileImg;
+            }}
+          />
           <h2 className="text-xl font-bold">{user.name}</h2>
           <div className="w-full text-left space-y-2">
             <div><span className="font-semibold">Email:</span> {user.email}</div>
-            <div><span className="font-semibold">User Type:</span> {user.type}</div>
-            <div><span className="font-semibold">Created At:</span> {user.createdAt}</div>
-            <div><span className="font-semibold">Last Active:</span> {user.lastLogin}</div>
+            <div><span className="font-semibold">User Type:</span> {user.type || 'User'}</div>
+            <div><span className="font-semibold">Created At:</span> {new Date(user.createdAt).toLocaleDateString()}</div>
+            <div><span className="font-semibold">Last Active:</span> {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}</div>
             <div><span className="font-semibold">ID:</span> {user._id}</div>
           </div>
         </div>
@@ -108,6 +121,7 @@ function UsersDataComponent() {
         <table className='w-full'>
             <thead>
          <tr className="text-left text-sm font-medium text-gray-500 border-b">
+            <th className="pb-3 px-4">Profile</th>
             <th className="pb-3 px-4">User Id</th>
             <th className="pb-3 px-4">Name</th>
             <th className="pb-3 px-4">Email</th>
@@ -118,14 +132,33 @@ function UsersDataComponent() {
           </tr>
             </thead>
             <tbody>
-              {users.map((user,index)=>(
-            <tr  className="border-b border-gray-100 hover:bg-gray-100">
+              {users.map((user,index)=>{
+                const defaultProfileImg = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
+                
+                const getImageUrl = (imgUrl) => {
+                  if (!imgUrl) return defaultProfileImg;
+                  if (imgUrl.startsWith('http')) return imgUrl;
+                  return `http://localhost:3001/${imgUrl}`;
+                };
+
+                return (
+            <tr key={user._id} className="border-b border-gray-100 hover:bg-gray-100">
+            <td className="py-4 px-4">
+              <img 
+                src={getImageUrl(user.imgUrl)} 
+                alt={user.name} 
+                className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                onError={(e) => {
+                  e.target.src = defaultProfileImg;
+                }}
+              />
+            </td>
             <td className="py-4 px-4 text-sm text-gray-600">{user._id}</td>
             <td className="py-4 px-4 text-sm text-gray-600">{user.name} </td>
             <td className="py-4 px-4 text-sm text-gray-600"> {user.email}</td>
-            <td className="py-4 px-4 text-sm text-gray-600">{user.type} </td>
-            <td className="py-4 px-4 text-sm text-gray-600"> {user.createdAt}</td>
-            <td className="py-4 px-4 text-sm text-gray-600"> {user.lastLogin}</td>
+            <td className="py-4 px-4 text-sm text-gray-600">{user.type || 'User'} </td>
+            <td className="py-4 px-4 text-sm text-gray-600"> {new Date(user.createdAt).toLocaleDateString()}</td>
+            <td className="py-4 px-4 text-sm text-gray-600"> {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}</td>
             <td className="py-4 px-4">
                 <div className="relative">
                   <button
@@ -161,7 +194,8 @@ function UsersDataComponent() {
                   </div>
             </td>
                 </tr>
-                ))}
+                );
+              })}
             </tbody>
         </table>
       {viewUser && <UserDetailModal user={viewUser} onClose={() => setViewUser(null)} />}
