@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 import { RiMotorbikeFill } from "react-icons/ri";
 import { FaCar, FaBus } from "react-icons/fa";
 import { PiTruckTrailerFill } from "react-icons/pi";
 import { PiTruckFill } from "react-icons/pi";
 import VehicleCard from "../components/VehicleCard";
-import vehicleData from '../assets/Sample.json';
-import { useRef } from "react";
+// import vehicleData from '../assets/Sample.json';
+// import { useRef } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
 
@@ -17,13 +18,14 @@ const vehicleTypes = [
   { name: 'Bus', icon: <FaBus /> },
 ];
 
+
 export default function VehicleBrowse() {
   const navigate = useNavigate();
-
+  
   const handleClick = (type) => {
     navigate(`/vehicles/${type}`);
   };
-
+  
   return (
     <div className="vehicle-browse flex justify-center items-center flex-col my-10 p-3  w-[90vw] md:w-[80vw]">
       <h2 className="text-3xl font-bold text-center m-12">
@@ -33,9 +35,9 @@ export default function VehicleBrowse() {
       <ul className="flex flex-wrap justify-center items-center gap-20 list-none mb-4 text-2xl">
         {vehicleTypes.map((vehicle, index) => (
           <li
-            key={index}
-            className="text-center cursor-pointer  flex flex-col items-center "
-            onClick={() => handleClick(vehicle.name)}
+          key={index}
+          className="text-center cursor-pointer  flex flex-col items-center "
+          onClick={() => handleClick(vehicle.name)}
           >
             {vehicle.icon}
             <h1 className="mt-1 text-sm font-bold">{vehicle.name}</h1>
@@ -52,22 +54,34 @@ export default function VehicleBrowse() {
 
 
 export const SuggestedVehicle = () => {
+  const [vehicles, setVehicles] = useState([]);
+  const [randomIds, setRandomIds] = useState([]);
   const scrollRef = useRef(null);
-  const Vehicle = vehicleData;
 
-  function generateUniqueRandomNumbers() {
-    const numbers = new Set();
-    while (numbers.size < 6) {
-      const randomNum = Math.floor(Math.random() * 24) + 1;
-      numbers.add(randomNum);
+  // 1️⃣  Fetch vehicles once
+  useEffect(() => {
+    async function getVehicles() {
+      const res  = await fetch("http://localhost:3001/api/vehicles");
+      const data = await res.json();
+      setVehicles(data);
     }
-    return Array.from(numbers);
-  }
+    getVehicles();
+  }, []);
 
-  const randomIds = generateUniqueRandomNumbers();
-  const filteredVehicles = Vehicle.filter((vehicle) =>
-    randomIds.includes(vehicle.id)
-  );
+
+  useEffect(() => {
+    if (!vehicles.length) return; 
+
+    const count = Math.min(6, vehicles.length);
+    const indexes = new Set();
+    while (indexes.size < count) {
+      indexes.add(Math.floor(Math.random() * vehicles.length)); 
+    }
+    setRandomIds([...indexes].map(i => vehicles[i]._id));
+  }, [vehicles]);
+
+  // 3️⃣  Filter
+  const filteredVehicles = vehicles.filter(v => randomIds.includes(v._id));
 
   const scroll = (direction) => {
     if (scrollRef.current) {

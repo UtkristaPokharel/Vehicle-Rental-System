@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Vehicle = require('../models/Vehicle');
 const authMiddleware = require('../middleware/auth');
-const upload = require('../middleware/upload');
+const { isAdmin } = require('../middleware/auth');
+const { vehicleUpload } = require('../middleware/upload');
 
-router.post('/add-vehicle', authMiddleware, upload.single('vehicleImage'), async (req, res) => {
+router.post('/add-vehicle', authMiddleware, isAdmin, vehicleUpload.single('vehicleImage'), async (req, res) => {
   try {
     const { name, type, brand, price, location, features,description } = req.body;
     const image = req.file ? req.file.filename : null;
@@ -22,7 +23,7 @@ router.post('/add-vehicle', authMiddleware, upload.single('vehicleImage'), async
       features: JSON.parse(features),
       image,
       description,
-      createdBy: req.user.id, // Use req.user.id from authMiddleware
+      createdBy:req.body.createdBy || 'admin', // Use rq.user.id from authMiddleware
     });
 
     await vehicle.save();

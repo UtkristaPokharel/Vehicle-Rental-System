@@ -1,32 +1,170 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { FaStar } from "react-icons/fa6";
 import { useState, useEffect } from "react";
 import { FaPen } from "react-icons/fa";
+import toast,{ Toaster } from "react-hot-toast";
 
 function VehicleDetails() {
   const location = useLocation();
-  const { name, price, image, dateRange, id } = location.state || {};
+  const navigate = useNavigate();
+  const { id } = useParams();
+  
+  const [vehicleData, setVehicleData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Add state to track booking data
+  const [bookingData, setBookingData] = useState({
+    startDate: '',
+    startTime: '',
+    endDate: '',
+    endTime: '',
+    location: 'Butwal'
+  });
+
+  useEffect(() => {
+    const fetchVehicleData = async () => {
+      // If we have data from location.state, use it
+      const stateData = location.state;
+      if (stateData && stateData.name && stateData.price && stateData.image) {
+        setVehicleData(stateData);
+        setLoading(false);
+        return;
+      }
+      
+      // Otherwise, fetch from database using ID
+      if (id) {
+        try {
+          const response = await fetch(`http://localhost:3001/api/vehicles/${id}`);
+          if (response.ok) {
+            const data = await response.json();
+            setVehicleData(data);
+          } else {
+            console.error("Vehicle not found");
+          }
+        } catch (error) {
+          console.error("Error fetching vehicle data:", error);
+        }
+      }
+      setLoading(false);
+    };
+
+    fetchVehicleData();
+  }, [id, location.state]);
+
+  // Function to handle continue to payment
+  const handleContinueToPayment = () => {
+    console.log("Continue button clicked!");
+    console.log("Booking data:", bookingData);
+    console.log("Price data:", vehicleData?.price, "Type:", typeof vehicleData?.price);
+    
+    // Basic validation
+    if (!bookingData.startDate || !bookingData.startTime || !bookingData.endDate || !bookingData.endTime) {
+      toast.error("Please fill in all trip details before continuing.");
+      return;
+    }
+
+    // Validate that end date/time is after start date/time
+    const startDateTime = new Date(`${bookingData.startDate}T${bookingData.startTime}`);
+    const endDateTime = new Date(`${bookingData.endDate}T${bookingData.endTime}`);
+    
+    if (endDateTime <= startDateTime) {
+      toast.error("End date and time must be after start date and time.");
+      return;
+    }
+
+    // Handle different price formats
+    let basePrice = 3116; // Default price
+    
+    if (vehicleData?.price) {
+      if (typeof vehicleData.price === 'string') {
+        // If price is a string like "रु3,116" or "Rs. 3000"
+        const numericPrice = vehicleData.price.replace(/[^\d]/g, '');
+        basePrice = parseInt(numericPrice) || 3116;
+      } else if (typeof vehicleData.price === 'number') {
+        // If price is already a number
+        basePrice = vehicleData.price;
+      }
+    }
+
+    console.log("Base price:", basePrice);
+
+    const discount = 1963;
+    const serviceFee = 200;
+    const taxes = 300;
+    const totalPrice = basePrice - discount + serviceFee + taxes;
+
+    console.log("Total price:", totalPrice);
+    console.log("Navigating to payment...");
+
+    // Navigate to payment page with all necessary data
+    navigate('/payment', {
+      state: {
+        bookingData: bookingData,
+        vehicleData: {
+          name: vehicleData?.name,
+          price: vehicleData?.price,
+          image: vehicleData?.image,
+          id: vehicleData?._id || vehicleData?.id,
+          dateRange: vehicleData?.dateRange
+        },
+        totalPrice: `रु${totalPrice.toLocaleString()}`,
+        originalPrice: typeof vehicleData?.price === 'string' ? vehicleData.price : `रु${basePrice.toLocaleString()}`,
+        discount: "रु1,963"
+      }
+    });
+  };
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="detail-page flex justify-center items-center min-h-screen">
+          <div className="text-xl">Loading...</div>
+        </div>
+      </>
+    );
+  }
+
+  if (!vehicleData) {
+    return (
+      <>
+        <Navbar />
+        <div className="detail-page flex justify-center items-center min-h-screen">
+          <div className="text-xl">Vehicle not found</div>
+        </div>
+      </>
+    );
+  }
+
+  const imageUrl = vehicleData.image?.startsWith('http') 
+    ? vehicleData.image 
+    : `http://localhost:3001/uploads/${vehicleData.image}`;
+
   return (
     <>
       <Navbar />
       <div className="detail-page flex justify-center item-center md:mb-5 mb-30 ">
         <div className="  w-full md:w-[85vw] lg:w-[80vw] px-10 mt-15 ">
           <div className=" py-5  flex justify-center items-center  ">
-            <img className="lg:w-[650px]" src={image} alt={name} />
+            <img className="lg:w-[650px]" src={imageUrl} alt={vehicleData.name} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 w-full">
             {/* Left Column on large screens */}
             <div className="lg:col-span-3 row-span-2 space-y-4 order-1 lg:order-1">
-              <BasicFeatures name={name} />
+              <BasicFeatures name={vehicleData.name} />
               <VehicleDescription />
             </div>
 
             {/* Booking Section (Right on lg, second overall on mobile) */}
             <div className="lg:col-span-2 row-span-3 space-y-4 order-2 lg:order-2">
-              <BookingSection price={price} />
+              <BookingSection 
+                price={vehicleData.price} 
+                onBookingChange={setBookingData}
+                onContinue={handleContinueToPayment}
+              />
             </div>
 
             {/* Vehicle Features (Below everything) */}
@@ -80,10 +218,14 @@ export const BasicFeatures = ({ name }) => {
   );
 };
 
-export const VehicleDescription = () => {
+export const VehicleDescription = ({ vehicleData }) => {
   const [expanded, setExpanded] = useState(false);
 
-  const description = `The Range Rover is an iconic luxury SUV known for its unmatched combination of refinement, capability, and cutting-edge technology. With a powerful engine lineup, including hybrid and V8 options, it delivers both smooth on-road performance and exceptional off-road capabilities. The cabin features exquisite materials, advanced infotainment, and best-in-class comfort, making it a top choice for those who demand elegance and ruggedness in one vehicle. The 2024 model continues the legacy with even more tech, improved efficiency, and a bold design that stands out in any environment.`;
+  // Default description fallback
+  const defaultDescription = `The Range Rover is an iconic luxury SUV known for its unmatched combination of refinement, capability, and cutting-edge technology. With a powerful engine lineup, including hybrid and V8 options, it delivers both smooth on-road performance and exceptional off-road capabilities. The cabin features exquisite materials, advanced infotainment, and best-in-class comfort, making it a top choice for those who demand elegance and ruggedness in one vehicle. The 2024 model continues the legacy with even more tech, improved efficiency, and a bold design that stands out in any environment.`;
+
+  const displayDescription = vehicleData?.description || defaultDescription;
+  // console.log(vehicleData.description);
 
   return (
     <div className="w-[90%] px-5 relative mt-6  ">
@@ -93,7 +235,7 @@ export const VehicleDescription = () => {
           : "line-clamp-5 max-h-[7.5rem]"
           }`}
       >
-        {description}
+        {displayDescription}
 
         {!expanded && (
           <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent pointer-events-none" />
@@ -121,6 +263,7 @@ export const BookingSection = ({
   price = "रु3,116",
   originalPrice = "रु5,079",
   onBookingChange,
+  onContinue
 }) => {
   const [booking, setBooking] = useState({
     startDate: getTodayDate(),
@@ -131,10 +274,29 @@ export const BookingSection = ({
 
   useEffect(() => {
     if (onBookingChange) onBookingChange(booking);
-  }, [booking]);
+  }, [booking, onBookingChange]);
 
   const handleChange = (field, value) => {
     setBooking((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Format price for display
+  const formatPrice = (priceValue) => {
+    if (typeof priceValue === 'string') {
+      return priceValue;
+    } else if (typeof priceValue === 'number') {
+      return `रु${priceValue.toLocaleString()}`;
+    }
+    return "रु3,116";
+  };
+
+  const testClick = () => {
+    console.log("Button clicked!");
+    if (onContinue) {
+      onContinue();
+    } else {
+      console.log("onContinue is not defined");
+    }
   };
 
   return (
@@ -149,7 +311,7 @@ export const BookingSection = ({
               <p className="text-sm text-gray-400 line-through">
                 {originalPrice}
               </p>
-              <p className="text-lg font-bold text-black">{price} total</p>
+              <p className="text-lg font-bold text-black">{formatPrice(price)} total</p>
               <p className="text-xs text-gray-500">Before taxes</p>
             </div>
           </div>
@@ -161,13 +323,16 @@ export const BookingSection = ({
               type="date"
               value={booking.startDate}
               onChange={(e) => handleChange("startDate", e.target.value)}
-              className="w-1/2 p-2 border rounded-md"
+              min={getTodayDate()}
+              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
             <input
               type="time"
               value={booking.startTime}
               onChange={(e) => handleChange("startTime", e.target.value)}
-              className="w-1/2 p-2 border rounded-md"
+              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
           </div>
 
@@ -177,13 +342,16 @@ export const BookingSection = ({
               type="date"
               value={booking.endDate}
               onChange={(e) => handleChange("endDate", e.target.value)}
-              className="w-1/2 p-2 border rounded-md"
+              min={booking.startDate || getTodayDate()}
+              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
             <input
               type="time"
               value={booking.endTime}
               onChange={(e) => handleChange("endTime", e.target.value)}
-              className="w-1/2 p-2 border rounded-md"
+              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
           </div>
         </div>
@@ -210,10 +378,14 @@ export const BookingSection = ({
           <p className="font-semibold text-md mb-1">Trip Savings</p>
           <div className="flex justify-between bg-gray-200 p-4 rounded-md text-md">
             <span>1-month discount</span>
-            <span className="text-green-600 font-semibold">रु 5000</span>
+            <span className="text-green-600 font-semibold">रु 1,963</span>
           </div>
-          <button className=" w-full my-5 hidden md:block  bg-[#ee3b3b] text-white font-semibold py-2 px-5 rounded-xl hover:bg-[#d22525] transition">
-            Continue
+          <button 
+            onClick={testClick}
+            type="button"
+            className="w-full my-5 hidden md:block bg-[#ee3b3b] text-white font-semibold py-3 px-5 rounded-xl hover:bg-[#d22525] transition-colors duration-200 cursor-pointer"
+          >
+            Continue to Payment
           </button>
         </div>
       </div>
@@ -225,11 +397,15 @@ export const BookingSection = ({
             <p className="text-sm text-gray-400 line-through">
               {originalPrice}
             </p>
-            <p className="text-lg font-bold text-black">{price} total</p>
+            <p className="text-lg font-bold text-black">{formatPrice(price)} total</p>
             <p className="text-xs text-gray-500">Before taxes</p>
           </div>
-          <button className="bg-[#5d3bee] text-white font-semibold py-2 px-5 rounded-xl hover:bg-[#4725d2] transition">
-            Continue
+          <button 
+            onClick={testClick}
+            type="button"
+            className="bg-[#5d3bee] text-white font-semibold py-3 px-6 rounded-xl hover:bg-[#4725d2] transition-colors duration-200 cursor-pointer"
+          >
+            Continue to Payment
           </button>
         </div>
       </div>

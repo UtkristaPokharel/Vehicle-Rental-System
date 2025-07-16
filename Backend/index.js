@@ -277,11 +277,14 @@ app.post('/api/auth/logout', (req, res) => {
 //Admin login route  logic setup
 app.use('/admin',adminRoutes);
 
-app.use("/user", addVehicle);
+app.use("/api", addVehicle);
+
+//Update vehicle detail or change status 
+const updateVehicle = require ("./routes/updateVehicle");
+app.use("/api", updateVehicle);
 
 
 //Data fetching for frontend display
-
 const fetchVehicle =require("./routes/fetchvehicle");
 app.use("/api/vehicles", fetchVehicle);
 

@@ -20,6 +20,29 @@ export default function Navbar() {
         }
     }, []);
 
+    // Listen for profile image updates
+    useEffect(() => {
+        const handleProfileUpdate = () => {
+            const stored = localStorage.getItem("profileImg");
+            if (stored) {
+                setImgUrl(stored);
+            } else {
+                setImgUrl(defaultProfile);
+            }
+        };
+
+        // Listen for custom profile update event
+        window.addEventListener('profileImageUpdated', handleProfileUpdate);
+        
+        // Also listen for storage changes (if opened in multiple tabs)
+        window.addEventListener('storage', handleProfileUpdate);
+
+        return () => {
+            window.removeEventListener('profileImageUpdated', handleProfileUpdate);
+            window.removeEventListener('storage', handleProfileUpdate);
+        };
+    }, []);
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (menuref.current && !menuref.current.contains(event.target)) {
@@ -87,7 +110,7 @@ export default function Navbar() {
                     <li><button onClick={handleFAQClick} className="hover:underline decoration-3 hover:decoration-red-600 hover:underline-offset-8">FAQ</button></li>
                 </ul>
 
-                <button className="border-0 px-4 py-2 bg-red-600 text-white text-sm rounded-2xl hover:scale-110 transition-transform duration-200">
+                <button onClick={() => { handleToggle(); navigate("/add-vehicle")}}  className="border-0 px-4 py-2 bg-red-600 text-white text-sm rounded-2xl hover:scale-110 transition-transform duration-200">
                     Become a host
                 </button>
 
