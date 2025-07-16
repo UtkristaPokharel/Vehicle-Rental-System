@@ -1,72 +1,164 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react';
 import { IoMenu, IoClose } from "react-icons/io5";
-import profile from "../../public/whiteprofile.svg"
-// import logo from"../../public/logo.png"
-
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
+    const [imgUrl, setImgUrl] = useState(""); // Dynamic profile image
     const menuref = useRef(null);
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const defaultProfile = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
 
     useEffect(() => {
+        const stored = localStorage.getItem("profileImg");
+        if (stored) {
+            setImgUrl(stored);
+        } else {
+            setImgUrl(defaultProfile);
+        }
+    }, []);
 
+    // Listen for profile image updates
+    useEffect(() => {
+        const handleProfileUpdate = () => {
+            const stored = localStorage.getItem("profileImg");
+            if (stored) {
+                setImgUrl(stored);
+            } else {
+                setImgUrl(defaultProfile);
+            }
+        };
+
+        // Listen for custom profile update event
+        window.addEventListener('profileImageUpdated', handleProfileUpdate);
+        
+        // Also listen for storage changes (if opened in multiple tabs)
+        window.addEventListener('storage', handleProfileUpdate);
+
+        return () => {
+            window.removeEventListener('profileImageUpdated', handleProfileUpdate);
+            window.removeEventListener('storage', handleProfileUpdate);
+        };
+    }, []);
+
+    useEffect(() => {
         const handleClickOutside = (event) => {
-            const target = event.target;
-
-            if (menuref.current && !menuref.current.contains(target)) {
+            if (menuref.current && !menuref.current.contains(event.target)) {
                 setIsOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleToggle = () => setIsOpen(prev => !prev);
+
+    const handleProfileClick = () => {
+        const token = localStorage.getItem("token");
+        navigate(token ? "/profile" : "/login");
+    };
+
+    const handleFAQClick = () => {
+        const scrollToSection = () => {
+            const faqSection = document.getElementById('faq-section');
+            if (faqSection) faqSection.scrollIntoView({ behavior: 'smooth' });
+        };
+        if (window.location.pathname === '/') {
+            scrollToSection();
+        } else {
+            navigate('/', { state: { scrollToFAQ: true } });
+            setTimeout(scrollToSection, 500);
         }
+        setIsOpen(false);
+    };
 
-    }, [isOpen]);
+    const handleContactUsClick = () => {
+        const scrollToSection = () => {
+            const section = document.getElementById('contactus-section');
+            if (section) section.scrollIntoView({ behavior: 'smooth' });
+        };
+        if (window.location.pathname === '/') {
+            scrollToSection();
+        } else {
+            navigate('/', { state: { scrollToContactUs: true } });
+            setTimeout(scrollToSection, 500);
+        }
+        setIsOpen(false);
+    };
 
-    const handleToggle = () => {
-        setIsOpen(prev => !prev);
+    const getLinkClass = (path) => {
+        const isActive = location.pathname === path || location.pathname.startsWith(path + '/');
+        return `decoration-3 hover:underline hover:decoration-red-600 hover:underline-offset-8 ${isActive ? 'underline underline-offset-8 decoration-red-600' : ''}`;
     };
 
     return (
-        <>
-            <nav className='static w-full h-18 bg-black flex justify-around items-center gap-10 px-3 xl:px-10 z-10'>
-                <div> <img src="/logo.png" alt="EasyWheels Logo" className="h-30" /></div>
-                <div className='flex gap-10 items-center text-white text-lg '>
-                    <ul className='hidden xl:flex space-x-9'>
-                        <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Home</a></li>
-                        <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>About us</a></li>
-                        <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Vehicles</a></li>
-                        <li><a href="#" className=' hover:decoration-red-600 decoration-3 hover:underline hover:underline-offset-8'>Contact</a></li>
-                    </ul>
+        <nav className='sticky top-0 left-0 w-full h-16 bg-black flex justify-around md:px:10 sm:justify-between items-center px-2 sm:px-4   xl:px-10 z-50'>
+            {/* Logo */}
+            <div className='h-20 w-20 sm:h-20 sm:w-20'>
+                <img src="/logo.png" alt="EasyWheels Logo" className="h-full w-full object-cover" />
+            </div>
 
-                    <button className="border-0 px-4 py-2 bg-red-600 text-white text-sm md:text-base rounded-2xl hover:cursor-pointer hover:scale-110 transition-transform duration-200">
-                        Become a host
+            {/* Desktop Navigation */}
+            <div className='hidden xl:flex gap-8 items-center text-white text-lg'>
+                <ul className='flex space-x-6'>
+                    <li><Link to="/" className={getLinkClass('/')}>Home</Link></li>
+                    <li><Link to="/about" className={getLinkClass('/about')}>About us</Link></li>
+                    <li><Link to="/browse" className={getLinkClass('/browse')}>Vehicles</Link></li>
+                    <li><button onClick={handleContactUsClick} className="hover:underline decoration-3 hover:decoration-red-600 hover:underline-offset-8">Contact Us</button></li>
+                    <li><button onClick={handleFAQClick} className="hover:underline decoration-3 hover:decoration-red-600 hover:underline-offset-8">FAQ</button></li>
+                </ul>
+
+                <button onClick={() => { handleToggle(); navigate("/add-vehicle")}}  className="border-0 px-4 py-2 bg-red-600 text-white text-sm rounded-2xl hover:scale-110 transition-transform duration-200">
+                    Become a host
+                </button>
+
+                <button className='profile-icon' onClick={handleProfileClick}>
+                    <img
+                        src={imgUrl}
+                        onError={(e) => e.currentTarget.src = defaultProfile}
+                        className='w-10 h-10 rounded-full bg-white'
+                        alt="profile"
+                    />
+                </button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <div className='xl:hidden flex items-center gap-3'>
+                <button className='text-white' onClick={handleProfileClick}>
+                    <img
+                        src={imgUrl}
+                        onError={(e) => e.currentTarget.src = defaultProfile}
+                        className='w-9 h-9 rounded-full bg-white'
+                        alt="profile"
+                    />
+                </button>
+
+                <button className='text-white mr-1' onClick={handleToggle}>
+                    {isOpen ? <IoClose className="text-3xl" /> : <IoMenu className="text-3xl" />}
+                </button>
+            </div>
+
+            {/* Fullscreen Mobile Menu */}
+            {isOpen && (
+                <div
+                    ref={menuref}
+                    className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-95 text-white flex flex-col items-center justify-center gap-6 text-xl z-50"
+                >
+                    <button onClick={handleToggle} className="absolute top-4 right-4 text-white text-3xl">
+                        <IoClose />
                     </button>
-
-                    <div className='profile-icon  '>
-                        <img src={profile} className='w-9' alt="" />
-                    </div>
-
-                    <button className='xl:hidden text-white' onClick={handleToggle}>
-                        {isOpen ? <IoClose className="ham-menu text-3xl" /> : <IoMenu className="ham-menu text-3xl" />}
+                    <Link to="/" onClick={handleToggle} className="hover:text-red-400">Home</Link>
+                    <Link to="/about" onClick={handleToggle} className="hover:text-red-400">About Us</Link>
+                    <Link to="/browse" onClick={handleToggle} className="hover:text-red-400">Vehicles</Link>
+                    <button onClick={handleContactUsClick} className="hover:text-red-400">Contact Us</button>
+                    <button onClick={handleFAQClick} className="hover:text-red-400">FAQ</button>
+                    <button onClick={() => { handleToggle(); navigate("/add-vehicle"); }} className="bg-red-600 text-white px-4 py-2 rounded-xl mt-4">
+                        Become a Host
                     </button>
-
-                    {/* for mobile  or tablet view */}
-                    <div
-                        ref={menuref}
-                        className={` xl:hidden text-white absolute top-16 right-0 bg-gray-600 w-30
-          h-30 list-none pl-5 transition-all duration-300 ease-in-out 
-            ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
-                        <li><a href="#" className='text-white hover:text-gray-400'>Home</a></li>
-                        <li><a href="#" className='text-white hover:text-gray-400'>About us</a></li>
-                        <li><a href="#" className='text-white hover:text-gray-400'>Vehicles</a></li>
-                        <li><a href="#" className='text-white hover:text-gray-400'>Contact</a></li>
-                    </div>
-
-
                 </div>
-            </nav>
-        </>
-    )
+            )}
+        </nav>
+    );
 }
