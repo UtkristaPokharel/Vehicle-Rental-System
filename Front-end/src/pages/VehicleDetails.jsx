@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { FaStar } from "react-icons/fa6";
@@ -7,7 +7,81 @@ import { FaPen } from "react-icons/fa";
 
 function VehicleDetails() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { name, price, image, dateRange, id } = location.state || {};
+  
+  // Add state to track booking data
+  const [bookingData, setBookingData] = useState({
+    startDate: '',
+    startTime: '',
+    endDate: '',
+    endTime: '',
+    location: 'Lihue, HI 96766'
+  });
+
+  // Function to handle continue to payment
+  const handleContinueToPayment = () => {
+    console.log("Continue button clicked!");
+    console.log("Booking data:", bookingData);
+    console.log("Price data:", price, "Type:", typeof price); // Debug price
+    
+    // Basic validation
+    if (!bookingData.startDate || !bookingData.startTime || !bookingData.endDate || !bookingData.endTime) {
+      alert("Please fill in all trip details before continuing.");
+      return;
+    }
+
+    // Validate that end date/time is after start date/time
+    const startDateTime = new Date(`${bookingData.startDate}T${bookingData.startTime}`);
+    const endDateTime = new Date(`${bookingData.endDate}T${bookingData.endTime}`);
+    
+    if (endDateTime <= startDateTime) {
+      alert("End date and time must be after start date and time.");
+      return;
+    }
+
+    // Handle different price formats
+    let basePrice = 3116; // Default price
+    
+    if (price) {
+      if (typeof price === 'string') {
+        // If price is a string like "रु3,116" or "Rs. 3000"
+        const numericPrice = price.replace(/[^\d]/g, '');
+        basePrice = parseInt(numericPrice) || 3116;
+      } else if (typeof price === 'number') {
+        // If price is already a number
+        basePrice = price;
+      }
+    }
+
+    console.log("Base price:", basePrice); // Debug
+
+    const discount = 1963;
+    const serviceFee = 200;
+    const taxes = 300;
+    const totalPrice = basePrice - discount + serviceFee + taxes;
+
+    console.log("Total price:", totalPrice); // Debug
+    console.log("Navigating to payment...");
+
+    // Navigate to payment page with all necessary data
+    navigate('/payment', {
+      state: {
+        bookingData: bookingData,
+        vehicleData: {
+          name: name,
+          price: price,
+          image: image,
+          id: id,
+          dateRange: dateRange
+        },
+        totalPrice: `रु${totalPrice.toLocaleString()}`,
+        originalPrice: typeof price === 'string' ? price : `रु${basePrice.toLocaleString()}`,
+        discount: "रु1,963"
+      }
+    });
+  };
+
   return (
     <>
       <Navbar />
@@ -26,7 +100,11 @@ function VehicleDetails() {
 
             {/* Booking Section (Right on lg, second overall on mobile) */}
             <div className="lg:col-span-2 row-span-3 space-y-4 order-2 lg:order-2">
-              <BookingSection price={price} />
+              <BookingSection 
+                price={price} 
+                onBookingChange={setBookingData}
+                onContinue={handleContinueToPayment}
+              />
             </div>
 
             {/* Vehicle Features (Below everything) */}
@@ -121,6 +199,7 @@ export const BookingSection = ({
   price = "रु3,116",
   originalPrice = "रु5,079",
   onBookingChange,
+  onContinue
 }) => {
   const [booking, setBooking] = useState({
     startDate: getTodayDate(),
@@ -131,10 +210,29 @@ export const BookingSection = ({
 
   useEffect(() => {
     if (onBookingChange) onBookingChange(booking);
-  }, [booking]);
+  }, [booking, onBookingChange]);
 
   const handleChange = (field, value) => {
     setBooking((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Format price for display
+  const formatPrice = (priceValue) => {
+    if (typeof priceValue === 'string') {
+      return priceValue;
+    } else if (typeof priceValue === 'number') {
+      return `रु${priceValue.toLocaleString()}`;
+    }
+    return "रु3,116";
+  };
+
+  const testClick = () => {
+    console.log("Button clicked!");
+    if (onContinue) {
+      onContinue();
+    } else {
+      console.log("onContinue is not defined");
+    }
   };
 
   return (
@@ -149,7 +247,7 @@ export const BookingSection = ({
               <p className="text-sm text-gray-400 line-through">
                 {originalPrice}
               </p>
-              <p className="text-lg font-bold text-black">{price} total</p>
+              <p className="text-lg font-bold text-black">{formatPrice(price)} total</p>
               <p className="text-xs text-gray-500">Before taxes</p>
             </div>
           </div>
@@ -161,13 +259,16 @@ export const BookingSection = ({
               type="date"
               value={booking.startDate}
               onChange={(e) => handleChange("startDate", e.target.value)}
-              className="w-1/2 p-2 border rounded-md"
+              min={getTodayDate()}
+              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
             <input
               type="time"
               value={booking.startTime}
               onChange={(e) => handleChange("startTime", e.target.value)}
-              className="w-1/2 p-2 border rounded-md"
+              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
           </div>
 
@@ -177,13 +278,16 @@ export const BookingSection = ({
               type="date"
               value={booking.endDate}
               onChange={(e) => handleChange("endDate", e.target.value)}
-              className="w-1/2 p-2 border rounded-md"
+              min={booking.startDate || getTodayDate()}
+              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
             <input
               type="time"
               value={booking.endTime}
               onChange={(e) => handleChange("endTime", e.target.value)}
-              className="w-1/2 p-2 border rounded-md"
+              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
           </div>
         </div>
@@ -210,10 +314,14 @@ export const BookingSection = ({
           <p className="font-semibold text-md mb-1">Trip Savings</p>
           <div className="flex justify-between bg-gray-200 p-4 rounded-md text-md">
             <span>1-month discount</span>
-            <span className="text-green-600 font-semibold">रु 5000</span>
+            <span className="text-green-600 font-semibold">रु 1,963</span>
           </div>
-          <button className=" w-full my-5 hidden md:block  bg-[#ee3b3b] text-white font-semibold py-2 px-5 rounded-xl hover:bg-[#d22525] transition">
-            Continue
+          <button 
+            onClick={testClick}
+            type="button"
+            className="w-full my-5 hidden md:block bg-[#ee3b3b] text-white font-semibold py-3 px-5 rounded-xl hover:bg-[#d22525] transition-colors duration-200 cursor-pointer"
+          >
+            Continue to Payment
           </button>
         </div>
       </div>
@@ -225,11 +333,15 @@ export const BookingSection = ({
             <p className="text-sm text-gray-400 line-through">
               {originalPrice}
             </p>
-            <p className="text-lg font-bold text-black">{price} total</p>
+            <p className="text-lg font-bold text-black">{formatPrice(price)} total</p>
             <p className="text-xs text-gray-500">Before taxes</p>
           </div>
-          <button className="bg-[#5d3bee] text-white font-semibold py-2 px-5 rounded-xl hover:bg-[#4725d2] transition">
-            Continue
+          <button 
+            onClick={testClick}
+            type="button"
+            className="bg-[#5d3bee] text-white font-semibold py-3 px-6 rounded-xl hover:bg-[#4725d2] transition-colors duration-200 cursor-pointer"
+          >
+            Continue to Payment
           </button>
         </div>
       </div>
