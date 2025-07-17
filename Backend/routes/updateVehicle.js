@@ -38,7 +38,7 @@ const upload = multer({
 
 router.put("/update-vehicle", verifyToken, isAdmin, async (req, res) => {
   try {
-    const { _id, name, type, brand, price, location, description, features } = req.body;
+    const { _id, name, type, brand, price, location, description, features, seats, fuelType, mileage, transmission } = req.body;
 
     if (!_id) {
       return res.status(400).json({ message: "Vehicle ID is required" });
@@ -52,6 +52,10 @@ router.put("/update-vehicle", verifyToken, isAdmin, async (req, res) => {
         brand,
         price,
         location,
+        seats: parseInt(seats),
+        fuelType,
+        mileage: parseFloat(mileage),
+        transmission,
         description,
         features,
       },
