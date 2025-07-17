@@ -13,7 +13,7 @@ export default function Navbar() {
 
     useEffect(() => {
         const stored = localStorage.getItem("profileImg");
-        if (stored) {
+        if (stored && stored.trim() !== "") {
             setImgUrl(stored);
         } else {
             setImgUrl(defaultProfile);
@@ -24,7 +24,8 @@ export default function Navbar() {
     useEffect(() => {
         const handleProfileUpdate = () => {
             const stored = localStorage.getItem("profileImg");
-            if (stored) {
+            console.log('Profile image updated, new URL:', stored); // Debug log
+            if (stored && stored.trim() !== "") {
                 setImgUrl(stored);
             } else {
                 setImgUrl(defaultProfile);

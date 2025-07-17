@@ -25,6 +25,7 @@ function Profile() {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const fileInputRef = useRef(null);
 
   // Fetch user profile from backend
   useEffect(() => {
@@ -55,6 +56,22 @@ function Profile() {
     fetchProfile();
   }, []);
 
+  // Reset form when switching modes
+  useEffect(() => {
+    if (!isEdit) {
+      // When switching to view mode, reset preview to current saved image
+      setProfileImagePreview(profileImg);
+      setProfileImage(null);
+      setPassword("");
+      setSuccessMsg("");
+      setErrorMsg("");
+      // Clear file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  }, [isEdit, profileImg]);
+
   // Handle profile image preview
   const handleProfileImageChange = (e) => {
     const file = e.target.files[0];
@@ -63,6 +80,9 @@ function Profile() {
       const reader = new FileReader();
       reader.onloadend = () => setProfileImagePreview(reader.result);
       reader.readAsDataURL(file);
+    } else {
+      // If no file is selected, reset to current profile image
+      setProfileImagePreview(profileImg);
     }
   };
 
@@ -110,9 +130,19 @@ function Profile() {
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        localStorage.setItem("profileImg", res.data.imgUrl);
-        setProfileImg(res.data.imgUrl);
-        setProfileImagePreview(res.data.imgUrl);
+        
+        // Update all profile image states immediately
+        const newImageUrl = res.data.imgUrl;
+        localStorage.setItem("profileImg", newImageUrl);
+        setProfileImg(newImageUrl);
+        setProfileImagePreview(newImageUrl);
+        
+        // Clear the file input
+        setProfileImage(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        
         // Notify navbar of profile image update
         window.dispatchEvent(new Event('profileImageUpdated'));
       }
@@ -129,6 +159,13 @@ function Profile() {
       }
       setSuccessMsg("Profile updated successfully!");
       setPassword("");
+      // Clear the file input and reset the profile image state
+      setProfileImage(null);
+      
+      // Force update of profile image in view mode immediately
+      setTimeout(() => {
+        SetIsEdit(false);
+      }, 100);
     } catch (err) {
       setErrorMsg(err.response?.data?.message || "Error updating profile");
     } finally {
@@ -172,14 +209,29 @@ function Profile() {
             {/* Profile Image Upload */}
             <div className="flex flex-col items-center gap-2">
               <label className="text-lg font-semibold mb-1">Profile Picture</label>
-              <div className="w-32 h-32 rounded-full border-4 border-amber-400 overflow-hidden flex items-center justify-center bg-gray-100 shadow">
+              <div className="relative w-32 h-32 rounded-full border-4 border-amber-400 overflow-hidden flex items-center justify-center bg-gray-100 shadow cursor-pointer group"
+                   onClick={() => fileInputRef.current?.click()}>
                 <img
                   src={profileImagePreview}
                   alt="Profile Preview"
                   className="object-cover w-full h-full"
                 />
+                {/* Overlay with camera icon */}
+                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
               </div>
-              <input type="file" accept="image/*" onChange={handleProfileImageChange} className="mt-2" />
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleProfileImageChange} 
+                ref={fileInputRef}
+                className="hidden" 
+              />
+              <p className="text-sm text-gray-500 text-center">Click to change profile picture</p>
             </div>
             {/* Name and Password */}
             <div className="flex flex-col gap-2 w-full max-w-xs">
@@ -205,25 +257,61 @@ function Profile() {
               <div className="flex gap-6">
                 <div className="flex flex-col items-center">
                   <span className="text-sm mb-1">Front</span>
-                  <div className="w-28 h-20 border-2 border-gray-300 rounded bg-gray-100 flex items-center justify-center overflow-hidden shadow">
+                  <div className="relative w-28 h-20 border-2 border-gray-300 rounded bg-gray-100 flex items-center justify-center overflow-hidden shadow cursor-pointer group"
+                       onClick={() => document.getElementById('licenseFrontInput').click()}>
                     {licenseFrontPreview ? (
                       <img src={licenseFrontPreview} alt="License Front" className="object-contain w-full h-full" />
                     ) : (
-                      <span className="text-gray-400 text-xs">No image</span>
+                      <div className="flex flex-col items-center">
+                        <svg className="w-6 h-6 text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        <span className="text-gray-400 text-xs">Add Front</span>
+                      </div>
                     )}
+                    <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </div>
                   </div>
-                  <input type="file" accept="image/*" onChange={handleLicenseFrontChange} className="mt-1" />
+                  <input 
+                    id="licenseFrontInput"
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleLicenseFrontChange} 
+                    className="hidden" 
+                  />
                 </div>
                 <div className="flex flex-col items-center">
                   <span className="text-sm mb-1">Back</span>
-                  <div className="w-28 h-20 border-2 border-gray-300 rounded bg-gray-100 flex items-center justify-center overflow-hidden shadow">
+                  <div className="relative w-28 h-20 border-2 border-gray-300 rounded bg-gray-100 flex items-center justify-center overflow-hidden shadow cursor-pointer group"
+                       onClick={() => document.getElementById('licenseBackInput').click()}>
                     {licenseBackPreview ? (
                       <img src={licenseBackPreview} alt="License Back" className="object-contain w-full h-full" />
                     ) : (
-                      <span className="text-gray-400 text-xs">No image</span>
+                      <div className="flex flex-col items-center">
+                        <svg className="w-6 h-6 text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        <span className="text-gray-400 text-xs">Add Back</span>
+                      </div>
                     )}
+                    <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </div>
                   </div>
-                  <input type="file" accept="image/*" onChange={handleLicenseBackChange} className="mt-1" />
+                  <input 
+                    id="licenseBackInput"
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleLicenseBackChange} 
+                    className="hidden" 
+                  />
                 </div>
               </div>
             </div>
@@ -263,6 +351,40 @@ function Profile() {
                 </button>
               </div>
             </div>
+            
+            {/* License Display Section */}
+            {(licenseFrontPreview || licenseBackPreview) && (
+              <div className="w-full mt-6 px-5">
+                <h3 className="text-lg font-semibold text-gray-600 mb-3">Driving License</h3>
+                <div className="flex gap-4 justify-center">
+                  {licenseFrontPreview && (
+                    <div className="flex flex-col items-center">
+                      <span className="text-sm text-gray-500 mb-2">Front</span>
+                      <div className="w-32 h-24 border border-gray-300 rounded-lg overflow-hidden shadow-sm">
+                        <img 
+                          src={licenseFrontPreview} 
+                          alt="License Front" 
+                          className="object-contain w-full h-full bg-gray-50" 
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {licenseBackPreview && (
+                    <div className="flex flex-col items-center">
+                      <span className="text-sm text-gray-500 mb-2">Back</span>
+                      <div className="w-32 h-24 border border-gray-300 rounded-lg overflow-hidden shadow-sm">
+                        <img 
+                          src={licenseBackPreview} 
+                          alt="License Back" 
+                          className="object-contain w-full h-full bg-gray-50" 
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
             <SettingsMenu />
             <div className="flex justify-center mt-2">
             <Logout/>
