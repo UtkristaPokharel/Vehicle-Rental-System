@@ -9,6 +9,10 @@ export default function AddVehicle() {
     brand: "",
     price: "",
     location: "",
+    seats: "",
+    fuelType: "",
+    mileage: "",
+    transmission: "",
     description: "",
     features: {
       Safety: [],
@@ -38,6 +42,14 @@ export default function AddVehicle() {
     if (!formData.price || parseFloat(formData.price) <= 1) newErrors.price = "Price must be positive.";
 
     if (!formData.location.trim()) newErrors.location = "Location is required.";
+
+    if (!formData.seats || parseInt(formData.seats) < 1) newErrors.seats = "Seats must be at least 1.";
+
+    if (!formData.fuelType.trim()) newErrors.fuelType = "Fuel type is required.";
+
+    if (!formData.mileage || parseFloat(formData.mileage) <= 0) newErrors.mileage = "Mileage must be positive.";
+
+    if (!formData.transmission.trim()) newErrors.transmission = "Transmission type is required.";
 
     if (!image) {
       newErrors.image = "Image is required.";
@@ -121,6 +133,10 @@ export default function AddVehicle() {
       submission.append("brand", formData.brand);
       submission.append("price", formData.price);
       submission.append("location", formData.location);
+      submission.append("seats", formData.seats);
+      submission.append("fuelType", formData.fuelType);
+      submission.append("mileage", formData.mileage);
+      submission.append("transmission", formData.transmission);
       submission.append("description", formData.description);
       submission.append("features", JSON.stringify(formData.features));
       submission.append("vehicleImage", image);
@@ -143,6 +159,10 @@ export default function AddVehicle() {
           brand: "",
           price: "",
           location: "",
+          seats: "",
+          fuelType: "",
+          mileage: "",
+          transmission: "",
           description: "",
           features: {
             Safety: [],
@@ -170,6 +190,7 @@ export default function AddVehicle() {
       <Toaster />
       <h2 className="text-2xl font-bold mb-4">Add Vehicle</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Basic Vehicle Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {["name", "type", "brand", "price", "location"].map((field) => (
             <div key={field}>
@@ -206,7 +227,83 @@ export default function AddVehicle() {
               )}
             </div>
           ))}
-          <div className="md:col-span-2">
+        </div>
+
+        {/* Vehicle Specifications */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <input
+              type="number"
+              name="seats"
+              placeholder="Number of Seats"
+              value={formData.seats}
+              onChange={handleChange}
+              className="border p-2 rounded w-full"
+              required
+              min="1"
+              max="50"
+            />
+            {errors.seats && (
+              <p className="text-red-500 text-sm">{errors.seats}</p>
+            )}
+          </div>
+          
+          <div>
+            <select
+              name="fuelType"
+              value={formData.fuelType}
+              onChange={handleChange}
+              className="border p-2 rounded w-full"
+              required
+            >
+              <option value="">Select Fuel Type</option>
+              <option value="Gas">Gas</option>
+              <option value="Electric">Electric</option>
+              <option value="Hybrid">Hybrid</option>
+            </select>
+            {errors.fuelType && (
+              <p className="text-red-500 text-sm">{errors.fuelType}</p>
+            )}
+          </div>
+
+          <div>
+            <input
+              type="number"
+              name="mileage"
+              placeholder="Mileage (MPG)"
+              value={formData.mileage}
+              onChange={handleChange}
+              className="border p-2 rounded w-full"
+              required
+              min="1"
+              step="0.1"
+            />
+            {errors.mileage && (
+              <p className="text-red-500 text-sm">{errors.mileage}</p>
+            )}
+          </div>
+
+          <div>
+            <select
+              name="transmission"
+              value={formData.transmission}
+              onChange={handleChange}
+              className="border p-2 rounded w-full"
+              required
+            >
+              <option value="">Select Transmission</option>
+              <option value="Automatic">Automatic</option>
+              <option value="Manual">Manual</option>
+            </select>
+            {errors.transmission && (
+              <p className="text-red-500 text-sm">{errors.transmission}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Description */}
+        <div className="grid grid-cols-1 gap-6">
+          <div>
             <textarea
               name="description"
               placeholder="Description"

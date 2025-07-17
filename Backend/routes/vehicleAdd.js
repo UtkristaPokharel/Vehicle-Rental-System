@@ -7,7 +7,7 @@ const { vehicleUpload } = require('../middleware/upload');
 
 router.post('/add-vehicle', authMiddleware, isAdmin, vehicleUpload.single('vehicleImage'), async (req, res) => {
   try {
-    const { name, type, brand, price, location, features,description } = req.body;
+    const { name, type, brand, price, location, features, description, seats, fuelType, mileage, transmission } = req.body;
     const image = req.file ? req.file.filename : null;
 
     if (!image) {
@@ -20,6 +20,10 @@ router.post('/add-vehicle', authMiddleware, isAdmin, vehicleUpload.single('vehic
       brand,
       price: parseFloat(price),
       location,
+      seats: parseInt(seats),
+      fuelType,
+      mileage: parseFloat(mileage),
+      transmission,
       features: JSON.parse(features),
       image,
       description,
