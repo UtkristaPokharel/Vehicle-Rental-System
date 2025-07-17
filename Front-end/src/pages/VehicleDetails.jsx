@@ -13,6 +13,7 @@ function VehicleDetails() {
   
   const [vehicleData, setVehicleData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
   
   // Add state to track booking data
   const [bookingData, setBookingData] = useState({
@@ -57,11 +58,11 @@ function VehicleDetails() {
       setLoading(false);
     };
 
-    // Only fetch if we don't have data and we're still loading
-    if (loading && !vehicleData) {
+    // Only fetch if we're still loading
+    if (loading) {
       fetchVehicleData();
     }
-  }, [id, loading, vehicleData, location.state]);
+  }, [id, loading, location.state]); // Removed vehicleData from dependencies to prevent infinite loop
 
   // Function to handle continue to payment
   const handleContinueToPayment = () => {
@@ -151,8 +152,8 @@ function VehicleDetails() {
 
   // Function to construct proper image URL
   const getImageUrl = (imagePath) => {
-    if (!imagePath) {
-      console.log("No image path provided");
+    if (!imagePath || imageError) {
+      console.log("No image path provided or image error occurred");
       return "/placeholder-vehicle.jpg";
     }
 
@@ -192,9 +193,9 @@ function VehicleDetails() {
               className="w-full max-w-[600px] lg:max-w-[650px] h-auto object-cover rounded-lg shadow-md" 
               src={imageUrl} 
               alt={vehicleData.name}
-              onError={(e) => {
+              onError={() => {
                 console.error("Failed to load vehicle image:", imageUrl);
-                e.target.src = "/placeholder-vehicle.jpg"; // fallback image
+                setImageError(true); // Set error state instead of directly changing src
               }}
             />
           </div>
