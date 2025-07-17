@@ -1,10 +1,12 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { LocationPicker } from './LocationPicker';
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { FaStar } from "react-icons/fa6";
 import { useState, useEffect } from "react";
-import { FaPen } from "react-icons/fa";
+import { FaPen, FaSpinner } from "react-icons/fa";
 import toast,{ Toaster } from "react-hot-toast";
+
 
 function VehicleDetails() {
   const location = useLocation();
@@ -339,6 +341,7 @@ export const BookingSection = ({
     startTime: getCurrentTime(),
     endDate: getTodayDate(),
     endTime: getCurrentTime(),
+    location: location // Initialize with the prop value
   });
 
   useEffect(() => {
@@ -347,6 +350,10 @@ export const BookingSection = ({
 
   const handleChange = (field, value) => {
     setBooking((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleLocationChange = (newLocation) => {
+    handleChange('location', newLocation);
   };
 
   // Format price for display
@@ -427,18 +434,11 @@ export const BookingSection = ({
 
         <hr className="my-4" />
 
-        {/* Location */}
-        <div className="flex justify-between items-center">
-          <div>
-            <p className="font-medium text-sm text-gray-700">
-              Pickup & return location
-            </p>
-            <p className="text-sm text-black">{location}</p>
-          </div>
-          <button className="p-2 hover:bg-gray-100 rounded-full">
-            <FaPen className="text-sm text-gray-600" />
-          </button>
-        </div>
+        {/* Location - Now using the LocationPicker component */}
+        <LocationPicker 
+          location={booking.location} 
+          onLocationChange={handleLocationChange} 
+        />
 
         <hr className="my-4" />
 
