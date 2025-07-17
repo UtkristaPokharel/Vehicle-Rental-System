@@ -23,6 +23,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
   useEffect(() => {
     if (initialData) {
       console.log("Initial vehicle data:", initialData); // Debug log
+      console.log("Vehicle image field:", initialData.image); // Debug log specifically for image
       setFormData({
         name: initialData.name || "",
         type: initialData.type || "",
@@ -38,7 +39,16 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
       });
 
       if (initialData.image) {
-        const imageUrl = `http://localhost:3001/${initialData.image}`;
+        let imageUrl;
+        // Check if it's already a full URL or just a filename/path
+        if (initialData.image.startsWith('http')) {
+          imageUrl = initialData.image;
+        } else if (initialData.image.startsWith('uploads/')) {
+          imageUrl = `http://localhost:3001/${initialData.image}`;
+        } else {
+          // If it's just a filename, assume it's in uploads/vehicles
+          imageUrl = `http://localhost:3001/uploads/vehicles/${initialData.image}`;
+        }
         console.log("Setting image preview to:", imageUrl); // Debug log
         setImagePreview(imageUrl);
       }
@@ -62,9 +72,10 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
 
     if (!formData.location.trim()) newErrors.location = "Location is required.";
 
+    // Image validation only for add mode (when initialData is null)
     if (!initialData && !image) {
       newErrors.image = "Image is required.";
-    } else if (image) {
+    } else if (!initialData && image) {
       const allowed = ['image/jpeg', 'image/png', 'image/jpg'];
       if (!allowed.includes(image.type)) {
         newErrors.image = "Invalid image type.";
@@ -88,14 +99,11 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImage(file);
+    
+    // Create preview for new uploads
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setImagePreview(null);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
     }
   };
 
@@ -166,20 +174,6 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Update failed");
 
-        if (image) {
-          const imageFormData = new FormData();
-          imageFormData.append("vehicleImage", image);
-          imageFormData.append("vehicleId", initialData._id);
-
-          const imageRes = await fetch("http://localhost:3001/api/update-vehicle-image", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
-            body: imageFormData,
-          });
-
-          if (!imageRes.ok) throw new Error("Failed to update image");
-        }
-
         toast.success("Vehicle updated successfully");
         onSubmit(updateData);
       } else {
@@ -245,7 +239,9 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         <div className="px-6 py-2">
           <Toaster />
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">{initialData ? "Edit Vehicle" : "Add Vehicle"}</h2>
+            <h2 className="text-2xl font-bold">
+              {initialData ? "Edit Vehicle Details" : "Add Vehicle"}
+            </h2>
             {onCancel && (
               <button
                 onClick={onCancel}
@@ -285,16 +281,33 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {["name", "type", "brand", "price", "location"].map((field) => (
                 <div key={field}>
-                  <input
-                    type={field === "price" ? "number" : "text"}
-                    name={field}
-                    placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                    value={formData[field]}
-                    onChange={handleChange}
-                    className="border p-2 rounded w-full"
-                    step={field === "price" ? "1" : undefined}
-                    min={field === "price" ? "0" : undefined}
-                  />
+                  {field === "type" ? (
+                    <select
+                      name={field}
+                      value={formData[field]}
+                      onChange={handleChange}
+                      className="border p-2 rounded w-full"
+                      required
+                    >
+                      <option value="">Select Vehicle Type</option>
+                      <option value="two-wheeler">Two-Wheeler</option>
+                      <option value="car">Car</option>
+                      <option value="truck">Truck</option>
+                      <option value="pickup">Pickup</option>
+                      <option value="bus">Bus</option>
+                    </select>
+                  ) : (
+                    <input
+                      type={field === "price" ? "number" : "text"}
+                      name={field}
+                      placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                      value={formData[field]}
+                      onChange={handleChange}
+                      className="border p-2 rounded w-full"
+                      step={field === "price" ? "1" : undefined}
+                      min={field === "price" ? "0" : undefined}
+                    />
+                  )}
                   {errors[field] && (
                     <p className="text-red-500 text-sm">{errors[field]}</p>
                   )}
@@ -311,51 +324,85 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
               </div>
             </div>
 
-            {/* Image Section */}
+            {/* Image Section - Upload for Add, Preview Only for Edit */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Vehicle Image Preview
-                </label>
-                <div className="flex flex-col items-center gap-2">
-                  <div className="border-2 border-gray-200 rounded-lg overflow-hidden w-48 h-36 flex items-center justify-center bg-gray-50">
-                    {imagePreview ? (
-                      <img
-                        src={imagePreview}
-                        alt="Vehicle preview"
-                        className="object-contain w-full h-full"
-                        onError={(e) => {
-                          console.error("Failed to load image:", imagePreview);
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'block';
-                        }}
-                        onLoad={() => {
-                          console.log("Image loaded successfully:", imagePreview);
-                        }}
-                      />
-                    ) : (
-                      <span className="text-gray-400 text-sm">No image selected</span>
+              {!initialData ? (
+                // Add Vehicle Mode - Show Upload Input and Preview
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Vehicle Image *
+                    </label>
+                    <input
+                      type="file"
+                      id="vehicleImage"
+                      name="vehicleImage"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="border p-2 rounded w-full"
+                      required
+                    />
+                    {errors.image && (
+                      <p className="text-red-500 text-sm mt-1">{errors.image}</p>
                     )}
-                    <span className="text-red-400 text-sm hidden">Failed to load image</span>
+                    {image && (
+                      <p className="text-green-600 text-sm mt-1">
+                        Selected: {image.name} ({(image.size / 1024 / 1024).toFixed(2)} MB)
+                      </p>
+                    )}
                   </div>
-                  <input
-                    type="file"
-                    id="vehicleImage"
-                    name="vehicleImage"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="border p-2 rounded w-full mt-2"
-                  />
-                  {errors.image && (
-                    <p className="text-red-500 text-sm">{errors.image}</p>
-                  )}
-                  {image && (
-                    <p className="text-green-600 text-sm mt-1">
-                      Selected: {image.name} ({(image.size / 1024 / 1024).toFixed(2)} MB)
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Image Preview
+                    </label>
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="border-2 border-gray-200 rounded-lg overflow-hidden w-48 h-36 flex items-center justify-center bg-gray-50">
+                        {imagePreview ? (
+                          <img
+                            src={imagePreview}
+                            alt="Vehicle preview"
+                            className="object-contain w-full h-full"
+                          />
+                        ) : (
+                          <span className="text-gray-400 text-sm">No image selected</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                // Edit Vehicle Mode - Show Preview Only
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Current Vehicle Image
+                  </label>
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="border-2 border-gray-200 rounded-lg overflow-hidden w-48 h-36 flex items-center justify-center bg-gray-50">
+                      {imagePreview ? (
+                        <img
+                          src={imagePreview}
+                          alt="Vehicle preview"
+                          className="object-contain w-full h-full"
+                          onError={(e) => {
+                            console.error("Failed to load image:", imagePreview);
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'block';
+                          }}
+                          onLoad={() => {
+                            console.log("Image loaded successfully:", imagePreview);
+                          }}
+                        />
+                      ) : (
+                        <span className="text-gray-400 text-sm">No image available</span>
+                      )}
+                      <span className="text-red-400 text-sm hidden">Failed to load image</span>
+                    </div>
+                    <p className="text-sm text-gray-600 text-center">
+                      Image updates are not available in edit mode
                     </p>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Features Section */}

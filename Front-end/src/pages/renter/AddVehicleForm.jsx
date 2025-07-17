@@ -173,17 +173,34 @@ export default function AddVehicle() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {["name", "type", "brand", "price", "location"].map((field) => (
             <div key={field}>
-              <input
-                type={field === "price" ? "number" : "text"}
-                name={field}
-                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                value={formData[field]}
-                onChange={handleChange}
-                className="border p-2 rounded w-full"
-                required
-                step={field === "price" ? "1" : undefined}
-                min={field === "price" ? "0" : undefined}
-              />
+              {field === "type" ? (
+                <select
+                  name={field}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  className="border p-2 rounded w-full"
+                  required
+                >
+                  <option value="">Select Vehicle Type</option>
+                  <option value="two-wheeler">Two Wheeler</option>
+                  <option value="car">Car</option>
+                  <option value="truck">Truck</option>
+                  <option value="pickup">Pickup</option>
+                  <option value="bus">Bus</option>
+                </select>
+              ) : (
+                <input
+                  type={field === "price" ? "number" : "text"}
+                  name={field}
+                  placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  className="border p-2 rounded w-full"
+                  required
+                  step={field === "price" ? "1" : undefined}
+                  min={field === "price" ? "0" : undefined}
+                />
+              )}
               {errors[field] && (
                 <p className="text-red-500 text-sm">{errors[field]}</p>
               )}

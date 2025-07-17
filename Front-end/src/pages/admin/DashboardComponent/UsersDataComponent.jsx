@@ -10,9 +10,13 @@ function UserDetailModal({ user, onClose }) {
   
   // Handle different image URL formats
   const getImageUrl = (imgUrl) => {
+    console.log("User image URL:", imgUrl); // Debug log
     if (!imgUrl) return defaultProfileImg;
     if (imgUrl.startsWith('http')) return imgUrl;
-    return `http://localhost:3001/${imgUrl}`;
+    // For profile images, they're stored as filenames and need the full path
+    const fullUrl = `http://localhost:3001/uploads/profiles/${imgUrl}`;
+    console.log("Constructed profile image URL:", fullUrl); // Debug log
+    return fullUrl;
   };
 
   return (
@@ -136,9 +140,13 @@ function UsersDataComponent() {
                 const defaultProfileImg = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
                 
                 const getImageUrl = (imgUrl) => {
+                  console.log("Table row - User image URL:", imgUrl); // Debug log
                   if (!imgUrl) return defaultProfileImg;
                   if (imgUrl.startsWith('http')) return imgUrl;
-                  return `http://localhost:3001/${imgUrl}`;
+                  // For profile images, they're stored as filenames and need the full path
+                  const fullUrl = `http://localhost:3001/uploads/profiles/${imgUrl}`;
+                  console.log("Table row - Constructed profile image URL:", fullUrl); // Debug log
+                  return fullUrl;
                 };
 
                 return (
