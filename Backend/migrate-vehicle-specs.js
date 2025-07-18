@@ -10,6 +10,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/vehicle-r
   useUnifiedTopology: true,
 });
 
+
 mongoose.connection.on('connected', async () => {
   console.log('✅ Connected to MongoDB');
   
