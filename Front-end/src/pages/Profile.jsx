@@ -51,6 +51,7 @@ function Profile() {
       } catch (err) {
         setProfileImg(defaultProfile);
         setProfileImagePreview(defaultProfile);
+      
       }
     };
     fetchProfile();

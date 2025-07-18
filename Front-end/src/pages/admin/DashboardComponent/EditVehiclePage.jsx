@@ -26,8 +26,8 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
 
   useEffect(() => {
     if (initialData) {
-      console.log("Initial vehicle data:", initialData); // Debug log
-      console.log("Vehicle image field:", initialData.image); // Debug log specifically for image
+      console.log("Initial vehicle data:", initialData);
+      console.log("Vehicle image field:", initialData.image);
       setFormData({
         name: initialData.name || "",
         type: initialData.type || "",
@@ -48,13 +48,11 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
 
       if (initialData.image) {
         let imageUrl;
-        // Check if it's already a full URL or just a filename/path
         if (initialData.image.startsWith('http')) {
           imageUrl = initialData.image;
         } else if (initialData.image.startsWith('uploads/')) {
           imageUrl = `http://localhost:3001/${initialData.image}`;
         } else {
-          // If it's just a filename, assume it's in uploads/vehicles
           imageUrl = `http://localhost:3001/uploads/vehicles/${initialData.image}`;
         }
         console.log("Setting image preview to:", imageUrl); // Debug log
@@ -226,6 +224,8 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
 
         if (res.ok) {
           toast.success("Vehicle added successfully");
+          
+          // Reset form data
           setFormData({
             name: "",
             type: "",
@@ -243,10 +243,15 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
               "Additional features": [],
             },
           });
-          setImage(null);
-          setImagePreview(null);
+          setImage();
+          setImagePreview();
           const fileInput = document.getElementById("vehicleImage");
           if (fileInput) fileInput.value = "";
+          
+          // Call onSubmit callback if provided
+          if (onSubmit) {
+            onSubmit(data);
+          }
         } else {
           toast.error("Error: " + data.message);
         }
@@ -263,7 +268,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
     <div className="bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full overflow-y-auto">
         <div className="px-6 py-2">
-          <Toaster />
+          {/* <Toaster /> */}
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold">
               {initialData ? "Edit Vehicle Details" : "Add Vehicle"}

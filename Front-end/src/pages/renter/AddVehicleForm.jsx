@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
-export default function AddVehicle() {
+export default function AddVehicle({ onSubmit }) {
   
   const [formData, setFormData] = useState({
     name: "",
@@ -21,8 +21,18 @@ export default function AddVehicle() {
     },
   });
   const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  // Cleanup effect to revoke object URLs
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
   // Auth check
 
@@ -77,6 +87,35 @@ export default function AddVehicle() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImage(file);
+    
+    // Create preview URL
+    if (file) {
+      // Clean up previous preview URL
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    } else {
+      setImagePreview(null);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+    setImage(null);
+    setImagePreview(null);
+    const fileInput = document.getElementById("vehicleImage");
+    if (fileInput) fileInput.value = "";
+    // Clear any image-related errors
+    if (errors.image) {
+      setErrors(prev => ({
+        ...prev,
+        image: undefined
+      }));
+    }
   };
 
   const handleFeatureChange = (category, index, value) => {
@@ -153,6 +192,8 @@ export default function AddVehicle() {
       const data = await res.json();
       if (res.ok) {
         toast.success("Vehicle added successfully");
+        
+        // Reset form data
         setFormData({
           name: "",
           type: "",
@@ -170,10 +211,22 @@ export default function AddVehicle() {
             "Additional features": [],
           },
         });
+        
+        // Clean up image and preview
+        if (imagePreview) {
+          URL.revokeObjectURL(imagePreview);
+        }
         setImage(null);
+        setImagePreview(null);
         setErrors({});
+        
         const fileInput = document.getElementById("vehicleImage");
         if (fileInput) fileInput.value = "";
+        
+        // Call onSubmit callback if provided
+        if (onSubmit) {
+          onSubmit(data);
+        }
       } else {
         toast.error("Error: " + data.message);
       }
@@ -315,6 +368,10 @@ export default function AddVehicle() {
         </div>
 
         <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Vehicle Image *
+          </label>
+          
           <input
             type="file"
             id="vehicleImage"
@@ -324,13 +381,58 @@ export default function AddVehicle() {
             className="border p-2 rounded w-full"
             required
           />
+          
           {errors.image && (
-            <p className="text-red-500 text-sm">{errors.image}</p>
+            <p className="text-red-500 text-sm mt-1">{errors.image}</p>
           )}
+          
           {image && (
             <p className="text-green-600 text-sm mt-1">
               Selected: {image.name} ({(image.size / 1024 / 1024).toFixed(2)} MB)
             </p>
+          )}
+          
+          {/* Image Preview Section */}
+          {imagePreview && (
+            <div className="mt-4">
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="text-sm font-medium text-gray-700">Preview:</h4>
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="text-red-600 hover:text-red-800 text-sm font-medium flex items-center gap-1"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Remove
+                </button>
+              </div>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50 relative">
+                <img
+                  src={imagePreview}
+                  alt="Vehicle preview"
+                  className="max-w-full h-48 object-cover rounded-lg mx-auto shadow-md"
+                />
+                <p className="text-center text-sm text-gray-500 mt-2">
+                  Vehicle image preview
+                </p>
+              </div>
+            </div>
+          )}
+          
+          {/* Upload Instructions */}
+          {!imagePreview && (
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                </svg>
+                <p className="text-sm text-blue-700">
+                  Upload a clear, high-quality image of your vehicle. Supported formats: JPG, PNG. Max size: 5MB.
+                </p>
+              </div>
+            </div>
           )}
         </div>
 
