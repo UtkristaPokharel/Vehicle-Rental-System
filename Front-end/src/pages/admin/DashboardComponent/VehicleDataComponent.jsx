@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { BsThreeDotsVertical } from "react-icons/bs";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { Toaster } from "react-hot-toast";
 import EditVehicleForm from './EditVehiclePage'; // Reusable Add/Edit form
 
 export default function VehicleDataComponent() {
@@ -99,7 +98,6 @@ export default function VehicleDataComponent() {
 
   return (
     <div className="overflow-x-auto">
-      <Toaster />
       <table className="w-full">
         <thead>
           <tr className="text-left text-sm font-medium text-gray-500 border-b">

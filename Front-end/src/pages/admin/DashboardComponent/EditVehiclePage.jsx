@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import toast, { Toaster } from "react-hot-toast";
 
 export default function EditVehicleForm({ initialData = null, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
@@ -161,7 +160,6 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
     const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
 
     if (!name || !token) {
-      toast.error("Login required.");
       return;
     }
 
@@ -190,7 +188,6 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Update failed");
 
-        toast.success("Vehicle updated successfully");
         onSubmit(updateData);
       } else {
         // Create new vehicle
@@ -223,7 +220,6 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         const data = await res.json();
 
         if (res.ok) {
-          toast.success("Vehicle added successfully");
           
           // Reset form data
           setFormData({
@@ -252,13 +248,10 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
           if (onSubmit) {
             onSubmit(data);
           }
-        } else {
-          toast.error("Error: " + data.message);
         }
       }
     } catch (error) {
       console.error("Error:", error);
-      toast.error("Something went wrong.");
     } finally {
       setLoading(false);
     }

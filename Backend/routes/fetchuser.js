@@ -6,7 +6,20 @@ const { isAdmin } = require('../middleware/auth');
 const { profileUpload } = require('../middleware/upload');
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
 
-// GET all vehicles
+// Debug route to test token
+router.get('/test-auth', verifyToken, (req, res) => {
+  console.log('Test auth - req.admin:', req.admin);
+  console.log('Test auth - req.user:', req.user);
+  res.json({ 
+    message: 'Token is valid',
+    admin: req.admin,
+    user: req.user,
+    hasAdmin: !!req.admin,
+    hasUser: !!req.user
+  });
+});
+
+// GET all users
 router.get('/', async (req, res) => {
   try { 
     const users = await User.find(); 
@@ -99,6 +112,48 @@ router.post('/upload-license', verifyToken, profileUpload.fields([
     res.json({ message: 'License images updated', user: updated });
   } catch (err) {
     res.status(500).json({ message: 'Error uploading license images' });
+  }
+});
+
+// Admin route to verify/unverify user
+router.patch('/verify/:id', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { verified } = req.body; // true or false
+    const adminName = req.admin?.name || req.user?.name || 'Admin';
+
+    console.log('Verify request - req.admin:', req.admin); // Debug log
+    console.log('Verify request - req.user:', req.user); // Debug log
+    console.log('Verify request - adminName:', adminName); // Debug log
+
+    const updateData = {
+      isVerified: verified,
+      verifiedAt: verified ? new Date() : null,
+      verifiedBy: verified ? adminName : null,
+    };
+
+    const user = await User.findByIdAndUpdate(id, updateData, { new: true });
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    console.log('User verification updated:', user.name, 'verified:', verified); // Debug log
+
+    res.json({ 
+      message: `User ${verified ? 'verified' : 'unverified'} successfully`,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        isVerified: user.isVerified,
+        verifiedAt: user.verifiedAt,
+        verifiedBy: user.verifiedBy
+      }
+    });
+  } catch (err) {
+    console.error('Verify user error:', err);
+    res.status(500).json({ message: 'Error updating verification status' });
   }
 });
 
