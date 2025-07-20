@@ -15,10 +15,12 @@ const VehicleTypePage = () => {
       try {
         const res = await fetch(`http://localhost:3001/api/vehicles/type/${type.toLowerCase()}`);
         const data = await res.json();
-        setVehicles(data);
+        const activeVehicles = data.filter(vehicle => vehicle.isActive === true);
+        setVehicles(activeVehicles);
         setLoading(false);
       } catch (error) {
         console.error("Failed to fetch vehicles:", error);
+        setLoading(false);
       }
     };
 
