@@ -26,6 +26,7 @@ function Logout() {
       localStorage.removeItem("userId");
 
       navigate('/');
+      window.location.reload();
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -60,7 +61,7 @@ function Logout() {
       {showPrompt && (
         <div
           ref={promptRef}
-          className="absolute mt-2 top-[-100px] left-25 w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-4"
+          className="absolute mt-2 top-[-100px] w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-4"
         >
           <p className="text-gray-800 font-medium mb-4">Are you sure you want to logout?</p>
           <div className="flex justify-end gap-2">
