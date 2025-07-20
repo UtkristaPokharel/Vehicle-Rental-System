@@ -2,29 +2,27 @@ import { useState, useRef, useEffect } from 'react';
 import { IoMenu, IoClose } from "react-icons/io5";
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 
-export default function Navbar() {
+export default function Navbar({ onProfileClick }) {
+    const defaultProfile = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
+    
     const [isOpen, setIsOpen] = useState(false);
-    const [imgUrl, setImgUrl] = useState(""); // Dynamic profile image
+    const [imgUrl, setImgUrl] = useState(defaultProfile); // Initialize with default profile image
     const menuref = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
-
-    const defaultProfile = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
 
     useEffect(() => {
         const stored = localStorage.getItem("profileImg");
         if (stored && stored.trim() !== "") {
             setImgUrl(stored);
-        } else {
-            setImgUrl(defaultProfile);
         }
+        // If no stored image, keep the default profile that was already set in state
     }, []);
 
     // Listen for profile image updates
     useEffect(() => {
         const handleProfileUpdate = () => {
             const stored = localStorage.getItem("profileImg");
-            console.log('Profile image updated, new URL:', stored); // Debug log
             if (stored && stored.trim() !== "") {
                 setImgUrl(stored);
             } else {
@@ -42,7 +40,7 @@ export default function Navbar() {
             window.removeEventListener('profileImageUpdated', handleProfileUpdate);
             window.removeEventListener('storage', handleProfileUpdate);
         };
-    }, []);
+    }, [defaultProfile]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -58,7 +56,18 @@ export default function Navbar() {
 
     const handleProfileClick = () => {
         const token = localStorage.getItem("token");
-        navigate(token ? "/profile" : "/login");
+        if (token) {
+            // If user is logged in and onProfileClick is provided, use sidebar
+            if (onProfileClick) {
+                onProfileClick();
+            } else {
+                // Fallback to navigation for backward compatibility
+                navigate("/profile");
+            }
+        } else {
+            // Not logged in, go to login
+            navigate("/login");
+        }
     };
 
     const handleFAQClick = () => {

@@ -11,7 +11,6 @@ export default function VehicleDataComponent() {
   const [editingVehicle, setEditingVehicle] = useState(null);
   const [vehicleToDelete, setVehicleToDelete] = useState(null);
   const [showDeletePopover, setShowDeletePopover] = useState(null); // index of row for popover
-  // const [deletePopoverPosition, setDeletePopoverPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
     fetchVehicles();

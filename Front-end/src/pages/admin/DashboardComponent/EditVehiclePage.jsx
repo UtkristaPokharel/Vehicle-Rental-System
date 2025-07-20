@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function EditVehicleForm({ initialData = null, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
     mileage: "",
     transmission: "",
     description: "",
+    isActive: true,
     features: {
       Safety: [],
       "Device connectivity": [],
@@ -38,6 +40,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         mileage: initialData.mileage || "",
         transmission: initialData.transmission || "",
         description: initialData.description || "",
+        isActive: initialData.isActive !== undefined ? initialData.isActive : true,
         features: initialData.features || {
           Safety: [],
           "Device connectivity": [],
@@ -59,6 +62,15 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
       }
     }
   }, [initialData]);
+
+  // Cleanup effect to revoke object URLs
+  useEffect(() => {
+    return () => {
+      if (imagePreview && imagePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
   const validate = () => {
     const newErrors = {};
@@ -115,8 +127,74 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
     
     // Create preview for new uploads
     if (file) {
+      // Clean up previous preview URL if it exists
+      if (imagePreview && imagePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreview);
+      }
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    // Clean up object URL if it's a blob URL
+    if (imagePreview && imagePreview.startsWith('blob:')) {
+      URL.revokeObjectURL(imagePreview);
+    }
+    setImage(null);
+    setImagePreview(null);
+    const fileInput = document.getElementById("vehicleImage");
+    if (fileInput) fileInput.value = "";
+    // Clear any image-related errors
+    if (errors.image) {
+      setErrors(prev => ({
+        ...prev,
+        image: undefined
+      }));
+    }
+  };
+
+  const handleToggleStatus = async () => {
+    if (!initialData) return; // Only for edit mode
+    
+    const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
+    if (!token) {
+      toast.error("Login required");
+      return;
+    }
+
+    const newStatus = !formData.isActive;
+    
+    try {
+      const res = await fetch(`http://localhost:3001/api/toggle-vehicle-status/${initialData._id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isActive: newStatus }),
+      });
+
+      const data = await res.json();
+      
+      if (res.ok) {
+        // Update local state
+        setFormData(prev => ({
+          ...prev,
+          isActive: newStatus
+        }));
+        
+        toast.success(data.message);
+        
+        if (onSubmit) {
+          onSubmit(data.vehicle);
+        }
+      } else {
+        throw new Error(data.message || "Failed to update status");
+      }
+    } catch (error) {
+      console.error("Error toggling status:", error);
+      toast.error("Error updating vehicle status: " + error.message);
     }
   };
 
@@ -158,8 +236,10 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
 
     const name = localStorage.getItem("name") || localStorage.getItem("adminName");
     const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
+    const userId = localStorage.getItem("userId") || localStorage.getItem("adminId");
 
     if (!name || !token) {
+      toast.error("Login required.");
       return;
     }
 
@@ -188,6 +268,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Update failed");
 
+        toast.success("Vehicle updated successfully");
         onSubmit(updateData);
       } else {
         // Create new vehicle
@@ -205,11 +286,10 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         submission.append("features", JSON.stringify(formData.features));
         submission.append("vehicleImage", image);
         submission.append("createdBy", name || "admin");
+        submission.append("createdById", userId || "admin");
+        submission.append("isActive", true); // Always set to true for admin-created vehicles
 
-        const status = name === localStorage.getItem("adminName") ? "active" : "inactive";
-        submission.append("status", status);
-
-        const res = await fetch("http://localhost:3001/api/add-vehicle", {
+        const res = await fetch("http://localhost:3001/api/user/add-vehicle", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -220,6 +300,12 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         const data = await res.json();
 
         if (res.ok) {
+          toast.success("Vehicle added successfully");
+          
+          // Clean up image and preview
+          if (imagePreview && imagePreview.startsWith('blob:')) {
+            URL.revokeObjectURL(imagePreview);
+          }
           
           // Reset form data
           setFormData({
@@ -233,14 +319,15 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
             mileage: "",
             transmission: "",
             description: "",
+            isActive: true,
             features: {
               Safety: [],
               "Device connectivity": [],
               "Additional features": [],
             },
           });
-          setImage();
-          setImagePreview();
+          setImage(null);
+          setImagePreview(null);
           const fileInput = document.getElementById("vehicleImage");
           if (fileInput) fileInput.value = "";
           
@@ -248,10 +335,13 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
           if (onSubmit) {
             onSubmit(data);
           }
+        } else {
+          toast.error("Error: " + data.message);
         }
       }
     } catch (error) {
       console.error("Error:", error);
+      toast.error("Something went wrong: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -261,7 +351,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
     <div className="bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full overflow-y-auto">
         <div className="px-6 py-2">
-          {/* <Toaster /> */}
+          <Toaster />
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold">
               {initialData ? "Edit Vehicle Details" : "Add Vehicle"}
@@ -279,7 +369,32 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
           {/* Current Vehicle Info Display */}
           {initialData && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <h3 className="text-lg font-semibold text-blue-800 mb-2">Editing Vehicle</h3>
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-lg font-semibold text-blue-800">Editing Vehicle</h3>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-600">Status:</span>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      formData.isActive 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {formData.isActive ? '✓ Active' : '✗ Inactive'}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleToggleStatus}
+                    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                      formData.isActive
+                        ? 'bg-red-100 text-red-700 hover:bg-red-200 border border-red-300'
+                        : 'bg-green-100 text-green-700 hover:bg-green-200 border border-green-300'
+                    }`}
+                  >
+                    {formData.isActive ? 'Deactivate' : 'Activate'}
+                  </button>
+                </div>
+              </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
                   <span className="font-medium text-gray-600">Name:</span>
@@ -454,19 +569,53 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Image Preview
                     </label>
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="border-2 border-gray-200 rounded-lg overflow-hidden w-48 h-36 flex items-center justify-center bg-gray-50">
-                        {imagePreview ? (
+                    
+                    {/* Image Preview Section */}
+                    {imagePreview ? (
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <h4 className="text-sm font-medium text-gray-700">Preview:</h4>
+                          <button
+                            type="button"
+                            onClick={handleRemoveImage}
+                            className="text-red-600 hover:text-red-800 text-sm font-medium flex items-center gap-1"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Remove
+                          </button>
+                        </div>
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50 relative">
                           <img
                             src={imagePreview}
                             alt="Vehicle preview"
-                            className="object-contain w-full h-full"
+                            className="max-w-full h-48 object-cover rounded-lg mx-auto shadow-md"
                           />
-                        ) : (
-                          <span className="text-gray-400 text-sm">No image selected</span>
-                        )}
+                          <p className="text-center text-sm text-gray-500 mt-2">
+                            Vehicle image preview
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="border-2 border-gray-200 rounded-lg overflow-hidden w-48 h-36 flex items-center justify-center bg-gray-50 mx-auto">
+                        <span className="text-gray-400 text-sm">No image selected</span>
+                      </div>
+                    )}
+
+                    {/* Upload Instructions */}
+                    {!imagePreview && (
+                      <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex items-center">
+                          <svg className="w-5 h-5 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                          </svg>
+                          <p className="text-sm text-blue-700">
+                            Upload a clear, high-quality image of your vehicle. Supported formats: JPG, PNG. Max size: 5MB.
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </>
               ) : (

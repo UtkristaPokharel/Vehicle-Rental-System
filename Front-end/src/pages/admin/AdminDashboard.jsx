@@ -61,6 +61,7 @@ const AddVehicle = () => (
   <div className="p-6">
     <h2 className="text-2xl font-bold mb-4">Add Vehicle</h2>
     <div className="bg-white p-4 rounded-lg shadow">
+     {/* <AddVehicleForm /> */}
      <EditVehicleForm />
     </div>
   </div>

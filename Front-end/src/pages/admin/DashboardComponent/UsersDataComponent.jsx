@@ -343,7 +343,6 @@ function UsersDataComponent() {
             <th className="pb-3 px-4">Verification</th>
             <th className="pb-3 px-4">License Status</th>
             <th className="pb-3 px-4">Created At</th>
-            <th className="pb-3 px-4">Last Active</th>
             <th className="pb-3 px-4">Action</th>
           </tr>
             </thead>
@@ -405,7 +404,6 @@ function UsersDataComponent() {
               )}
             </td>
             <td className="py-4 px-4 text-sm text-gray-600"> {new Date(user.createdAt).toLocaleDateString()}</td>
-            <td className="py-4 px-4 text-sm text-gray-600"> {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}</td>
             <td className="py-4 px-4">
                 <div className="relative">
                   <button

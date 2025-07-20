@@ -23,6 +23,7 @@ function Logout() {
       localStorage.removeItem('token');
       localStorage.removeItem('email');
       localStorage.removeItem("name");
+      localStorage.removeItem("userId");
 
       navigate('/');
     } catch (error) {

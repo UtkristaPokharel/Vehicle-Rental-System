@@ -43,7 +43,29 @@ router.delete('/delete-user/:id', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-// Update user profile (name, password)
+// Update user profile (name, email, password) - REST style
+router.put('/me', verifyToken, async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    const userId = req.user?.id || req.admin?.id;
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+    
+    const update = {};
+    if (name) update.name = name;
+    if (email) update.email = email;
+    if (password) update.password = password; // In production, hash the password
+    
+    const updated = await User.findByIdAndUpdate(userId, update, { new: true });
+    if (!updated) return res.status(404).json({ message: 'User not found' });
+    
+    res.json({ message: 'Profile updated successfully', user: updated });
+  } catch (err) {
+    console.error('Profile update error:', err);
+    res.status(500).json({ message: 'Error updating profile' });
+  }
+});
+
+// Update user profile (name, password) - Legacy route for backward compatibility
 router.put('/update-profile', verifyToken, async (req, res) => {
   try {
     const { name, password } = req.body;
@@ -82,7 +104,29 @@ router.get('/me', verifyToken, async (req, res) => {
   }
 });
 
-// Upload profile image
+// Upload profile image - Updated to match frontend expectations
+router.post('/upload-profile', verifyToken, profileUpload.single('profileImage'), async (req, res) => {
+  try {
+    const userId = req.user?.id || req.admin?.id;
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+    
+    const updated = await User.findByIdAndUpdate(userId, { imgUrl: req.file.filename }, { new: true });
+    if (!updated) return res.status(404).json({ message: 'User not found' });
+    
+    const fullImageUrl = `${BASE_URL}/uploads/profiles/${req.file.filename}`;
+    res.json({ 
+      message: 'Profile image updated successfully', 
+      imgUrl: fullImageUrl,
+      filename: req.file.filename 
+    });
+  } catch (err) {
+    console.error('Profile image upload error:', err);
+    res.status(500).json({ message: 'Error uploading profile image' });
+  }
+});
+
+// Upload profile image - Legacy route for backward compatibility
 router.post('/upload-profile-image', verifyToken, profileUpload.single('profileImg'), async (req, res) => {
   try {
     const userId = req.user?.id || req.admin?.id;
@@ -104,13 +148,28 @@ router.post('/upload-license', verifyToken, profileUpload.fields([
   try {
     const userId = req.user?.id || req.admin?.id;
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+    
     const update = {};
     if (req.files.licenseFront) update.licenseFront = req.files.licenseFront[0].filename;
     if (req.files.licenseBack) update.licenseBack = req.files.licenseBack[0].filename;
+    
+    if (Object.keys(update).length === 0) {
+      return res.status(400).json({ message: 'No license images uploaded' });
+    }
+    
     const updated = await User.findByIdAndUpdate(userId, update, { new: true });
     if (!updated) return res.status(404).json({ message: 'User not found' });
-    res.json({ message: 'License images updated', user: updated });
+    
+    res.json({ 
+      message: 'License images updated successfully', 
+      user: updated,
+      uploadedFiles: {
+        licenseFront: req.files.licenseFront ? `${BASE_URL}/uploads/profiles/${req.files.licenseFront[0].filename}` : null,
+        licenseBack: req.files.licenseBack ? `${BASE_URL}/uploads/profiles/${req.files.licenseBack[0].filename}` : null
+      }
+    });
   } catch (err) {
+    console.error('License upload error:', err);
     res.status(500).json({ message: 'Error uploading license images' });
   }
 });

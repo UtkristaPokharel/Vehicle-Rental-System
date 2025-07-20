@@ -25,13 +25,12 @@ function AddVehiclePage() {
   }, [navigate]);
 
   const handleVehicleSubmit = (vehicleData) => {
-    // This callback is executed after successful vehicle creation
     console.log("Vehicle added successfully:", vehicleData);
     
     // Optional: Navigate to a different page after successful addition
     setTimeout(() => {
       toast.success("Redirecting to dashboard...");
-      navigate("/dashboard"); // or wherever you want to redirect
+      navigate(-1) 
     }, 2000);
   };
 
