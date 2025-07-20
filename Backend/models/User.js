@@ -45,11 +45,7 @@ const userSchema = new mongoose.Schema({
   },
   isActive: {
     type: Boolean,
-    default:false,
-  },
-  isVerified:{
-    type: Boolean,
-    default: false,
+    default: true,
   },
   lastLogin: {
     type: Date,

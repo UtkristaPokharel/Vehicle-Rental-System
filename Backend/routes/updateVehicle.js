@@ -38,27 +38,34 @@ const upload = multer({
 
 router.put("/update-vehicle", verifyToken, isAdmin, async (req, res) => {
   try {
-    const { _id, name, type, brand, price, location, description, features, seats, fuelType, mileage, transmission } = req.body;
+    const { _id, name, type, brand, price, location, description, features, seats, fuelType, mileage, transmission, isActive } = req.body;
 
     if (!_id) {
       return res.status(400).json({ message: "Vehicle ID is required" });
     }
 
+    const updateData = {
+      name,
+      type,
+      brand,
+      price,
+      location,
+      seats: parseInt(seats),
+      fuelType,
+      mileage: parseFloat(mileage),
+      transmission,
+      description,
+      features,
+    };
+
+    // Include isActive if provided
+    if (typeof isActive === 'boolean') {
+      updateData.isActive = isActive;
+    }
+
     const updated = await Vehicle.findByIdAndUpdate(
       _id,
-      {
-        name,
-        type,
-        brand,
-        price,
-        location,
-        seats: parseInt(seats),
-        fuelType,
-        mileage: parseFloat(mileage),
-        transmission,
-        description,
-        features,
-      },
+      updateData,
       { new: true }
     );
 
@@ -69,6 +76,36 @@ router.put("/update-vehicle", verifyToken, isAdmin, async (req, res) => {
     res.status(200).json({ message: "Vehicle updated successfully", vehicle: updated });
   } catch (err) {
     console.error("Update vehicle error:", err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// Route to toggle vehicle active status
+router.patch("/toggle-vehicle-status/:id", verifyToken, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isActive } = req.body;
+
+    if (typeof isActive !== 'boolean') {
+      return res.status(400).json({ message: "isActive must be a boolean value" });
+    }
+
+    const updated = await Vehicle.findByIdAndUpdate(
+      id,
+      { isActive },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "Vehicle not found" });
+    }
+
+    res.status(200).json({ 
+      message: `Vehicle ${isActive ? 'activated' : 'deactivated'} successfully`, 
+      vehicle: updated 
+    });
+  } catch (err) {
+    console.error("Toggle vehicle status error:", err);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });

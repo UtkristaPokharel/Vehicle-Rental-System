@@ -73,6 +73,14 @@ const vehicleSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  createdById: {
+    type: String,
+    required: false,
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

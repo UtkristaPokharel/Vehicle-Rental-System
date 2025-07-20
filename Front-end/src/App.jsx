@@ -5,7 +5,6 @@ import Home from './pages/Home.jsx'
 import VehicleTypePage from './components/VehicleTypePage';
 import AuthForm from './pages/Auth.jsx';
 import VehicleDetails from './pages/VehicleDetails.jsx';
-import Profile from './pages/Profile.jsx';
 import AboutUs from './pages/AboutUs.jsx';
 import ContactUs from './pages/ContactUs.jsx';
 import Vehicle from './pages/Vehicles.jsx';
@@ -72,7 +71,6 @@ export default function App() {
           <Route path="/login" element={<AuthForm />} />
           <Route path="/vehicles/:type" element={<VehicleTypePage />} />
           <Route path="/vehicle/:type/:id" element={<VehicleDetails />} />
-          <Route path="/profile" element={<Profile />} />
           <Route path="/faq" element={<FAQPage />} />
           <Route path="/add-vehicle" element={<AddVehiclePage/>} />
           <Route path="/payment" element={<PaymentPage/>} />

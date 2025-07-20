@@ -14,6 +14,7 @@ export default function AddVehicle({ onSubmit }) {
     mileage: "",
     transmission: "",
     description: "",
+    isActive: false,
     features: {
       Safety: [],
       "Device connectivity": [],
@@ -154,8 +155,9 @@ export default function AddVehicle({ onSubmit }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const name = localStorage.getItem("name") ||localStorage.getItem("adminName");
-  const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
+    const name = localStorage.getItem("name") || localStorage.getItem("adminName");
+    const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
+    const userId = localStorage.getItem("userId") 
 
     if (!name || !token ) {
       toast.error("Login required.");
@@ -180,8 +182,10 @@ export default function AddVehicle({ onSubmit }) {
       submission.append("features", JSON.stringify(formData.features));
       submission.append("vehicleImage", image);
       submission.append("createdBy", name || "admin");
+      submission.append("createdById", userId || "admin");
+      submission.append("isActive", formData.isActive);
 
-      const res = await fetch("http://localhost:3001/api/add-vehicle", {
+      const res = await fetch("http://localhost:3001/api/user/add-vehicle", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -205,6 +209,7 @@ export default function AddVehicle({ onSubmit }) {
           mileage: "",
           transmission: "",
           description: "",
+          isActive: false,
           features: {
             Safety: [],
             "Device connectivity": [],

@@ -6,14 +6,24 @@ import Footer from "../components/Footer.jsx"
 import VehicleBrowse from './Browse.jsx';
 import ContactUs from './ContactUs.jsx';
 import FAQPage from './FAQPage.jsx';
+import ProfileSidebar from '../components/ProfileSidebar.jsx';
+import { useState } from 'react';
 import { FaCarSide, FaRegHandshake, FaGift } from "react-icons/fa";
 
-
-
 function Home() {
+  const [isProfileSidebarOpen, setIsProfileSidebarOpen] = useState(false);
+
+  const handleProfileClick = () => {
+    setIsProfileSidebarOpen(true);
+  };
+
+  const handleCloseSidebar = () => {
+    setIsProfileSidebarOpen(false);
+  };
+
   return (
     <>
-      <Navbar />
+      <Navbar onProfileClick={handleProfileClick} />
       <div className="Home-page flex justify-center flex-col items-center">
         <LandingPage />
         <VehicleBrowse />
@@ -45,11 +55,15 @@ function Home() {
         <FAQPage />
         <SubscriptionForm />
       <Footer />
+      
+      {/* Profile Sidebar */}
+      <ProfileSidebar 
+        isOpen={isProfileSidebarOpen} 
+        onClose={handleCloseSidebar} 
+      />
     </>
   );
-}
-
-
+} 
 
 export function FeatureSection() {
   const features = [
