@@ -30,7 +30,7 @@ const VehicleCard = ({ vehicle }) => {
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.5 }}
 		>
-			<img src={`http://localhost:3001/uploads/${vehicle.image}`} alt={vehicle.name} className="w-full h-48 object-cover" />
+			<img src={`http://localhost:3001/uploads/vehicles/${vehicle.image}`} alt={vehicle.name} className="w-full h-48 object-cover" />
 			<div className="p-4">
 				<h3 className="text-xl font-semibold text-gray-800">{vehicle.name}</h3>
 				<p className="text-gray-600 capitalize">
@@ -68,11 +68,12 @@ const VehicleBrowse = () => {
 			try {
 				const res = await fetch('http://localhost:3001/api/vehicles');
 				const data = await res.json();
-				setVehicles(data);
+				const activeVehicles = data.filter(vehicle => vehicle.isActive === true);
+				setVehicles(activeVehicles);
 
 				const uniqueCategories = [
 					'All',
-					...new Set(data.map(vehicle => vehicle.type).sort()),
+					...new Set(activeVehicles.map(vehicle => vehicle.type).sort()),
 				].map(category =>
 					category === 'two-wheeler'
 						? 'Two Wheeler'

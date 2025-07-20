@@ -5,7 +5,6 @@ import Home from './pages/Home.jsx'
 import VehicleTypePage from './components/VehicleTypePage';
 import AuthForm from './pages/Auth.jsx';
 import VehicleDetails from './pages/VehicleDetails.jsx';
-import Profile from './pages/Profile.jsx';
 import AboutUs from './pages/AboutUs.jsx';
 import ContactUs from './pages/ContactUs.jsx';
 import Vehicle from './pages/Vehicles.jsx';
@@ -51,15 +50,15 @@ export default function App() {
           success: {
             duration: 3000,
             style: {
-              background: '#10b981',
-              color: '#ffffff',
+              background: '#ffffff',
+              color: '#00000',
             },
           },
           error: {
             duration: 5000,
             style: {
-              background: '#ef4444',
-              color: '#ffffff',
+              background: '#ffffff',
+              color: '#000000',
             },
           },
         }}
@@ -71,22 +70,16 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<AuthForm />} />
           <Route path="/vehicles/:type" element={<VehicleTypePage />} />
-
           <Route path="/vehicle/:type/:id" element={<VehicleDetails />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/vehicle/:type/:id" element={<VehicleDetails />} />
-          <Route path="/profile" element={<Profile />} />
           <Route path="/faq" element={<FAQPage />} />
-          <Route path="add-vehicle" element={<AddVehiclePage/>} />
+          <Route path="/add-vehicle" element={<AddVehiclePage/>} />
           <Route path="/payment" element={<PaymentPage/>} />
-
-
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/about" element={<AboutUs />} />
-          <Route path="browse" element={<Vehicle />} />
-
-           <Route path="/admin-login" element={<AdminLoginPage />} />
-         <Route path="/dashboard" element={<AdminDashboard />} />
+          <Route path="/browse" element={<Vehicle />} />
+          <Route path="/admin-login" element={<AdminLoginPage />} />
+          <Route path="/dashboard" element={<AdminDashboard />} />
+          <Route path="/logout" element={<Logout/>} />
           {/* Fallback route for 404 */}
 
 

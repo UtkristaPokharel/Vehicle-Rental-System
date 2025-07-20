@@ -162,7 +162,7 @@ function PaymentPage() {
 	const getImageUrl = (image) => {
 		if (!image) return "/api/placeholder/80/60";
 		if (image.startsWith('http')) return image;
-		return `http://localhost:3001/uploads/${image}`;
+		return `http://localhost:3001/uploads/vehicles/${image}`;
 	};
 
 	if (loading) {
@@ -532,7 +532,7 @@ function PaymentPage() {
 									</div>
 									<div className="flex justify-between text-sm">
 										<span className="text-gray-600">Location</span>
-										<span>Lihue, HI 96766</span>
+										<span>Butwal, Nepal</span>
 									</div>
 								</div>
 

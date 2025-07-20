@@ -18,9 +18,9 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173'], 
+  origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174'], 
   credentials: true, // This is crucial for cookies
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
@@ -277,7 +277,15 @@ app.post('/api/auth/logout', (req, res) => {
 //Admin login route  logic setup
 app.use('/admin',adminRoutes);
 
-app.use("/api", addVehicle);
+
+//Adding vehicle
+const authMiddleware = require('./middleware/auth');
+const { isAdmin } = require('./middleware/auth');
+
+
+app.use("/api/user" , authMiddleware,  addVehicle);
+
+app.use("/api/admin", authMiddleware, isAdmin,  addVehicle);
 
 //Update vehicle detail or change status 
 const updateVehicle = require ("./routes/updateVehicle");
