@@ -68,11 +68,12 @@ const VehicleBrowse = () => {
 			try {
 				const res = await fetch('http://localhost:3001/api/vehicles');
 				const data = await res.json();
-				setVehicles(data);
+				const activeVehicles = data.filter(vehicle => vehicle.isActive === true);
+				setVehicles(activeVehicles);
 
 				const uniqueCategories = [
 					'All',
-					...new Set(data.map(vehicle => vehicle.type).sort()),
+					...new Set(activeVehicles.map(vehicle => vehicle.type).sort()),
 				].map(category =>
 					category === 'two-wheeler'
 						? 'Two Wheeler'
