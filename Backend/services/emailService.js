@@ -4,16 +4,20 @@ require('dotenv').config();
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: parseInt(process.env.EMAIL_PORT),
-  secure: process.env.EMAIL_SECURE === "true", // true for 465, false for 587
+  secure: false, // Use STARTTLS instead of SSL for port 587
+  requireTLS: true, // Force TLS
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.EMAIL_USER_Auth,
+    pass: process.env.EMAIL_PASS_Auth,
   },
+  tls: {
+    rejectUnauthorized: false // Accept self-signed certificates
+  }
 });
 
 const sendLoginEmail = async (to, name) => {
   let info = await transporter.sendMail({
-    from: `"Easy Wheels" <${process.env.FROM_EMAIL}>`,
+    from: `"Easy Wheels" <${process.env.EMAIL_USER_Auth}>`,
     to,
     subject: "Login Notification",
     html: `
@@ -27,7 +31,7 @@ const sendLoginEmail = async (to, name) => {
 
 const  sendSignupEmail = async (to, name) => {
   let info = await transporter.sendMail({
-    from: `"Easy Wheels" <${process.env.FROM_EMAIL}>`,
+    from: `"Easy Wheels" <${process.env.EMAIL_USER_Auth}>`,
     to,
     subject: "Welcome to Easy Wheels",
     html: `
