@@ -53,7 +53,7 @@ mongoose.connection.on('connected', async () => {
       }
 
       if (!vehicle.fuelType) {
-        updateData.fuelType = 'Gas'; // Default to Gas
+        updateData.fuelType = 'Petrol'; // Default to Petrol
       }
 
       if (!vehicle.mileage) {
