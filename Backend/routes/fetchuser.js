@@ -8,8 +8,6 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
 
 // Debug route to test token
 router.get('/test-auth', verifyToken, (req, res) => {
-  console.log('Test auth - req.admin:', req.admin);
-  console.log('Test auth - req.user:', req.user);
   res.json({ 
     message: 'Token is valid',
     admin: req.admin,
@@ -181,10 +179,6 @@ router.patch('/verify/:id', verifyToken, isAdmin, async (req, res) => {
     const { verified } = req.body; // true or false
     const adminName = req.admin?.name || req.user?.name || 'Admin';
 
-    console.log('Verify request - req.admin:', req.admin); // Debug log
-    console.log('Verify request - req.user:', req.user); // Debug log
-    console.log('Verify request - adminName:', adminName); // Debug log
-
     const updateData = {
       isVerified: verified,
       verifiedAt: verified ? new Date() : null,
@@ -196,8 +190,6 @@ router.patch('/verify/:id', verifyToken, isAdmin, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-
-    console.log('User verification updated:', user.name, 'verified:', verified); // Debug log
 
     res.json({ 
       message: `User ${verified ? 'verified' : 'unverified'} successfully`,
