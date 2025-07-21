@@ -27,8 +27,6 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
 
   useEffect(() => {
     if (initialData) {
-      console.log("Initial vehicle data:", initialData);
-      console.log("Vehicle image field:", initialData.image);
       setFormData({
         name: initialData.name || "",
         type: initialData.type || "",
@@ -57,7 +55,6 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         } else {
           imageUrl = `http://localhost:3001/uploads/vehicles/${initialData.image}`;
         }
-        console.log("Setting image preview to:", imageUrl); // Debug log
         setImagePreview(imageUrl);
       }
     }
@@ -635,9 +632,6 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
                             console.error("Failed to load image:", imagePreview);
                             e.target.style.display = 'none';
                             e.target.nextSibling.style.display = 'block';
-                          }}
-                          onLoad={() => {
-                            console.log("Image loaded successfully:", imagePreview);
                           }}
                         />
                       ) : (
