@@ -234,8 +234,8 @@ function PaymentPage() {
 											type="button"
 											onClick={() => setPaymentMethod("apple")}
 											className={`p-4 border rounded-lg flex flex-col items-center justify-center ${paymentMethod === "apple"
-													? "border-blue-500 bg-blue-50"
-													: "border-gray-300 hover:border-gray-400"
+												? "border-blue-500 bg-blue-50"
+												: "border-gray-300 hover:border-gray-400"
 												}`}
 										>
 											<FaApplePay className="text-2xl mb-2" />
@@ -382,7 +382,7 @@ function PaymentPage() {
 												type="text"
 												value={billingAddress.address}
 												onChange={(e) => handleBillingChange("address", e.target.value)}
-												placeholder="123 Main Street"
+												placeholder="eg. Jyotinagar"
 												className={`w-full p-3 border rounded-lg ${errors.address ? "border-red-500" : "border-gray-300"
 													} focus:outline-none focus:ring-2 focus:ring-blue-500`}
 											/>
@@ -400,7 +400,7 @@ function PaymentPage() {
 													type="text"
 													value={billingAddress.city}
 													onChange={(e) => handleBillingChange("city", e.target.value)}
-													placeholder="Kathmandu"
+													placeholder="Butwal"
 													className={`w-full p-3 border rounded-lg ${errors.city ? "border-red-500" : "border-gray-300"
 														} focus:outline-none focus:ring-2 focus:ring-blue-500`}
 												/>
@@ -417,7 +417,7 @@ function PaymentPage() {
 													type="text"
 													value={billingAddress.state}
 													onChange={(e) => handleBillingChange("state", e.target.value)}
-													placeholder="Bagmati"
+													placeholder="Lumbini"
 													className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 												/>
 											</div>
@@ -432,7 +432,7 @@ function PaymentPage() {
 													type="text"
 													value={billingAddress.zipCode}
 													onChange={(e) => handleBillingChange("zipCode", e.target.value)}
-													placeholder="44600"
+													placeholder="32400"
 													className={`w-full p-3 border rounded-lg ${errors.zipCode ? "border-red-500" : "border-gray-300"
 														} focus:outline-none focus:ring-2 focus:ring-blue-500`}
 												/>
@@ -494,7 +494,7 @@ function PaymentPage() {
 											Processing Payment...
 										</div>
 									) : (
-										`Complete Payment - ${totalPrice || "रु3,116"}`
+										`Complete Payment - ${totalPrice || "रु5,579"}`
 									)}
 								</button>
 							</form>
@@ -544,10 +544,6 @@ function PaymentPage() {
 										<span>Trip price</span>
 										<span>रु5,079</span>
 									</div>
-									<div className="flex justify-between text-green-600">
-										<span>1-month discount</span>
-										<span>-रु1,963</span>
-									</div>
 									<div className="flex justify-between text-sm text-gray-600">
 										<span>Service fee</span>
 										<span>रु200</span>
@@ -562,7 +558,7 @@ function PaymentPage() {
 
 								<div className="flex justify-between text-lg font-semibold">
 									<span>Total</span>
-									<span>{totalPrice || "रु3,616"}</span>
+									<span>{totalPrice || "रु5,579"}</span>
 								</div>
 
 								{/* Security Notice */}

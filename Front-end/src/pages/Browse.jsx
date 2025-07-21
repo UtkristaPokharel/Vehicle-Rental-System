@@ -213,7 +213,7 @@ export const SuggestedVehicle = () => {
           </h3>
           <button
             onClick={refreshSuggestions}
-            className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+            className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
           >
             Refresh
           </button>

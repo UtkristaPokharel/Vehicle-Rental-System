@@ -13,7 +13,7 @@ import PaymentPage from './pages/PaymentPage.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import { Toaster } from 'react-hot-toast';
 
-import Logout from './pages/Api/logout.jsx';
+import Logout from './pages/Api/Logout.jsx';
 import { UserProvider } from "./context/UserContext.jsx"
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 
