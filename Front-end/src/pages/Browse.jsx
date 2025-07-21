@@ -97,40 +97,85 @@ export const SuggestedVehicle = () => {
 
     const generateSuggestions = async () => {
       try {
-        // Try to get popular vehicles first (based on clicks)
-        const popularRes = await fetch("http://localhost:3001/api/public/popular?limit=10");
+        // Get vehicles with clicks and group by click count, then randomize within groups
+        const vehiclesWithClicks = vehicles
+          .filter(v => v.clickCount && v.clickCount > 0)
+          .reduce((groups, vehicle) => {
+            const count = vehicle.clickCount;
+            if (!groups[count]) {
+              groups[count] = [];
+            }
+            groups[count].push(vehicle);
+            return groups;
+          }, {});
         
-        if (popularRes.ok) {
-          const popularVehicles = await popularRes.json();
+        // Sort click counts in descending order and flatten with randomization within each group
+        const sortedClickedVehicles = Object.keys(vehiclesWithClicks)
+          .map(Number)
+          .sort((a, b) => b - a) // Descending order (highest clicks first)
+          .flatMap(clickCount => {
+            // Shuffle vehicles within the same click count group
+            const shuffledGroup = [...vehiclesWithClicks[clickCount]].sort(() => 0.5 - Math.random());
+            return shuffledGroup;
+          })
+          .slice(0, 5); // Max 5 vehicles
+        
+        if (sortedClickedVehicles.length > 0) {
+          const clickedVehicleIds = sortedClickedVehicles.map(v => v._id);
           
-          // Get vehicles with clicks (max 5)
-          const vehiclesWithClicks = popularVehicles.filter(v => v.clickCount > 0).slice(0, 5);
+          // Get unclicked vehicles (clickCount = 0 or undefined)
+          const unclickedVehicles = vehicles.filter(v => 
+            !clickedVehicleIds.includes(v._id) && 
+            v.isActive &&
+            (!v.clickCount || v.clickCount === 0)
+          );
           
-          if (vehiclesWithClicks.length > 0) {
-            // We have some click data, create a mixed recommendation
-            const clickedVehicleIds = vehiclesWithClicks.map(v => v._id);
+          // Check if we have unclicked vehicles
+          if (unclickedVehicles.length > 0) {
+            // Calculate remaining slots needed (total 8)
+            const remainingSlotsNeeded = 8 - sortedClickedVehicles.length;
             
-            // Get remaining vehicles (excluding already clicked ones)
-            const remainingVehicles = vehicles.filter(v => !clickedVehicleIds.includes(v._id) && v.isActive);
+            // Get random unclicked vehicles to fill remaining slots
+            const shuffledUnclicked = [...unclickedVehicles].sort(() => 0.5 - Math.random());
+            const randomUnclickedVehicles = shuffledUnclicked.slice(0, remainingSlotsNeeded);
             
-            // Calculate how many more vehicles we need (total 6)
-            const remainingSlotsNeeded = 6 - vehiclesWithClicks.length;
-            
-            // Get random vehicles to fill remaining slots
-            const shuffledRemaining = [...remainingVehicles].sort(() => 0.5 - Math.random());
-            const randomVehicles = shuffledRemaining.slice(0, remainingSlotsNeeded);
-            
-            // Combine clicked vehicles and random vehicles
-            const mixedSuggestions = [...vehiclesWithClicks, ...randomVehicles];
+            // Combine clicked vehicles (priority order with randomization) + random unclicked vehicles
+            const mixedSuggestions = [...sortedClickedVehicles, ...randomUnclickedVehicles];
             
             setSuggestedVehicles(mixedSuggestions);
+            setIsPersonalized(true);
+            return;
+          } else {
+            // All vehicles are clicked, show by priority with randomization within same click counts
+            const allClickedGrouped = vehicles
+              .filter(v => v.clickCount && v.clickCount > 0)
+              .reduce((groups, vehicle) => {
+                const count = vehicle.clickCount;
+                if (!groups[count]) {
+                  groups[count] = [];
+                }
+                groups[count].push(vehicle);
+                return groups;
+              }, {});
+            
+            const allClickedByPriorityWithShuffle = Object.keys(allClickedGrouped)
+              .map(Number)
+              .sort((a, b) => b - a) // Descending order (priority)
+              .flatMap(clickCount => {
+                // Shuffle vehicles within the same click count group
+                const shuffledGroup = [...allClickedGrouped[clickCount]].sort(() => 0.5 - Math.random());
+                return shuffledGroup;
+              })
+              .slice(0, 8);
+            
+            setSuggestedVehicles(allClickedByPriorityWithShuffle);
             setIsPersonalized(true);
             return;
           }
         }
         
         // Fallback: Show random vehicles if no click data
-        const count = Math.min(6, vehicles.length);
+        const count = Math.min(8, vehicles.length);
         const shuffled = [...vehicles].sort(() => 0.5 - Math.random());
         setSuggestedVehicles(shuffled.slice(0, count));
         setIsPersonalized(false);
@@ -138,7 +183,7 @@ export const SuggestedVehicle = () => {
       } catch (error) {
         console.error('Error generating suggestions:', error);
         // Fallback to random vehicles
-        const count = Math.min(6, vehicles.length);
+        const count = Math.min(8, vehicles.length);
         const shuffled = [...vehicles].sort(() => 0.5 - Math.random());
         setSuggestedVehicles(shuffled.slice(0, count));
         setIsPersonalized(false);
@@ -164,7 +209,7 @@ export const SuggestedVehicle = () => {
       <div className="text-center mb-4">
         <div className="flex items-center justify-center gap-4">
           <h3 className="text-xl font-semibold text-gray-800">
-            {isPersonalized ? "Trending & Featured Vehicles" : "Featured Vehicles"}
+            {isPersonalized ? "Trending & Discover More" : "Featured Vehicles"}
           </h3>
           <button
             onClick={refreshSuggestions}
@@ -175,7 +220,7 @@ export const SuggestedVehicle = () => {
         </div>
         {isPersonalized && (
           <p className="text-sm text-gray-600 mt-1">
-            Popular choices + more vehicles for you • Click refresh to update
+            Most popular vehicles + new discoveries • Click refresh to update
           </p>
         )}
       </div>
@@ -198,12 +243,12 @@ export const SuggestedVehicle = () => {
               type={vehicle.type === 'two-wheeler' ? 'two-wheeler' : vehicle.type.toLowerCase()}
             />
             {isPersonalized && vehicle.clickCount > 0 && (
-              <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-400 to-red-500 text-white text-xs px-2 py-1 rounded-full">
                 🔥 {vehicle.clickCount} {vehicle.clickCount === 1 ? 'view' : 'views'}
               </div>
             )}
             {isPersonalized && vehicle.clickCount === 0 && (
-              <div className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white text-xs px-2 py-1 rounded-full">
                 ✨ New
               </div>
             )}
