@@ -7,7 +7,7 @@ import { MdSecurity, MdInfo } from "react-icons/md";
 function PaymentPage() {
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { bookingData, vehicleData, totalPrice } = location.state || {};
+	const { bookingData, vehicleData } = location.state || {};
 
 	const [paymentMethod, setPaymentMethod] = useState("card");
 	const [cardData, setCardData] = useState({
@@ -28,21 +28,60 @@ function PaymentPage() {
 	const [loading, setLoading] = useState(false);
 	const [currentVehicleData, setCurrentVehicleData] = useState(vehicleData);
 
+	// Calculate total price based on booking duration and vehicle price
+	const calculateTotalPrice = () => {
+		if (!currentVehicleData?.price || !bookingData?.startDate || !bookingData?.endDate) {
+			return {
+				basePrice: 5079,
+				serviceFee: 200,
+				taxes: 300,
+				total: 5579,
+				days: 1
+			};
+		}
+
+		const startDate = new Date(bookingData.startDate);
+		const endDate = new Date(bookingData.endDate);
+		const diffTime = Math.abs(endDate - startDate);
+		const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24))); // At least 1 day
+
+		const basePrice = currentVehicleData.price * diffDays;
+		const serviceFee = 200;
+		const taxes = Math.round(basePrice * 0.05); // 5% tax
+
+		return {
+			basePrice,
+			serviceFee,
+			taxes,
+			total: basePrice + serviceFee + taxes,
+			days: diffDays
+		};
+	};
+
+	const priceBreakdown = calculateTotalPrice();
+
 	// Fetch vehicle data if not available in location.state
 	useEffect(() => {
 		const fetchVehicleData = async () => {
-			if (!vehicleData && location.state?.vehicleId) {
+			// If we have vehicleData with id, or vehicleId from location.state, fetch complete data
+			const vehicleId = vehicleData?.id || location.state?.vehicleId;
+			
+			if (vehicleId) {
 				setLoading(true);
 				try {
-					const response = await fetch(`http://localhost:3001/api/vehicles/${location.state.vehicleId}`);
+					const response = await fetch(`http://localhost:3001/api/vehicles/${vehicleId}`);
 					if (response.ok) {
 						const data = await response.json();
+						console.log("Fetched complete vehicle data:", data);
 						setCurrentVehicleData(data);
 					}
 				} catch (error) {
 					console.error("Error fetching vehicle data:", error);
 				}
 				setLoading(false);
+			} else if (vehicleData) {
+				console.log("Using passed vehicle data:", vehicleData);
+				setCurrentVehicleData(vehicleData);
 			}
 		};
 
@@ -122,7 +161,8 @@ function PaymentPage() {
 				state: {
 					bookingData,
 					vehicleData: currentVehicleData,
-					totalPrice,
+					totalPrice: priceBreakdown.total,
+					priceBreakdown,
 					paymentMethod,
 					transactionId: "TXN" + Date.now(),
 				}
@@ -494,7 +534,7 @@ function PaymentPage() {
 											Processing Payment...
 										</div>
 									) : (
-										`Complete Payment - ${totalPrice || "रु5,579"}`
+										`Complete Payment - रु${priceBreakdown.total.toLocaleString()}`
 									)}
 								</button>
 							</form>
@@ -515,7 +555,9 @@ function PaymentPage() {
 										/>
 										<div>
 											<h3 className="font-medium">{currentVehicleData?.name || "Range Rover"}</h3>
-											<p className="text-sm text-gray-600">5 seats • Automatic</p>
+											<p className="text-sm text-gray-600">
+												{currentVehicleData?.seats} seats • {currentVehicleData?.transmission}
+											</p>
 										</div>
 									</div>
 								</div>
@@ -532,7 +574,7 @@ function PaymentPage() {
 									</div>
 									<div className="flex justify-between text-sm">
 										<span className="text-gray-600">Location</span>
-										<span>Butwal, Nepal</span>
+										<span>{currentVehicleData?.location || "Butwal, Nepal"}</span>
 									</div>
 								</div>
 
@@ -541,16 +583,16 @@ function PaymentPage() {
 								{/* Pricing Breakdown */}
 								<div className="space-y-3 mb-6">
 									<div className="flex justify-between">
-										<span>Trip price</span>
-										<span>रु5,079</span>
+										<span>Trip price ({priceBreakdown.days} day{priceBreakdown.days > 1 ? 's' : ''})</span>
+										<span>रु{priceBreakdown.basePrice.toLocaleString()}</span>
 									</div>
 									<div className="flex justify-between text-sm text-gray-600">
 										<span>Service fee</span>
-										<span>रु200</span>
+										<span>रु{priceBreakdown.serviceFee.toLocaleString()}</span>
 									</div>
 									<div className="flex justify-between text-sm text-gray-600">
 										<span>Taxes</span>
-										<span>रु300</span>
+										<span>रु{priceBreakdown.taxes.toLocaleString()}</span>
 									</div>
 								</div>
 
@@ -558,7 +600,7 @@ function PaymentPage() {
 
 								<div className="flex justify-between text-lg font-semibold">
 									<span>Total</span>
-									<span>{totalPrice || "रु5,579"}</span>
+									<span>रु{priceBreakdown.total.toLocaleString()}</span>
 								</div>
 
 								{/* Security Notice */}

@@ -322,7 +322,6 @@ const getCurrentTime = () =>
 
 export const BookingSection = ({
   price = "रु3,116",
-  originalPrice = "रु5,079",
   location = "Butwal, Nepal",
   onBookingChange,
   onContinue
@@ -375,9 +374,6 @@ export const BookingSection = ({
 
           <div className="md:flex items-center justify-between max-w-lg   hidden">
             <div>
-              <p className="text-sm text-gray-400 line-through">
-                {originalPrice}
-              </p>
               <p className="text-lg font-bold text-black">{formatPrice(price)} total</p>
               <p className="text-xs text-gray-500">Before taxes</p>
             </div>
@@ -448,9 +444,6 @@ export const BookingSection = ({
       <div className="fixed bottom-0 left-0 right-0 bg-white shadow-inner md:hidden md:mt-6 p-4 border-t md:border-none z-50">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <div>
-            <p className="text-sm text-gray-400 line-through">
-              {originalPrice}
-            </p>
             <p className="text-lg font-bold text-black">{formatPrice(price)} total</p>
             <p className="text-xs text-gray-500">Before taxes</p>
           </div>
