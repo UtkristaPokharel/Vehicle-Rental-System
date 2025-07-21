@@ -42,8 +42,7 @@ export default function AuthForm() {
         setIsAuthenticated(true);
         navigate('/'); // Redirect to dashboard if already logged in
       }
-    } catch (error) {
-      console.log('Not authenticated ', error);
+    } catch {
       setIsAuthenticated(false);
     }
   };
@@ -67,7 +66,6 @@ export default function AuthForm() {
             return;
           }
 
-          console.log(userData);
           const { imgUrl, email, name, id } = userData;
 
           // Safely store user data in localStorage
@@ -139,8 +137,6 @@ const handleSubmit = async (e) => {
         email: form.email,
         password: form.password,
       });
-
-      console.log("Login response:", response.data); // Debug log
       const { user: userData, token } = response.data;
       
       // Validate response data
@@ -211,7 +207,6 @@ const handleSubmit = async (e) => {
         password: form.password,
       });
 
-      console.log("Signup response:", response.data); // Debug log
       const { user: userData, token } = response.data;
       
       // Validate response data

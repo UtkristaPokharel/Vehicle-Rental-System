@@ -104,28 +104,44 @@ const ContactUs = () => {
 		}
 	};
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 		const formErrors = validateForm();
 
 		if (Object.keys(formErrors).length === 0) {
 			setIsSubmitting(true);
-			// Here you would typically send the data to your backend
-			console.log('Form submitted:', formData);
 			
-			// Simulate API call
-			setTimeout(() => {
-				alert('Thank you for your message! We will get back to you soon.');
-				setFormData({
-					name: '',
-					email: '',
-					address: '',
-					phone: '',
-					message: '',
-					country: 'Nepal'
+			try {
+				const response = await fetch('http://localhost:3001/api/contact', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(formData)
 				});
+
+				const result = await response.json();
+
+				if (result.success) {
+					alert(result.message);
+					// Reset form on successful submission
+					setFormData({
+						name: '',
+						email: '',
+						address: '',
+						phone: '',
+						message: '',
+						country: 'Nepal'
+					});
+				} else {
+					alert(result.message || 'There was an error sending your message. Please try again.');
+				}
+			} catch (error) {
+				console.error('Error submitting form:', error);
+				alert('There was an error sending your message. Please check your internet connection and try again.');
+			} finally {
 				setIsSubmitting(false);
-			}, 1000);
+			}
 		} else {
 			setErrors(formErrors);
 		}

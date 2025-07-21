@@ -170,8 +170,6 @@ const VehicleBrowse = () => {
 				
 				const priceA = getPriceValue(a.price);
 				const priceB = getPriceValue(b.price);
-				console.log('Price A:', a.price, '-> Parsed:', priceA);
-				console.log('Price B:', b.price, '-> Parsed:', priceB);
 				return priceA - priceB;
 			}
 			case 'price-desc': {

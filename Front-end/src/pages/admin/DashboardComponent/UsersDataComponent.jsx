@@ -17,20 +17,15 @@ function UserDetailModal({ user, onClose, onUserUpdate }) {
 
     try {
       const newVerifiedStatus = !user.isVerified;
-      console.log("Attempting to verify user:", user._id, "New status:", newVerifiedStatus);
-      console.log("Using token:", token ? "Token present" : "No token");
       
-      const response = await axios.patch(
-        `http://localhost:3001/api/fetch/users/verify/${user._id}`,
-        { verified: newVerifiedStatus },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          timeout: 10000 // 10 second timeout
-        }
-      );
+      const response = await fetch(`http://localhost:3001/api/fetch/users/verify/${user._id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ verified: newVerifiedStatus })
+      });
 
       if (response.status === 200) {
         toast.success(response.data.message);
