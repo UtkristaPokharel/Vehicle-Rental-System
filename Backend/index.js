@@ -296,6 +296,8 @@ app.use("/api", updateVehicle);
 const fetchVehicle =require("./routes/fetchvehicle");
 app.use("/api/vehicles", fetchVehicle);
 
+// Public routes for click tracking (no authentication required)
+app.use("/api/public", addVehicle);
 
 const fetchUsers = require("./routes/fetchuser");
 app.use("/api/fetch/users", fetchUsers);

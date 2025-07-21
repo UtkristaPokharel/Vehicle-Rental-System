@@ -6,6 +6,19 @@ import { useState } from "react";
 const VehicleCard = ({ vehicle, type }) => {
   const [liked, setLiked] = useState(false);
 
+  const trackClick = async () => {
+    try {
+      await fetch(`http://localhost:3001/api/public/track-click/${vehicle._id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error) {
+      console.error('Error tracking click:', error);
+    }
+  };
+
   return (
     <Link
       to={`/vehicle/${type}/${vehicle._id}`}
@@ -16,6 +29,7 @@ const VehicleCard = ({ vehicle, type }) => {
         dateRange: vehicle.dateRange,
         price: vehicle.price,
       }}
+      onClick={trackClick}
     >
       <div className="vehicle-card group w-full rounded-2xl bg-white border border-gray-200 hover:shadow-2xl transition-shadow-md duration-300 overflow-hidden">
         <div className="relative">
