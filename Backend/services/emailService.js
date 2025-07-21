@@ -4,8 +4,8 @@ require('dotenv').config();
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: parseInt(process.env.EMAIL_PORT),
-  secure: false, // Use STARTTLS instead of SSL for port 587
-  requireTLS: true, // Force TLS
+  secure: false, 
+  requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER_Auth,
     pass: process.env.EMAIL_PASS_Auth,
