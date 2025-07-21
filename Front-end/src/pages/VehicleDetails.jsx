@@ -498,14 +498,12 @@ const features = [
 export function VehicleFeatures({ features }) {
   // Handle both array format (from database) and object format (default)
   const formatFeatures = (featuresData) => {
-    if (!featuresData) return features; // Use default features if none provided
+    if (!featuresData) return features; 
     
-    // If it's already in the correct format (array of objects with category and items)
     if (Array.isArray(featuresData) && featuresData[0]?.category) {
       return featuresData;
     }
     
-    // If it's an object format from database, convert it
     if (typeof featuresData === 'object' && !Array.isArray(featuresData)) {
       return Object.entries(featuresData).map(([category, items]) => ({
         category,
