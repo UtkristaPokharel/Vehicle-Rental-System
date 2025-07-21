@@ -1,9 +1,152 @@
 import { FaPhoneAlt, FaMapMarkerAlt, FaEnvelope } from "react-icons/fa";
 import { FaWhatsapp } from "react-icons/fa6";
+import { useState } from "react";
 // import Navbar from "../components/Navbar";
 // import Footer from "../components/Footer";
 
 const ContactUs = () => {
+	const [formData, setFormData] = useState({
+		name: '',
+		email: '',
+		address: '',
+		phone: '',
+		message: '',
+		country: 'Nepal'
+	});
+
+	const [errors, setErrors] = useState({});
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const validateForm = () => {
+		const newErrors = {};
+
+		// Name validation
+		if (!formData.name.trim()) {
+			newErrors.name = 'Name is required';
+		} else if (formData.name.trim().length < 2) {
+			newErrors.name = 'Name must be at least 2 characters long';
+		} else if (!/^[a-zA-Z\s.'-]+$/.test(formData.name.trim())) {
+			newErrors.name = 'Name can only contain letters, spaces, dots, apostrophes, and hyphens';
+		} else if (!/[a-zA-Z]/.test(formData.name.trim())) {
+			newErrors.name = 'Name must contain at least one letter';
+		} else if (/^[^a-zA-Z]*$/.test(formData.name.trim())) {
+			newErrors.name = 'Name must start with a letter';
+		} else if (/[.'-]{2,}/.test(formData.name.trim())) {
+			newErrors.name = 'Name cannot have consecutive special characters';
+		} else if (/^[.'-]|[.'-]$/.test(formData.name.trim())) {
+			newErrors.name = 'Name cannot start or end with special characters';
+		} else if (!/^[a-zA-Z]/.test(formData.name.trim())) {
+			newErrors.name = 'Name must start with a letter';
+		} else if (!/[a-zA-Z]$/.test(formData.name.trim())) {
+			newErrors.name = 'Name must end with a letter';
+		} else if (/(.)\1{2,}/.test(formData.name.trim())) {
+			newErrors.name = 'Name cannot have more than 2 consecutive repeated characters';
+		}
+
+		// Email validation
+		if (!formData.email.trim()) {
+			newErrors.email = 'Email is required';
+		} else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email)) {
+			newErrors.email = 'Please enter a valid email address';
+		} else if (/^[0-9]+@/.test(formData.email)) {
+			newErrors.email = 'Email username cannot contain only numbers';
+		} else if (formData.email.length > 254) {
+			newErrors.email = 'Email address is too long';
+		}
+
+		// Address validation
+		if (!formData.address.trim()) {
+			newErrors.address = 'Address is required';
+		} else if (formData.address.trim().length < 5) {
+			newErrors.address = 'Address must be at least 5 characters long';
+		} else if (/^[0-9\s]+$/.test(formData.address.trim())) {
+			newErrors.address = 'Address cannot contain only numbers';
+		} else if (!/[a-zA-Z]/.test(formData.address.trim())) {
+			newErrors.address = 'Address must contain at least one letter';
+		} else if (/(.)\1{4,}/.test(formData.address.trim())) {
+			newErrors.address = 'Address cannot have more than 4 consecutive repeated characters';
+		}
+
+		// Phone validation
+		if (formData.phone.trim() && !/^[9876]\d{9}$/.test(formData.phone.replace(/\s/g, ''))) {
+			newErrors.phone = 'Phone number must be 10 digits starting with 9, 8, 7, or 6';
+		}
+
+		// Message validation
+		if (!formData.message.trim()) {
+			newErrors.message = 'Message is required';
+		} else if (formData.message.trim().length < 10) {
+			newErrors.message = 'Message must be at least 10 characters long';
+		} else if (/^[0-9\s]+$/.test(formData.message.trim())) {
+			newErrors.message = 'Message cannot contain only numbers';
+		} else if (!/[a-zA-Z]/.test(formData.message.trim())) {
+			newErrors.message = 'Message must contain at least one letter';
+		} else if (/(.)\1{5,}/.test(formData.message.trim())) {
+			newErrors.message = 'Message cannot have more than 5 consecutive repeated characters';
+		}
+
+		return newErrors;
+	};
+
+	const handleInputChange = (e) => {
+		const { name, value } = e.target;
+		setFormData(prev => ({
+			...prev,
+			[name]: value
+		}));
+
+		// Clear error for this field when user starts typing
+		if (errors[name]) {
+			setErrors(prev => ({
+				...prev,
+				[name]: ''
+			}));
+		}
+	};
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		const formErrors = validateForm();
+
+		if (Object.keys(formErrors).length === 0) {
+			setIsSubmitting(true);
+			
+			try {
+				const response = await fetch('http://localhost:3001/api/contact', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(formData)
+				});
+
+				const result = await response.json();
+
+				if (result.success) {
+					alert(result.message);
+					// Reset form on successful submission
+					setFormData({
+						name: '',
+						email: '',
+						address: '',
+						phone: '',
+						message: '',
+						country: 'Nepal'
+					});
+				} else {
+					alert(result.message || 'There was an error sending your message. Please try again.');
+				}
+			} catch (error) {
+				console.error('Error submitting form:', error);
+				alert('There was an error sending your message. Please check your internet connection and try again.');
+			} finally {
+				setIsSubmitting(false);
+			}
+		} else {
+			setErrors(formErrors);
+		}
+	};
+
 	return (
 		<>
 			{/* <div className="bg-white min-h-screen"> */}
@@ -57,38 +200,92 @@ const ContactUs = () => {
 						<strong>Note:</strong> <span className="text-red-500">*</span> symbol represents required
 					</p>
 
-					<form className="space-y-5">
+					<form className="space-y-5" onSubmit={handleSubmit}>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<div>
 								<label className="text-sm">Name <span className="text-red-500">*</span></label>
-								<input type="text" placeholder="Full Name" className="w-full px-4 py-2 mt-1 border-0 rounded bg-white" />
+								<input 
+									type="text" 
+									name="name"
+									value={formData.name}
+									onChange={handleInputChange}
+									placeholder="Full Name" 
+									className={`w-full px-4 py-2 mt-1 border-0 rounded bg-white ${errors.name ? 'border-2 border-red-500' : ''}`} 
+								/>
+								{errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
 							</div>
 							<div>
 								<label className="text-sm">Email <span className="text-red-500">*</span></label>
-								<input type="email" placeholder="Your Email" className="w-full px-4 py-2 mt-1 border-0 rounded bg-white" />
+								<input 
+									type="email" 
+									name="email"
+									value={formData.email}
+									onChange={handleInputChange}
+									placeholder="Your Email" 
+									className={`w-full px-4 py-2 mt-1 border-0 rounded bg-white ${errors.email ? 'border-2 border-red-500' : ''}`} 
+								/>
+								{errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
 							</div>
 							<div>
 								<label className="text-sm">Your Address <span className="text-red-500">*</span></label>
-								<input type="text" placeholder="Address" className="w-full px-4 py-2 mt-1 border-0 rounded bg-white" />
+								<input 
+									type="text" 
+									name="address"
+									value={formData.address}
+									onChange={handleInputChange}
+									placeholder="Address" 
+									className={`w-full px-4 py-2 mt-1 border-0 rounded bg-white ${errors.address ? 'border-2 border-red-500' : ''}`} 
+								/>
+								{errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
 							</div>
 							<div>
 								<label className="text-sm">Phone</label>
 								<div className="flex items-center">
-									<span className="px-3 py-2 border-0 bg-white text-gray-600 rounded-l"><select name="country" id="country-code" defaultValue={"Nepal"}>
-										<option value="nepal">Nepal</option>
-										<option value="india">India</option>
-											
-										</select></span>
-									<input type="tel" placeholder="Your Phone" className="w-full px-4 py-2 border-0 rounded-r bg-white" />
+									<span className="px-3 py-2 border-0 bg-white text-gray-600 rounded-l">
+										<select 
+											name="country" 
+											value={formData.country}
+											onChange={handleInputChange}
+											className="outline-none bg-transparent"
+										>
+											<option value="Nepal">Nepal</option>
+											<option value="India">India</option>
+										</select>
+									</span>
+									<input 
+										type="tel" 
+										name="phone"
+										value={formData.phone}
+										onChange={handleInputChange}
+										placeholder="Your Phone" 
+										className={`w-full px-4 py-2 border-0 rounded-r bg-white ${errors.phone ? 'border-2 border-red-500' : ''}`} 
+									/>
 								</div>
+								{errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
 							</div>
 						</div>
 						<div>
 							<label className="text-sm">Message <span className="text-red-500">*</span></label>
-							<textarea rows="4" className="w-full px-4 py-2 mt-1 border-0 rounded bg-white" placeholder="Your Message" />
+							<textarea 
+								rows="4" 
+								name="message"
+								value={formData.message}
+								onChange={handleInputChange}
+								className={`w-full px-4 py-2 mt-1 border-0 rounded bg-white ${errors.message ? 'border-2 border-red-500' : ''}`} 
+								placeholder="Your Message" 
+							/>
+							{errors.message && <p className="text-red-500 text-xs mt-1">{errors.message}</p>}
 						</div>
-						<button type="submit" className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">
-							Submit
+						<button 
+							type="submit" 
+							disabled={isSubmitting}
+							className={`px-6 py-2 rounded text-white ${
+								isSubmitting 
+									? 'bg-gray-400 cursor-not-allowed' 
+									: 'bg-red-500 hover:bg-red-600'
+							}`}
+						>
+							{isSubmitting ? 'Submitting...' : 'Submit'}
 						</button>
 					</form>
 				</div>

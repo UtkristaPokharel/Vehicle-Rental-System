@@ -2,42 +2,52 @@ import Navbar from '../components/Navbar.jsx'
 import LandingPage from '../components/LandingPage.jsx';
 import PopularDest from "../components/Destination.jsx";
 import SubscriptionForm from "../components/SubscriptionPage.jsx";
-import Footer from "../components/Footer.jsx"
+import Footer from "../components/footer.jsx"
 import VehicleBrowse from './Browse.jsx';
 import ContactUs from './ContactUs.jsx';
 import FAQPage from './FAQPage.jsx';
+import ProfileSidebar from '../components/ProfileSidebar.jsx';
+import { useState } from 'react';
 import { FaCarSide, FaRegHandshake, FaGift } from "react-icons/fa";
 
-
-
 function Home() {
+  const [isProfileSidebarOpen, setIsProfileSidebarOpen] = useState(false);
+
+  const handleProfileClick = () => {
+    setIsProfileSidebarOpen(true);
+  };
+
+  const handleCloseSidebar = () => {
+    setIsProfileSidebarOpen(false);
+  };
+
   return (
     <>
-      <Navbar />
+      <Navbar onProfileClick={handleProfileClick} />
       <div className="Home-page flex justify-center flex-col items-center">
         <LandingPage />
         <VehicleBrowse />
         <PopularDest />
 
         {/* info-boxes */}
-        <div className="info-section p-10  flex justify-center flex-row items-center flex-wrap lg:flex-nowrap  gap-10">
+        {/* <div className="info-section p-10  flex justify-center flex-row items-center flex-wrap lg:flex-nowrap  gap-10">
 
           <div className="box1 bg-cyan-200 md:w-[450px]  md:h-70 w-[80vw] h-75  rounded-2xl ">
             <h2 className='text-2xl font-bold  mx-10 mt-13 mb-2 '>Are you looking for a car, bike, scooter, truck ... ?</h2>
             <h4 className='text-md font-semibold text-gray-600 mx-10 '> We provide a platform for easy and affordable solution for renting a vehicle</h4>
             <button className=' bg-red-500  text-white font-bold px-3 py-2 mt-8 mx-10 rounded-xl'> Get Started</button>
 
-          </div>
+          </div> */}
 
           {/* box-2's content must be changed */}
-          <div className="box2 bg-amber-200 md:w-[450px] md:h-70  w-[80vw] h-85 rounded-2xl">
+          {/* <div className="box2 bg-amber-200 md:w-[450px] md:h-70  w-[80vw] h-85 rounded-2xl">
             <h2 className='text-2xl font-bold  mx-10 mt-13 mb-2 '>Are you looking for a car, bike, scooter, truck ... ?</h2>
             <h4 className='text-md font-semibold text-gray-600 mx-10 '> We provide a platform for easy and affordable solution for renting a vehicle</h4>
             <button className=' bg-red-500  text-white font-bold px-3 py-2 mt-8 mx-10 rounded-xl'> Get Started</button>
 
-          </div>
+          </div> */}
 
-        </div>
+        {/* </div> */}
 
       </div>
         <FeatureSection/>
@@ -45,11 +55,15 @@ function Home() {
         <FAQPage />
         <SubscriptionForm />
       <Footer />
+      
+      {/* Profile Sidebar */}
+      <ProfileSidebar 
+        isOpen={isProfileSidebarOpen} 
+        onClose={handleCloseSidebar} 
+      />
     </>
   );
-}
-
-
+} 
 
 export function FeatureSection() {
   const features = [

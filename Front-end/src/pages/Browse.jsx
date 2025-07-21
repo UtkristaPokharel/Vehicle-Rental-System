@@ -55,33 +55,143 @@ export default function VehicleBrowse() {
 
 export const SuggestedVehicle = () => {
   const [vehicles, setVehicles] = useState([]);
-  const [randomIds, setRandomIds] = useState([]);
+  const [suggestedVehicles, setSuggestedVehicles] = useState([]);
+  const [isPersonalized, setIsPersonalized] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const scrollRef = useRef(null);
 
-  // 1️⃣  Fetch vehicles once
+  // Fetch all vehicles
   useEffect(() => {
     async function getVehicles() {
-      const res  = await fetch("http://localhost:3001/api/vehicles");
-      const data = await res.json();
-      setVehicles(data);
+      try {
+        const res = await fetch("http://localhost:3001/api/vehicles");
+        const data = await res.json();
+        // Filter only active vehicles
+        const activeVehicles = data.filter(vehicle => vehicle.isActive === true);
+        setVehicles(activeVehicles);
+      } catch (error) {
+        console.error('Error fetching vehicles:', error);
+      }
     }
     getVehicles();
   }, []);
 
+  // Function to refresh suggestions
+  const refreshSuggestions = () => {
+    setRefreshKey(prev => prev + 1);
+  };
 
+  // Add event listener for focus to refresh suggestions when user returns to page
   useEffect(() => {
-    if (!vehicles.length) return; 
+    const handleFocus = () => {
+      refreshSuggestions();
+    };
 
-    const count = Math.min(6, vehicles.length);
-    const indexes = new Set();
-    while (indexes.size < count) {
-      indexes.add(Math.floor(Math.random() * vehicles.length)); 
-    }
-    setRandomIds([...indexes].map(i => vehicles[i]._id));
-  }, [vehicles]);
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
-  // 3️⃣  Filter
-  const filteredVehicles = vehicles.filter(v => randomIds.includes(v._id));
+  // Generate suggestions based on click data or show random vehicles
+  useEffect(() => {
+    if (!vehicles.length) return;
+
+    const generateSuggestions = async () => {
+      try {
+        // Get vehicles with clicks and group by click count, then randomize within groups
+        const vehiclesWithClicks = vehicles
+          .filter(v => v.clickCount && v.clickCount > 0)
+          .reduce((groups, vehicle) => {
+            const count = vehicle.clickCount;
+            if (!groups[count]) {
+              groups[count] = [];
+            }
+            groups[count].push(vehicle);
+            return groups;
+          }, {});
+        
+        // Sort click counts in descending order and flatten with randomization within each group
+        const sortedClickedVehicles = Object.keys(vehiclesWithClicks)
+          .map(Number)
+          .sort((a, b) => b - a) // Descending order (highest clicks first)
+          .flatMap(clickCount => {
+            // Shuffle vehicles within the same click count group
+            const shuffledGroup = [...vehiclesWithClicks[clickCount]].sort(() => 0.5 - Math.random());
+            return shuffledGroup;
+          })
+          .slice(0, 5); // Max 5 vehicles
+        
+        if (sortedClickedVehicles.length > 0) {
+          const clickedVehicleIds = sortedClickedVehicles.map(v => v._id);
+          
+          // Get unclicked vehicles (clickCount = 0 or undefined)
+          const unclickedVehicles = vehicles.filter(v => 
+            !clickedVehicleIds.includes(v._id) && 
+            v.isActive &&
+            (!v.clickCount || v.clickCount === 0)
+          );
+          
+          // Check if we have unclicked vehicles
+          if (unclickedVehicles.length > 0) {
+            // Calculate remaining slots needed (total 8)
+            const remainingSlotsNeeded = 8 - sortedClickedVehicles.length;
+            
+            // Get random unclicked vehicles to fill remaining slots
+            const shuffledUnclicked = [...unclickedVehicles].sort(() => 0.5 - Math.random());
+            const randomUnclickedVehicles = shuffledUnclicked.slice(0, remainingSlotsNeeded);
+            
+            // Combine clicked vehicles (priority order with randomization) + random unclicked vehicles
+            const mixedSuggestions = [...sortedClickedVehicles, ...randomUnclickedVehicles];
+            
+            setSuggestedVehicles(mixedSuggestions);
+            setIsPersonalized(true);
+            return;
+          } else {
+            // All vehicles are clicked, show by priority with randomization within same click counts
+            const allClickedGrouped = vehicles
+              .filter(v => v.clickCount && v.clickCount > 0)
+              .reduce((groups, vehicle) => {
+                const count = vehicle.clickCount;
+                if (!groups[count]) {
+                  groups[count] = [];
+                }
+                groups[count].push(vehicle);
+                return groups;
+              }, {});
+            
+            const allClickedByPriorityWithShuffle = Object.keys(allClickedGrouped)
+              .map(Number)
+              .sort((a, b) => b - a) // Descending order (priority)
+              .flatMap(clickCount => {
+                // Shuffle vehicles within the same click count group
+                const shuffledGroup = [...allClickedGrouped[clickCount]].sort(() => 0.5 - Math.random());
+                return shuffledGroup;
+              })
+              .slice(0, 8);
+            
+            setSuggestedVehicles(allClickedByPriorityWithShuffle);
+            setIsPersonalized(true);
+            return;
+          }
+        }
+        
+        // Fallback: Show random vehicles if no click data
+        const count = Math.min(8, vehicles.length);
+        const shuffled = [...vehicles].sort(() => 0.5 - Math.random());
+        setSuggestedVehicles(shuffled.slice(0, count));
+        setIsPersonalized(false);
+        
+      } catch (error) {
+        console.error('Error generating suggestions:', error);
+        // Fallback to random vehicles
+        const count = Math.min(8, vehicles.length);
+        const shuffled = [...vehicles].sort(() => 0.5 - Math.random());
+        setSuggestedVehicles(shuffled.slice(0, count));
+        setIsPersonalized(false);
+      }
+    };
+
+    generateSuggestions();
+  }, [vehicles, refreshKey]); // Added refreshKey as dependency
 
   const scroll = (direction) => {
     if (scrollRef.current) {
@@ -95,6 +205,25 @@ export const SuggestedVehicle = () => {
 
   return (
     <div className="relative w-full mt-8">
+      {/* Header with personalization indicator and refresh button */}
+      <div className="text-center mb-4">
+        <div className="flex items-center justify-center gap-4">
+          <h3 className="text-xl font-semibold text-gray-800">
+            {isPersonalized ? "Trending & Discover More" : "Featured Vehicles"}
+          </h3>
+          <button
+            onClick={refreshSuggestions}
+            className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+          >
+            Refresh
+          </button>
+        </div>
+        {isPersonalized && (
+          <p className="text-sm text-gray-600 mt-1">
+            Most popular vehicles + new discoveries • Click refresh to update
+          </p>
+        )}
+      </div>
     
       <button
         onClick={() => scroll("left")}
@@ -107,9 +236,22 @@ export const SuggestedVehicle = () => {
         ref={scrollRef}
         className="flex gap-6 overflow-x-auto scroll-smooth px-10 py-4 hide-scrollbar"
       >
-        {filteredVehicles.map((vehicle) => (
-          <div key={vehicle.id} className="min-w-[300px]">
-            <VehicleCard vehicle={vehicle} />
+        {suggestedVehicles.map((vehicle) => (
+          <div key={vehicle._id} className="min-w-[300px] relative">
+            <VehicleCard 
+              vehicle={vehicle} 
+              type={vehicle.type === 'two-wheeler' ? 'two-wheeler' : vehicle.type.toLowerCase()}
+            />
+            {isPersonalized && vehicle.clickCount > 0 && (
+              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-400 to-red-500 text-white text-xs px-2 py-1 rounded-full">
+                🔥 {vehicle.clickCount} {vehicle.clickCount === 1 ? 'view' : 'views'}
+              </div>
+            )}
+            {isPersonalized && vehicle.clickCount === 0 && (
+              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                ✨ New
+              </div>
+            )}
           </div>
         ))}
       </div>

@@ -42,8 +42,7 @@ export default function AuthForm() {
         setIsAuthenticated(true);
         navigate('/'); // Redirect to dashboard if already logged in
       }
-    } catch (error) {
-      console.log('Not authenticated ', error);
+    } catch {
       setIsAuthenticated(false);
     }
   };
@@ -61,25 +60,44 @@ export default function AuthForm() {
         .then((response) => {
           const { user: userData, token } = response.data;
 
-          console.log(userData);
-          const { imgUrl, email, name,id } = userData;
+          // Validate response data
+          if (!userData || !token) {
+            toast.error("Invalid response from server. Please try again.");
+            return;
+          }
 
-          localStorage.setItem("token", token);
-          localStorage.setItem("profileImg", imgUrl);
-          localStorage.setItem("name", name);
-          localStorage.setItem("email", email);
-          localStorage.setItem("userId",id);
+          const { imgUrl, email, name, id } = userData;
+
+          // Safely store user data in localStorage
+          try {
+            localStorage.setItem("token", token);
+            localStorage.setItem("profileImg", imgUrl || "");
+            localStorage.setItem("name", name || "");
+            localStorage.setItem("email", email || "");
+            localStorage.setItem("userId", id || "");
+            
+            // Dispatch event to update navbar profile image
+            window.dispatchEvent(new Event('profileImageUpdated'));
+          } catch (storageError) {
+            console.error("localStorage error:", storageError);
+            toast.error("Error saving user data. Please try again.");
+            return;
+          }
           
           setIsAuthenticated(true);
-          toast.success("Google login successful!");
+          toast.success("Google login successful! Welcome!");
           setTimeout(() => navigate("/"), 1500);
         })
         .catch((error) => {
           console.error("Google Sign-In API Error:", error);
-          if (error.response?.data?.message) {
+          if (error.response?.status === 401) {
+            toast.error("Google authentication failed. Please try again.");
+          } else if (error.response?.status === 409) {
+            toast.error("Account already exists. Please login with your email and password.");
+          } else if (error.response?.data?.message) {
             toast.error(error.response.data.message);
           } else {
-            toast.error("Google sign-in failed. Please try again.");
+            toast.error("Google sign-in failed. Please try again or use email login.");
           }
         });
     })
@@ -109,21 +127,64 @@ const handleSubmit = async (e) => {
         return;
       }
 
+      if (!form.email.includes("@") || !form.email.includes(".")) {
+        toast.error("Please enter a valid email address");
+        setLoading(false);
+        return;
+      }
+
       const response = await api.post("/auth/login", {
         email: form.email,
         password: form.password,
       });
+      const { user: userData, token } = response.data;
+      
+      // Validate response data
+      if (!userData || !token) {
+        console.error("Invalid response structure:", response.data);
+        toast.error("Invalid response from server. Please try again.");
+        setLoading(false);
+        return;
+      }
 
-      const { userData, token } = response.data;
       setUser(userData);
-      localStorage.setItem("token", token);
+      
+      // Safely store user data in localStorage
+      try {
+        localStorage.setItem("token", token);
+        localStorage.setItem("profileImg", userData?.imgUrl || "");
+        localStorage.setItem("name", userData?.name || "");
+        localStorage.setItem("email", userData?.email || "");
+        localStorage.setItem("userId", userData?.id || "");
+        
+        // Dispatch event to update navbar profile image
+        window.dispatchEvent(new Event('profileImageUpdated'));
+      } catch (storageError) {
+        console.error("localStorage error:", storageError);
+        toast.error("Error saving user data. Please try again.");
+        setLoading(false);
+        return;
+      }
+      
       setIsAuthenticated(true);
-      toast.success("Login successful!");
+      toast.success("Login successful! Welcome back!");
       setTimeout(() => navigate("/"), 1500); // delay redirect
     } else {
       // Validate signup fields
       if (!form.name || !form.email || !form.password || !form.confirmPassword) {
         toast.error("Please fill in all required fields");
+        setLoading(false);
+        return;
+      }
+
+      if (!form.email.includes("@") || !form.email.includes(".")) {
+        toast.error("Please enter a valid email address");
+        setLoading(false);
+        return;
+      }
+
+      if (form.name.length < 2) {
+        toast.error("Name must be at least 2 characters long");
         setLoading(false);
         return;
       }
@@ -146,23 +207,68 @@ const handleSubmit = async (e) => {
         password: form.password,
       });
 
-      const { userData, token } = response.data;
+      const { user: userData, token } = response.data;
+      
+      // Validate response data
+      if (!userData || !token) {
+        console.error("Invalid response structure:", response.data);
+        toast.error("Invalid response from server. Please try again.");
+        setLoading(false);
+        return;
+      }
+
       setUser(userData);
-      localStorage.setItem("token", token);
+      
+      // Safely store user data in localStorage
+      try {
+        localStorage.setItem("token", token);
+        localStorage.setItem("profileImg", userData?.imgUrl || "");
+        localStorage.setItem("name", userData?.name || "");
+        localStorage.setItem("email", userData?.email || "");
+        localStorage.setItem("userId", userData?.id || "");
+        
+        // Dispatch event to update navbar profile image
+        window.dispatchEvent(new Event('profileImageUpdated'));
+      } catch (storageError) {
+        console.error("localStorage error:", storageError);
+        toast.error("Error saving user data. Please try again.");
+        setLoading(false);
+        return;
+      }
+      
       setIsAuthenticated(true);
-      toast.success("Signup successful! Redirecting...");
+      toast.success("Account created successfully! Welcome to EasyWheels!");
       setTimeout(() => navigate("/"), 1500); // delay redirect
     }
   } catch (error) {
     console.error("Auth error:", error);
-    if (error.response?.data?.message) {
+    
+    // Handle specific error cases
+    if (error.response?.status === 401) {
+      if (isLogin) {
+        toast.error("Invalid email or password. Please check your credentials.");
+      } else {
+        toast.error("Account creation failed. Please try again.");
+      }
+    } else if (error.response?.status === 409) {
+      toast.error("An account with this email already exists. Please login instead.");
+    } else if (error.response?.status === 400) {
+      const message = error.response?.data?.message;
+      if (message?.includes("password")) {
+        toast.error("Password requirements not met. Please use a stronger password.");
+      } else if (message?.includes("email")) {
+        toast.error("Please enter a valid email address.");
+      } else {
+        toast.error(message || "Invalid input. Please check your information.");
+      }
+    } else if (error.response?.data?.message) {
       toast.error(error.response.data.message);
     } else if (error.code === "ERR_NETWORK") {
-      toast.error("Cannot connect to server. Please check your connection.");
+      toast.error("Cannot connect to server. Please check your internet connection.");
     } else if (error.code === "ECONNABORTED") {
       toast.error("Request timeout. Please try again.");
     } else {
-      toast.error("An error occurred. Please try again.");
+      toast.error(isLogin ? "Login failed. Please try again." : "Signup failed. Please try again.");
     }
   } finally {
     setLoading(false);
@@ -173,11 +279,17 @@ const handleSubmit = async (e) => {
     try {
       await api.post('/auth/logout');
       localStorage.removeItem('token');
+      localStorage.removeItem('profileImg');
+      localStorage.removeItem('name');
+      localStorage.removeItem('email');
+      localStorage.removeItem('userId');
       setIsAuthenticated(false);
-      navigate('/auth');
+      toast.success("Logged out successfully");
+      navigate('/');
       setUser("")
     } catch (error) {
       console.error('Logout error:', error);
+      toast.error("Error logging out. Please try again.");
     }
   };
 
