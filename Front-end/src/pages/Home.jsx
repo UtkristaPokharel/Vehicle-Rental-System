@@ -2,7 +2,7 @@ import Navbar from '../components/Navbar.jsx'
 import LandingPage from '../components/LandingPage.jsx';
 import PopularDest from "../components/Destination.jsx";
 import SubscriptionForm from "../components/SubscriptionPage.jsx";
-import Footer from "../components/Footer.jsx"
+import Footer from "../components/footer.jsx"
 import VehicleBrowse from './Browse.jsx';
 import ContactUs from './ContactUs.jsx';
 import FAQPage from './FAQPage.jsx';

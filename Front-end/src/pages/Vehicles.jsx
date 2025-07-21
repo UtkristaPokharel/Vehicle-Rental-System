@@ -10,7 +10,21 @@ import { useNavigate } from 'react-router-dom';
 const VehicleCard = ({ vehicle }) => {
 	const navigate = useNavigate();
 
-	const handleRentNow = () => {
+	const trackClick = async () => {
+		try {
+			await fetch(`http://localhost:3001/api/public/track-click/${vehicle._id}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+		} catch (error) {
+			console.error('Error tracking click:', error);
+		}
+	};
+
+	const handleRentNow = async () => {
+		await trackClick(); // Track the click
 		const type = vehicle.type === 'two-wheeler' ? 'two-wheeler' : vehicle.type.toLowerCase();
 		navigate(`/vehicle/${type}/${vehicle._id}`, {
 			state: {
