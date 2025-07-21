@@ -45,7 +45,10 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("✅ Connected to MongoDB"))
+  .then(() => {
+    console.log("✅ Connected to MongoDB Atlas");
+    console.log(`📊 Database: ${mongoose.connection.db.databaseName}`);
+  })
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // JWT secret key (use environment variable in production)

@@ -479,7 +479,8 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
                   required
                 >
                   <option value="">Select Fuel Type</option>
-                  <option value="Gas">Gas</option>
+                  <option value="Petrol">Petrol</option>
+                  <option value="Diesel">Diesel</option>
                   <option value="Electric">Electric</option>
                   <option value="Hybrid">Hybrid</option>
                 </select>

@@ -27,7 +27,7 @@ router.post('/add-vehicle', vehicleUpload.single('vehicleImage'), async (req, re
       image,
       description,
       isActive: isActive !== undefined ? isActive : true, // Default to true if not provided
-      clickCount: 0, // Initialize click count to 0
+      clickCount: 0, 
       createdBy: req.body.createdBy || 'admin',
       createdById: createdById || 'admin',
     });

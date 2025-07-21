@@ -248,8 +248,8 @@ export const BasicFeatures = ({ name, type, seats, fuelType, mileage , transmiss
   };
 
   const formatFuelType = (fuel) => {
-    if (!fuel) return "Gas (Regular)";
-    return fuel === "Gas" ? "Gas (Regular)" : fuel;
+    if (!fuel) return "Petrol (Regular)";
+    return fuel === "Petrol" ? "Petrol (Regular)" : fuel;
   };
 
   return (
@@ -268,7 +268,7 @@ export const BasicFeatures = ({ name, type, seats, fuelType, mileage , transmiss
         </div>
         <div className="flex items-center gap-2 px-2 md:px-3 py-2 bg-gray-200 rounded text-xs md:text-sm">
           <span>🧳</span>
-          <span>{mileage} MPG</span>
+          <span>{mileage} KMPL</span>
         </div>
         <div className="flex items-center gap-2 px-2 md:px-3 py-2 bg-gray-200 rounded text-xs md:text-sm">
           <span>⚙️</span>
