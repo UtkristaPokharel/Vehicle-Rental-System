@@ -43,7 +43,6 @@ const VehicleCard = ({ vehicle }) => {
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.5 }}
 		>
-			{/* Simplified hover overlay */}
 			<div className="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
 			
 			<div className="relative">
@@ -52,8 +51,7 @@ const VehicleCard = ({ vehicle }) => {
 					alt={vehicle.name} 
 					className="w-full h-52 sm:h-56 object-cover object-center transition-transform duration-300 group-hover:scale-105"
 				/>
-				
-				{/* Simplified gradient overlay */}
+
 				<div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 				
 				<button
@@ -74,10 +72,10 @@ const VehicleCard = ({ vehicle }) => {
 			<div className="p-6 flex flex-col justify-between min-h-[180px] relative">
 				<div className="flex flex-col gap-3">
 					<div className="flex items-center justify-between">
-						<h3 className="text-xl font-bold text-gray-800 truncate group-hover:text-blue-600 transition-colors duration-200">
+						<h3 className="text-xl font-bold text-gray-800 truncate group-hover:text-indigo-600 transition-colors duration-200">
 							{vehicle.name}
 						</h3>
-						<div className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm font-medium capitalize">
+						<div className="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-sm font-medium capitalize">
 							{vehicle.type.replace('two-wheeler', 'Two Wheeler')}
 						</div>
 					</div>
@@ -89,7 +87,7 @@ const VehicleCard = ({ vehicle }) => {
 
 				<div className="mt-4 flex items-end justify-between">
 					<div className="flex flex-col">
-						<p className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+						<p className="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
 							{vehicle.price}
 						</p>
 						<p className="text-sm text-gray-400">Before taxes</p>
@@ -97,15 +95,12 @@ const VehicleCard = ({ vehicle }) => {
 					
 					<button
 						onClick={handleRentNow}
-						className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg hover:scale-105 transition-transform duration-200"
+						className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg hover:scale-105 transition-transform duration-200"
 					>
 						Rent Now
 					</button>
 				</div>
 			</div>
-			
-			{/* Simple bottom accent */}
-			<div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
 		</Motion.div>
 	);
 };
@@ -114,6 +109,7 @@ const VehicleBrowse = () => {
 	const [vehicles, setVehicles] = useState([]);
 	const [selectedCategory, setSelectedCategory] = useState('All');
 	const [categories, setCategories] = useState(['All']);
+	const [sortBy, setSortBy] = useState('default');
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
@@ -156,30 +152,90 @@ const VehicleBrowse = () => {
 							: selectedCategory.toLowerCase())
 			  );
 
+	// Sort the filtered vehicles based on the selected sort option
+	const sortedVehicles = [...filteredVehicles].sort((a, b) => {
+		switch (sortBy) {
+			case 'name-asc':
+				return a.name.localeCompare(b.name);
+			case 'name-desc':
+				return b.name.localeCompare(a.name);
+			case 'price-asc': {
+				const getPriceValue = (priceData) => {
+					if (typeof priceData === 'number') return priceData;
+					if (typeof priceData === 'string') {
+						return parseFloat(priceData.replace(/[^\d.-]/g, '')) || 0;
+					}
+					return 0;
+				};
+				
+				const priceA = getPriceValue(a.price);
+				const priceB = getPriceValue(b.price);
+				console.log('Price A:', a.price, '-> Parsed:', priceA);
+				console.log('Price B:', b.price, '-> Parsed:', priceB);
+				return priceA - priceB;
+			}
+			case 'price-desc': {
+				const getPriceValue = (priceData) => {
+					if (typeof priceData === 'number') return priceData;
+					if (typeof priceData === 'string') {
+						return parseFloat(priceData.replace(/[^\d.-]/g, '')) || 0;
+					}
+					return 0;
+				};
+				
+				const priceA2 = getPriceValue(a.price);
+				const priceB2 = getPriceValue(b.price);
+				return priceB2 - priceA2;
+			}
+			default:
+				return 0;
+		}
+	});
+
 	return (
 		<>
 			<Navbar />
 			<div className="min-h-screen bg-gray-100">
 				<main className="container mx-auto px-4 py-8">
 					<Motion.div
-						className="flex justify-center space-x-4 mb-8 flex-wrap"
+						className="flex flex-col lg:flex-row items-center justify-between gap-4 mb-8"
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
 						transition={{ delay: 0.2, duration: 0.8 }}
 					>
-						{categories.map(category => (
-							<button
-								key={category}
-								className={`px-4 py-2 rounded-lg font-semibold transition-colors m-2 ${
-									selectedCategory === category
-										? 'bg-red-600 text-white'
-										: 'bg-white text-gray-800 hover:bg-indigo-100'
-								}`}
-								onClick={() => setSelectedCategory(category)}
+						<div className="flex justify-center space-x-2 flex-wrap">
+							{categories.map(category => (
+								<button
+									key={category}
+									className={`px-4 py-2 rounded-lg font-semibold transition-colors m-1 ${
+										selectedCategory === category
+											? 'bg-red-600 text-white'
+											: 'bg-white text-gray-800 hover:bg-indigo-100'
+									}`}
+									onClick={() => setSelectedCategory(category)}
+								>
+									{category}
+								</button>
+							))}
+						</div>
+
+						<div className="flex items-center gap-3 flex-shrink-0">
+							<label htmlFor="sort-select" className="text-gray-700 font-medium whitespace-nowrap">
+								Sort by:
+							</label>
+							<select
+								id="sort-select"
+								value={sortBy}
+								onChange={(e) => setSortBy(e.target.value)}
+								className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all min-w-[180px]"
 							>
-								{category}
-							</button>
-						))}
+								<option value="default">Default</option>
+								<option value="name-asc">Name (A-Z)</option>
+								<option value="name-desc">Name (Z-A)</option>
+								<option value="price-asc">Price (Low to High)</option>
+								<option value="price-desc">Price (High to Low)</option>
+							</select>
+						</div>
 					</Motion.div>
 
 					{loading ? (
@@ -193,8 +249,8 @@ const VehicleBrowse = () => {
 						>
 							{error ? (
 								<p className="text-center col-span-full text-red-600">{error}</p>
-							) : filteredVehicles.length > 0 ? (
-								filteredVehicles.map(vehicle => (
+							) : sortedVehicles.length > 0 ? (
+								sortedVehicles.map(vehicle => (
 									// The key below assumes your backend sends _id or id
 									<VehicleCard key={vehicle._id || vehicle.id} vehicle={vehicle} />
 								))
