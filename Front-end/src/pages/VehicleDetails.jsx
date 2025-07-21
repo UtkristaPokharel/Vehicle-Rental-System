@@ -2,7 +2,6 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { LocationPicker } from './LocationPicker';
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
-import { FaStar } from "react-icons/fa6";
 import { useState, useEffect } from "react";
 import { FaPen, FaSpinner } from "react-icons/fa";
 import toast,{ Toaster } from "react-hot-toast";
@@ -258,14 +257,6 @@ export const BasicFeatures = ({ name, type, seats, fuelType, mileage , transmiss
       <h1 className="text-2xl md:text-3xl font-bold mb-2">{name}</h1>
       <p className="text-gray-500 text-sm md:text-base mb-2">{formatType(type)}</p>
 
-      <div className="flex items-center gap-2 mt-2 text-sm">
-        <span className="font-bold text-lg text-black">5.0</span>
-        <span className="text-red-600">
-          <FaStar />
-        </span>
-        <span className="text-gray-600">(21 trips)</span>
-      </div>
-
       <div className="flex flex-wrap gap-2 md:gap-3 mt-4">
         <div className="flex items-center gap-2 px-2 md:px-3 py-2 bg-gray-200 rounded text-xs md:text-sm">
           <span>👤</span>
@@ -442,13 +433,7 @@ export const BookingSection = ({
 
         <hr className="my-4" />
 
-        {/* Trip Savings */}
         <div>
-          <p className="font-semibold text-md mb-1">Trip Savings</p>
-          <div className="flex justify-between bg-gray-200 p-4 rounded-md text-md">
-            <span>1-month discount</span>
-            <span className="text-green-600 font-semibold">रु 1,963</span>
-          </div>
           <button 
             onClick={testClick}
             type="button"
