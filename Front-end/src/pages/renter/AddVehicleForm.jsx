@@ -315,7 +315,8 @@ export default function AddVehicle({ onSubmit }) {
               required
             >
               <option value="">Select Fuel Type</option>
-              <option value="Gas">Gas</option>
+              <option value="Petrol">Petrol</option>
+              <option value="Diesel">Diesel</option>
               <option value="Electric">Electric</option>
               <option value="Hybrid">Hybrid</option>
             </select>
@@ -328,7 +329,7 @@ export default function AddVehicle({ onSubmit }) {
             <input
               type="number"
               name="mileage"
-              placeholder="Mileage (MPG)"
+              placeholder="Mileage (KMPL)"
               value={formData.mileage}
               onChange={handleChange}
               className="border p-2 rounded w-full"
