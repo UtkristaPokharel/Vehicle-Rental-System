@@ -35,11 +35,26 @@ const vehicleSchema = new mongoose.Schema({
     required: [true, 'Location is required'],
   },
   // Vehicle specifications
-  seats: {
+  capacity: {
     type: Number,
-    required: [true, 'Number of seats is required'],
-    min: [1, 'Seats must be at least 1'],
-    max: [50, 'Seats cannot exceed 50'],
+    required: [true, 'Capacity is required'],
+    min: [1, 'Capacity must be at least 1'],
+    validate: {
+      validator: function(value) {
+        // For trucks and pickups, allow higher capacity (up to 10000)
+        // For other vehicles, limit to 50 seats
+        if (this.type === 'truck' || this.type === 'pickup') {
+          return value <= 10000;
+        }
+        return value <= 50;
+      },
+      message: function(props) {
+        if (this.type === 'truck' || this.type === 'pickup') {
+          return 'Capacity cannot exceed 10000 for trucks and pickups';
+        }
+        return 'Seats cannot exceed 50 for passenger vehicles';
+      }
+    }
   },
   fuelType: {
     type: String,

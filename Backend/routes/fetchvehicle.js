@@ -2,11 +2,22 @@ const express = require('express');
 const router = express.Router();
 const Vehicle = require('../models/Vehicle.js'); // adjust path if needed
 
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
+
+// Helper function to process vehicle image URLs
+const processVehicleImageUrl = (vehicle) => {
+  if (vehicle.image && !vehicle.image.startsWith('http')) {
+    vehicle.image = `${BASE_URL}/uploads/vehicles/${vehicle.image}`;
+  }
+  return vehicle;
+};
+
 // GET all vehicles
 router.get('/', async (req, res) => {
   try {
     const vehicles = await Vehicle.find();
-    res.json(vehicles);
+    const processedVehicles = vehicles.map(vehicle => processVehicleImageUrl(vehicle.toObject()));
+    res.json(processedVehicles);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -16,7 +27,8 @@ router.get('/', async (req, res) => {
 router.get('/type/:type', async (req, res) => {
   try {
     const vehicles = await Vehicle.find({ type: req.params.type });
-    res.json(vehicles);
+    const processedVehicles = vehicles.map(vehicle => processVehicleImageUrl(vehicle.toObject()));
+    res.json(processedVehicles);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -29,7 +41,8 @@ router.get('/:id', async (req, res) => {
     if (!vehicle) {
       return res.status(404).json({ message: 'Vehicle not found' });
     }
-    res.json(vehicle);
+    const processedVehicle = processVehicleImageUrl(vehicle.toObject());
+    res.json(processedVehicle);
   } catch (err) {
     console.error('Error fetching vehicle:', err);
     res.status(500).json({ message: err.message });

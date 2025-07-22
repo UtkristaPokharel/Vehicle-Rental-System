@@ -231,7 +231,7 @@ function VehicleDetails() {
 
 export default VehicleDetails;
 
-export const BasicFeatures = ({ name, type, seats, fuelType, mileage , transmission = "Automatic" }) => {
+export const BasicFeatures = ({ name, type, capacity,seats, fuelType, mileage , transmission = "Automatic" }) => {
   const formatType = (vehicleType) => {
     if (!vehicleType) return "Vehicle";
     return vehicleType === 'two-wheeler' ? 'Two Wheeler' : 
@@ -251,7 +251,7 @@ export const BasicFeatures = ({ name, type, seats, fuelType, mileage , transmiss
       <div className="flex flex-wrap gap-2 md:gap-3 mt-4">
         <div className="flex items-center gap-2 px-2 md:px-3 py-2 bg-gray-200 rounded text-xs md:text-sm">
           <span>👤</span>
-          <span>{seats} seats</span>
+          <span>{seats || capacity }</span>
         </div>
         <div className="flex items-center gap-2 px-2 md:px-3 py-2 bg-gray-200 rounded text-xs md:text-sm">
           <span>⛽</span>
