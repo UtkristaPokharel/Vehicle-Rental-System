@@ -1,6 +1,6 @@
 // API Configuration
-// Update this URL when deploying to production
-export const API_BASE_URL = 'https://vehicle-rental-system-rjvj.onrender.com';
+// Use environment variable if available, fallback to production URL
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://vehicle-rental-system-rjvj.onrender.com';
 
 // Helper function to construct API URLs
 export const getApiUrl = (endpoint) => {

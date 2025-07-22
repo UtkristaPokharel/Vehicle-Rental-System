@@ -60,12 +60,8 @@ function UserDetailModal({ user, onClose, onUserUpdate }) {
     if (!imgUrl) return defaultProfileImg;
     if (imgUrl.startsWith('http')) return imgUrl;
     // For profile images, they're stored as filenames and need the full path
-
-    const fullUrl = `http://localhost:3001/uploads/profiles/${imgUrl}`;
-
     const fullUrl = getProfileImageUrl(imgUrl);
     console.log("Constructed profile image URL:", fullUrl); // Debug log
-
     return fullUrl;
   };
 
@@ -346,7 +342,8 @@ function UsersDataComponent() {
               {users.map((user,index)=>{
                 const defaultProfileImg = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
                 
-                const getImageUrl = (imgUrl) => {                  if (!imgUrl) return defaultProfileImg;
+                const getImageUrl = (imgUrl) => {
+                  if (!imgUrl) return defaultProfileImg;
                   if (imgUrl.startsWith('http')) return imgUrl;
                   // For profile images, they're stored as filenames and need the full path
                   const fullUrl = getProfileImageUrl(imgUrl);

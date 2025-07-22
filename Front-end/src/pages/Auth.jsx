@@ -34,85 +34,90 @@ export default function AuthForm() {
 
   // Check if user is already authenticated on component mount
   useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  const checkAuthStatus = async () => {
-    try {
-      const response = await api.get('/auth/check');
-      if (response.data.authenticated) {
-        setIsAuthenticated(true);
-        navigate('/'); // Redirect to dashboard if already logged in
-      }
-    } catch {
-      setIsAuthenticated(false);
-    }
-  };
-
- const handleGoogleLogin = () => {
-  signInWithPopup(auth, provider)
-    .then((result) => {
-      const user = result.user;
-      api.post("/auth/google", {
-        name: user.displayName,
-        email: user.email,
-        googleId: user.uid,
-        imgUrl: user.photoURL,
-      })
-        .then((response) => {
-          const { user: userData, token } = response.data;
-
-          // Validate response data
-          if (!userData || !token) {
-            toast.error("Invalid response from server. Please try again.");
-            return;
-          }
-
-          const { imgUrl, email, name, id } = userData;
-
-          // Safely store user data in localStorage
-          try {
-            localStorage.setItem("token", token);
-            localStorage.setItem("profileImg", imgUrl || "");
-            localStorage.setItem("name", name || "");
-            localStorage.setItem("email", email || "");
-            localStorage.setItem("userId", id || "");
-            
-            // Dispatch event to update navbar profile image
-            window.dispatchEvent(new Event('profileImageUpdated'));
-          } catch (storageError) {
-            console.error("localStorage error:", storageError);
-            toast.error("Error saving user data. Please try again.");
-            return;
-          }
-          
+    const checkAuthStatus = async () => {
+      try {
+        const response = await api.get('/auth/check');
+        if (response.data.authenticated) {
           setIsAuthenticated(true);
-          toast.success("Google login successful! Welcome!");
-          setTimeout(() => navigate("/"), 1500);
-        })
-        .catch((error) => {
-          console.error("Google Sign-In API Error:", error);
-          if (error.response?.status === 401) {
-            toast.error("Google authentication failed. Please try again.");
-          } else if (error.response?.status === 409) {
-            toast.error("Account already exists. Please login with your email and password.");
-          } else if (error.response?.data?.message) {
-            toast.error(error.response.data.message);
-          } else {
-            toast.error("Google sign-in failed. Please try again or use email login.");
-          }
-        });
-    })
-    .catch((error) => {
-      console.error("Google Sign-In Popup Error:", error);
-      if (error.code === 'auth/popup-closed-by-user') {
-        toast.error("Google sign-in was cancelled");
-      } else if (error.code === 'auth/popup-blocked') {
-        toast.error("Popup was blocked. Please allow popups and try again");
-      } else {
-        toast.error("Google sign-in failed. Please try again.");
+          navigate('/'); // Redirect to dashboard if already logged in
+        }
+      } catch {
+        setIsAuthenticated(false);
       }
+    };
+    
+    checkAuthStatus();
+  }, [navigate]);
+
+ const handleGoogleLogin = async () => {
+  try {
+    // Add loading state for Google login
+    setLoading(true);
+    
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    
+    const response = await api.post("/auth/google", {
+      name: user.displayName,
+      email: user.email,
+      googleId: user.uid,
+      imgUrl: user.photoURL,
     });
+    
+    const { user: userData, token } = response.data;
+
+    // Validate response data
+    if (!userData || !token) {
+      toast.error("Invalid response from server. Please try again.");
+      return;
+    }
+
+    const { imgUrl, email, name, id } = userData;
+
+    // Safely store user data in localStorage
+    try {
+      localStorage.setItem("token", token);
+      localStorage.setItem("profileImg", imgUrl || "");
+      localStorage.setItem("name", name || "");
+      localStorage.setItem("email", email || "");
+      localStorage.setItem("userId", id || "");
+      
+      // Dispatch event to update navbar profile image
+      window.dispatchEvent(new Event('profileImageUpdated'));
+    } catch (storageError) {
+      console.error("localStorage error:", storageError);
+      toast.error("Error saving user data. Please try again.");
+      return;
+    }
+    
+    setIsAuthenticated(true);
+    toast.success("Google login successful! Welcome!");
+    setTimeout(() => navigate("/"), 1500);
+    
+  } catch (error) {
+    console.error("Google Sign-In Error:", error);
+    
+    // Handle specific Firebase auth errors
+    if (error.code === 'auth/popup-closed-by-user') {
+      toast.error("Google sign-in was cancelled");
+    } else if (error.code === 'auth/popup-blocked') {
+      toast.error("Popup was blocked. Please allow popups and try again");
+    } else if (error.code === 'auth/network-request-failed') {
+      toast.error("Network error. Please check your connection and try again");
+    } else if (error.code === 'auth/unauthorized-domain') {
+      toast.error("This domain is not authorized for Google sign-in. Please contact support.");
+    } else if (error.response?.status === 401) {
+      toast.error("Google authentication failed. Please try again.");
+    } else if (error.response?.status === 409) {
+      toast.error("Account already exists. Please login with your email and password.");
+    } else if (error.response?.data?.message) {
+      toast.error(error.response.data.message);
+    } else {
+      toast.error("Google sign-in failed. Please try again or use email login.");
+    }
+  } finally {
+    setLoading(false);
+  }
 };
 
 
