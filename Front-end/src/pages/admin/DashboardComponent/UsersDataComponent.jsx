@@ -3,6 +3,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import axios from "axios";
 import toast,{ Toaster } from "react-hot-toast";
 // UserDetailModal component
+
 function UserDetailModal({ user, onClose, onUserUpdate }) {
   const defaultProfileImg = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
   
@@ -27,44 +28,38 @@ function UserDetailModal({ user, onClose, onUserUpdate }) {
         body: JSON.stringify({ verified: newVerifiedStatus })
       });
 
-      if (response.status === 200) {
-        toast.success(response.data.message);
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.message || "Verification status updated successfully");
         // Call the callback to refresh the user data
         if (onUserUpdate) {
           onUserUpdate();
         }
         onClose(); // Close the modal to refresh the view
       } else {
-        toast.error(response.data.message || "Failed to update verification status");
+        toast.error(data.message || "Failed to update verification status");
       }
     } catch (err) {
       console.error('Verification error details:', err);
       
       // Handle specific error types
-      if (err.code === 'ERR_NETWORK' || err.message.includes('Network Error')) {
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
         toast.error("Network error. Please check if the server is running.");
-      } else if (err.response?.status === 401) {
-        toast.error("Unauthorized. Please log in as admin.");
-      } else if (err.response?.status === 403) {
-        toast.error("Access denied. Admin privileges required.");
-      } else if (err.response?.status === 404) {
-        toast.error("User not found.");
-      } else if (err.message.includes('CORS')) {
-        toast.error("Server configuration error. Please contact administrator.");
+      } else if (err.message.includes('Network Error')) {
+        toast.error("Network error. Please check if the server is running.");
       } else {
-        toast.error(err.response?.data?.message || "Error updating verification status");
+        toast.error("Error updating verification status. Please try again.");
       }
     }
   };
   
   // Handle different image URL formats
   const getImageUrl = (imgUrl) => {
-    console.log("User image URL:", imgUrl); // Debug log
     if (!imgUrl) return defaultProfileImg;
     if (imgUrl.startsWith('http')) return imgUrl;
     // For profile images, they're stored as filenames and need the full path
     const fullUrl = `http://localhost:3001/uploads/profiles/${imgUrl}`;
-    console.log("Constructed profile image URL:", fullUrl); // Debug log
     return fullUrl;
   };
 
@@ -345,9 +340,7 @@ function UsersDataComponent() {
               {users.map((user,index)=>{
                 const defaultProfileImg = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
                 
-                const getImageUrl = (imgUrl) => {
-                  console.log("Table row - User image URL:", imgUrl); // Debug log
-                  if (!imgUrl) return defaultProfileImg;
+                const getImageUrl = (imgUrl) => {                  if (!imgUrl) return defaultProfileImg;
                   if (imgUrl.startsWith('http')) return imgUrl;
                   // For profile images, they're stored as filenames and need the full path
                   const fullUrl = `http://localhost:3001/uploads/profiles/${imgUrl}`;
