@@ -17,6 +17,8 @@ import Logout from './pages/Api/Logout.jsx';
 import { UserProvider } from "./context/UserContext.jsx"
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 
+import Map from "./utils/map.jsx"
+
 import FAQPage from './pages/FAQPage.jsx';
 import AddVehiclePage from './pages/renter/AddVehiclePage.jsx';
 
@@ -80,6 +82,8 @@ export default function App() {
           <Route path="/admin-login" element={<AdminLoginPage />} />
           <Route path="/dashboard" element={<AdminDashboard />} />
           <Route path="/logout" element={<Logout/>} />
+          
+          <Route path="/map" element={<Map/>} />  
           {/* Fallback route for 404 */}
 
 

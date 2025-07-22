@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile Image Debug</title>
+</head>
+<body>
+    <h1>Profile Image Debug Tool</h1>
+    
+    <div>
+        <h3>Current localStorage profileImg:</h3>
+        <p id="localStorage-content">Loading...</p>
+    </div>
+    
+    <div>
+        <h3>Test Profile Image Display:</h3>
+        <img id="profile-test" src="" alt="Profile test" style="width: 100px; height: 100px; border: 1px solid #ccc; border-radius: 50%;" />
+        <p id="img-src">Image src: </p>
+    </div>
+    
+    <div>
+        <h3>Actions:</h3>
+        <button onclick="checkLocalStorage()">Check localStorage</button>
+        <button onclick="testBackendAPI()">Test Backend API</button>
+        <button onclick="clearLocalStorage()">Clear localStorage</button>
+    </div>
+    
+    <div>
+        <h3>Backend Response:</h3>
+        <pre id="backend-response"></pre>
+    </div>
+
+    <script>
+        function checkLocalStorage() {
+            const stored = localStorage.getItem("profileImg");
+            document.getElementById('localStorage-content').textContent = stored || 'No profile image in localStorage';
+            
+            if (stored) {
+                const processedUrl = stored.startsWith('http') 
+                    ? stored 
+                    : `http://localhost:3001/uploads/profiles/${stored}`;
+                
+                document.getElementById('profile-test').src = processedUrl;
+                document.getElementById('img-src').textContent = 'Image src: ' + processedUrl;
+            }
+        }
+        
+        async function testBackendAPI() {
+            try {
+                const token = localStorage.getItem("token") || localStorage.getItem("adminToken");
+                if (!token) {
+                    alert("Please login first to test the API");
+                    return;
+                }
+                
+                const response = await fetch('http://localhost:3001/api/fetch/users/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                document.getElementById('backend-response').textContent = JSON.stringify(data, null, 2);
+                
+                if (data.imgUrl) {
+                    localStorage.setItem("profileImg", data.imgUrl);
+                    checkLocalStorage();
+                }
+            } catch (error) {
+                document.getElementById('backend-response').textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        function clearLocalStorage() {
+            localStorage.removeItem("profileImg");
+            checkLocalStorage();
+        }
+        
+        // Check on page load
+        checkLocalStorage();
+    </script>
+</body>
+</html>

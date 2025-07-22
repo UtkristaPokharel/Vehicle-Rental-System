@@ -13,8 +13,14 @@ export default function Navbar({ onProfileClick }) {
 
     useEffect(() => {
         const stored = localStorage.getItem("profileImg");
+        console.log('Navbar - stored profile image:', stored); // Debug log
         if (stored && stored.trim() !== "") {
-            setImgUrl(stored);
+            // Check if the stored URL is a complete URL or just a filename
+            const processedUrl = stored.startsWith('http') 
+                ? stored 
+                : `http://localhost:3001/uploads/profiles/${stored}`;
+            console.log('Navbar - processed URL:', processedUrl); // Debug log
+            setImgUrl(processedUrl);
         }
         // If no stored image, keep the default profile that was already set in state
     }, []);
@@ -23,8 +29,14 @@ export default function Navbar({ onProfileClick }) {
     useEffect(() => {
         const handleProfileUpdate = () => {
             const stored = localStorage.getItem("profileImg");
+            console.log('Navbar - profile update event, stored:', stored); // Debug log
             if (stored && stored.trim() !== "") {
-                setImgUrl(stored);
+                // Check if the stored URL is a complete URL or just a filename
+                const processedUrl = stored.startsWith('http') 
+                    ? stored 
+                    : `http://localhost:3001/uploads/profiles/${stored}`;
+                console.log('Navbar - update processed URL:', processedUrl); // Debug log
+                setImgUrl(processedUrl);
             } else {
                 setImgUrl(defaultProfile);
             }
@@ -127,7 +139,13 @@ export default function Navbar({ onProfileClick }) {
                 <button className='profile-icon' onClick={handleProfileClick}>
                     <img
                         src={imgUrl}
-                        onError={(e) => e.currentTarget.src = defaultProfile}
+                        onError={(e) => {
+                            console.log('Navbar - Image load error, src was:', e.currentTarget.src);
+                            e.currentTarget.src = defaultProfile;
+                        }}
+                        onLoad={() => {
+                            console.log('Navbar - Image loaded successfully:', imgUrl);
+                        }}
                         className='w-10 h-10 rounded-full bg-white'
                         alt="profile"
                     />
@@ -139,7 +157,13 @@ export default function Navbar({ onProfileClick }) {
                 <button className='text-white' onClick={handleProfileClick}>
                     <img
                         src={imgUrl}
-                        onError={(e) => e.currentTarget.src = defaultProfile}
+                        onError={(e) => {
+                            console.log('Navbar Mobile - Image load error, src was:', e.currentTarget.src);
+                            e.currentTarget.src = defaultProfile;
+                        }}
+                        onLoad={() => {
+                            console.log('Navbar Mobile - Image loaded successfully:', imgUrl);
+                        }}
                         className='w-9 h-9 rounded-full bg-white'
                         alt="profile"
                     />
