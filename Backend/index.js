@@ -22,6 +22,7 @@ app.use(
       "http://localhost:3000",
       "http://localhost:5173",
       "http://localhost:5174",
+      "https://vehicle-rental-system-lwna.vercel.app",
     ],
     credentials: true, // This is crucial for cookies
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
