@@ -4,9 +4,19 @@ const Vehicle = require('../models/Vehicle');
 
 const { vehicleUpload } = require('../middleware/upload');
 
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
+
+// Helper function to process vehicle image URLs
+const processVehicleImageUrl = (vehicle) => {
+  if (vehicle.image && !vehicle.image.startsWith('http')) {
+    vehicle.image = `${BASE_URL}/uploads/vehicles/${vehicle.image}`;
+  }
+  return vehicle;
+};
+
 router.post('/add-vehicle', vehicleUpload.single('vehicleImage'), async (req, res) => {
   try {
-    const { name, type, brand, price, location, features, description, seats, fuelType, mileage, transmission, isActive, createdById } = req.body;
+    const { name, type, brand, price, location, features, description, capacity, fuelType, mileage, transmission, isActive, createdById } = req.body;
     const image = req.file ? req.file.filename : null;
 
     if (!image) {
@@ -19,7 +29,7 @@ router.post('/add-vehicle', vehicleUpload.single('vehicleImage'), async (req, re
       brand,
       price: parseFloat(price),
       location,
-      seats: parseInt(seats),
+      capacity: parseInt(capacity),
       fuelType,
       mileage: parseFloat(mileage),
       transmission,
@@ -74,7 +84,8 @@ router.get('/popular', async (req, res) => {
       .sort({ clickCount: -1 }) // Sort by click count in descending order
       .limit(limit);
 
-    res.status(200).json(popularVehicles);
+    const processedVehicles = popularVehicles.map(vehicle => processVehicleImageUrl(vehicle.toObject()));
+    res.status(200).json(processedVehicles);
   } catch (error) {
     console.error('Error fetching popular vehicles:', error.message);
     res.status(400).json({ message: error.message });

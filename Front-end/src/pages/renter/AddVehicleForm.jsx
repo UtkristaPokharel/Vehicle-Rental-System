@@ -10,7 +10,7 @@ export default function AddVehicle({ onSubmit }) {
     brand: "",
     price: "",
     location: "",
-    seats: "",
+    capacity: "",
     fuelType: "",
     mileage: "",
     transmission: "",
@@ -26,6 +26,27 @@ export default function AddVehicle({ onSubmit }) {
   const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  // Helper functions for dynamic labels
+  const getMileageLabel = () => {
+    return formData.fuelType === "Electric" ? "Range (KM)" : "Mileage (KMPL)";
+  };
+
+  const getMileagePlaceholder = () => {
+    return formData.fuelType === "Electric" ? "Range in Kilometers" : "Mileage (KMPL)";
+  };
+
+  const getSeatsLabel = () => {
+    return (formData.type === "pickup" || formData.type === "truck") ? "Capacity" : "Number of Seats";
+  };
+
+  const getSeatsPlaceholder = () => {
+    return (formData.type === "pickup" || formData.type === "truck") ? "Load Capacity" : "Number of Seats";
+  };
+
+  const getMaxCapacity = () => {
+    return (formData.type === "pickup" || formData.type === "truck") ? "10000" : "50";
+  };
 
   // Cleanup effect to revoke object URLs
   useEffect(() => {
@@ -55,11 +76,29 @@ export default function AddVehicle({ onSubmit }) {
 
     if (!formData.location.trim()) newErrors.location = "Location is required.";
 
-    if (!formData.seats || parseInt(formData.seats) < 1) newErrors.seats = "Seats must be at least 1.";
+    if (!formData.capacity || parseInt(formData.capacity) < 1) {
+      if (formData.type === "pickup" || formData.type === "truck") {
+        newErrors.capacity = "Capacity must be at least 1.";
+      } else {
+        newErrors.capacity = "Seats must be at least 1.";
+      }
+    } else if (formData.type === "pickup" || formData.type === "truck") {
+      if (parseInt(formData.capacity) > 10000) {
+        newErrors.capacity = "Capacity cannot exceed 10000 for trucks and pickups.";
+      }
+    } else if (parseInt(formData.capacity) > 50) {
+      newErrors.capacity = "Seats cannot exceed 50 for passenger vehicles.";
+    }
 
     if (!formData.fuelType.trim()) newErrors.fuelType = "Fuel type is required.";
 
-    if (!formData.mileage || parseFloat(formData.mileage) <= 0) newErrors.mileage = "Mileage must be positive.";
+    if (!formData.mileage || parseFloat(formData.mileage) <= 0) {
+      if (formData.fuelType === "Electric") {
+        newErrors.mileage = "Range must be positive.";
+      } else {
+        newErrors.mileage = "Mileage must be positive.";
+      }
+    }
 
     if (!formData.transmission.trim()) newErrors.transmission = "Transmission type is required.";
 
@@ -175,7 +214,7 @@ export default function AddVehicle({ onSubmit }) {
       submission.append("brand", formData.brand);
       submission.append("price", formData.price);
       submission.append("location", formData.location);
-      submission.append("seats", formData.seats);
+      submission.append("capacity", formData.capacity);
       submission.append("fuelType", formData.fuelType);
       submission.append("mileage", formData.mileage);
       submission.append("transmission", formData.transmission);
@@ -205,7 +244,7 @@ export default function AddVehicle({ onSubmit }) {
           brand: "",
           price: "",
           location: "",
-          seats: "",
+          capacity: "",
           fuelType: "",
           mileage: "",
           transmission: "",
@@ -291,23 +330,34 @@ export default function AddVehicle({ onSubmit }) {
         {/* Vehicle Specifications */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {getSeatsLabel()} *
+            </label>
             <input
               type="number"
-              name="seats"
-              placeholder="Number of Seats"
-              value={formData.seats}
+              name="capacity"
+              placeholder={getSeatsPlaceholder()}
+              value={formData.capacity}
               onChange={handleChange}
               className="border p-2 rounded w-full"
               required
               min="1"
-              max="50"
+              max={getMaxCapacity()}
             />
-            {errors.seats && (
-              <p className="text-red-500 text-sm">{errors.seats}</p>
+            {(formData.type === "pickup" || formData.type === "truck") && (
+              <p className="text-xs text-gray-500 mt-1">
+                For pickup/truck: Enter load capacity or passenger count (max 10,000)
+              </p>
+            )}
+            {errors.capacity && (
+              <p className="text-red-500 text-sm">{errors.capacity}</p>
             )}
           </div>
           
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Fuel Type *
+            </label>
             <select
               name="fuelType"
               value={formData.fuelType}
@@ -327,10 +377,13 @@ export default function AddVehicle({ onSubmit }) {
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {getMileageLabel()} *
+            </label>
             <input
               type="number"
               name="mileage"
-              placeholder="Mileage (KMPL)"
+              placeholder={getMileagePlaceholder()}
               value={formData.mileage}
               onChange={handleChange}
               className="border p-2 rounded w-full"
@@ -338,12 +391,20 @@ export default function AddVehicle({ onSubmit }) {
               min="1"
               step="0.1"
             />
+            {formData.fuelType === "Electric" && (
+              <p className="text-xs text-gray-500 mt-1">
+                Electric vehicles: Enter driving range in kilometers
+              </p>
+            )}
             {errors.mileage && (
               <p className="text-red-500 text-sm">{errors.mileage}</p>
             )}
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Transmission *
+            </label>
             <select
               name="transmission"
               value={formData.transmission}

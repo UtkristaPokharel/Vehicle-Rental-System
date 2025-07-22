@@ -137,13 +137,13 @@ router.post("/update-vehicle-image", verifyToken, isAdmin, upload.single('vehicl
       return res.status(400).json({ message: "No image file provided" });
     }
 
-    // Construct the image URL
-    const imageUrl = `http://localhost:3001/uploads/vehicles/${req.file.filename}`;
+    // Store just the filename to be consistent with vehicleAdd route
+    const filename = req.file.filename;
 
     // Update the vehicle with the new image
     const updated = await Vehicle.findByIdAndUpdate(
       vehicleId,
-      { image: imageUrl },
+      { image: filename },
       { new: true }
     );
 
@@ -151,9 +151,13 @@ router.post("/update-vehicle-image", verifyToken, isAdmin, upload.single('vehicl
       return res.status(404).json({ message: "Vehicle not found" });
     }
 
+    // Return full URL for frontend but store only filename in DB
+    const imageUrl = `http://localhost:3001/uploads/vehicles/${filename}`;
+
     res.status(200).json({ 
       message: "Vehicle image updated successfully", 
       imageUrl: imageUrl,
+      filename: filename,
       vehicle: updated 
     });
   } catch (err) {

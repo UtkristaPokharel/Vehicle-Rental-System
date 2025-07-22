@@ -105,6 +105,7 @@ export default function VehicleDataComponent() {
             <th className="pb-3 px-4">Name</th>
             <th className="pb-3 px-4">Type</th>
             <th className="pb-3 px-4">Location</th>
+            <th className="pb-3 px-4">Status</th>
             <th className="pb-3 px-4">Price</th>
             <th className="pb-3 px-4">Created By</th>
             <th className="pb-3 px-4">Action</th>
@@ -117,6 +118,15 @@ export default function VehicleDataComponent() {
               <td className="py-4 px-4 text-sm text-gray-600">{vehicle.name}</td>
               <td className="py-4 px-4 text-sm text-gray-600">{vehicle.type}</td>
               <td className="py-4 px-4 text-sm text-gray-600">{vehicle.location}</td>
+              <td className="py-4 px-4 text-sm">
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  vehicle.isActive 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {vehicle.isActive ? "Active" : "Inactive"}
+                </span>
+              </td>
               <td className="py-4 px-4 text-sm text-gray-800 font-medium">Rs {vehicle.price}</td>
               <td className="py-4 px-4 text-sm text-gray-600">{vehicle.createdBy}</td>
               <td className="py-4 px-4">
