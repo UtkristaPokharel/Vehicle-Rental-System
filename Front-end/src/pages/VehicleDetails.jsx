@@ -1,5 +1,4 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import Navbar from "../components/Navbar";
 import { LocationPicker } from './LocationPicker';
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { useState, useEffect } from "react";
@@ -132,23 +131,17 @@ function VehicleDetails() {
 
   if (loading) {
     return (
-      <>
-        <Navbar />
-        <div className="detail-page flex justify-center items-center min-h-screen">
-          <div className="text-xl">Loading...</div>
-        </div>
-      </>
+      <div className="detail-page flex justify-center items-center min-h-screen">
+        <div className="text-xl">Loading...</div>
+      </div>
     );
   }
 
   if (!vehicleData) {
     return (
-      <>
-        <Navbar />
-        <div className="detail-page flex justify-center items-center min-h-screen">
-          <div className="text-xl">Vehicle not found</div>
-        </div>
-      </>
+      <div className="detail-page flex justify-center items-center min-h-screen">
+        <div className="text-xl">Vehicle not found</div>
+      </div>
     );
   }
 
@@ -176,7 +169,6 @@ function VehicleDetails() {
 
   return (
     <>
-      <Navbar />
       <Toaster />
       <div className="detail-page flex justify-center items-center md:mb-5 mb-20">
         <div className="w-full md:w-[90vw] lg:w-[85vw] xl:w-[80vw] px-4 md:px-6 lg:px-10 mt-8 md:mt-12">

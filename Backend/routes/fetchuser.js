@@ -87,15 +87,28 @@ router.get('/me', verifyToken, async (req, res) => {
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
+    
+    // Handle both Cloudinary URLs (which start with http) and legacy local files
     let imgUrl = user.imgUrl;
     if (imgUrl && !imgUrl.startsWith('http')) {
       imgUrl = `${BASE_URL}/uploads/profiles/${imgUrl}`;
     }
+    
+    let licenseFront = user.licenseFront;
+    if (licenseFront && !licenseFront.startsWith('http')) {
+      licenseFront = `${BASE_URL}/uploads/profiles/${licenseFront}`;
+    }
+    
+    let licenseBack = user.licenseBack;
+    if (licenseBack && !licenseBack.startsWith('http')) {
+      licenseBack = `${BASE_URL}/uploads/profiles/${licenseBack}`;
+    }
+    
     res.json({
       ...user.toObject(),
       imgUrl,
-      licenseFront: user.licenseFront ? `${BASE_URL}/uploads/profiles/${user.licenseFront}` : null,
-      licenseBack: user.licenseBack ? `${BASE_URL}/uploads/profiles/${user.licenseBack}` : null,
+      licenseFront,
+      licenseBack,
     });
   } catch (err) {
     res.status(500).json({ message: 'Error fetching profile' });
@@ -109,13 +122,15 @@ router.post('/upload-profile', verifyToken, profileUpload.single('profileImage')
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
     
-    const updated = await User.findByIdAndUpdate(userId, { imgUrl: req.file.filename }, { new: true });
+    // Use Cloudinary URL if available, otherwise fallback to local file handling
+    const imageUrl = req.file.path || `${BASE_URL}/uploads/profiles/${req.file.filename}`;
+    
+    const updated = await User.findByIdAndUpdate(userId, { imgUrl: imageUrl }, { new: true });
     if (!updated) return res.status(404).json({ message: 'User not found' });
     
-    const fullImageUrl = `${BASE_URL}/uploads/profiles/${req.file.filename}`;
     res.json({ 
       message: 'Profile image updated successfully', 
-      imgUrl: fullImageUrl,
+      imgUrl: imageUrl,
       filename: req.file.filename 
     });
   } catch (err) {
@@ -148,8 +163,19 @@ router.post('/upload-license', verifyToken, profileUpload.fields([
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
     
     const update = {};
-    if (req.files.licenseFront) update.licenseFront = req.files.licenseFront[0].filename;
-    if (req.files.licenseBack) update.licenseBack = req.files.licenseBack[0].filename;
+    let uploadedFiles = {};
+    
+    if (req.files.licenseFront) {
+      const frontUrl = req.files.licenseFront[0].path || `${BASE_URL}/uploads/profiles/${req.files.licenseFront[0].filename}`;
+      update.licenseFront = frontUrl;
+      uploadedFiles.licenseFront = frontUrl;
+    }
+    
+    if (req.files.licenseBack) {
+      const backUrl = req.files.licenseBack[0].path || `${BASE_URL}/uploads/profiles/${req.files.licenseBack[0].filename}`;
+      update.licenseBack = backUrl;
+      uploadedFiles.licenseBack = backUrl;
+    }
     
     if (Object.keys(update).length === 0) {
       return res.status(400).json({ message: 'No license images uploaded' });
@@ -161,10 +187,7 @@ router.post('/upload-license', verifyToken, profileUpload.fields([
     res.json({ 
       message: 'License images updated successfully', 
       user: updated,
-      uploadedFiles: {
-        licenseFront: req.files.licenseFront ? `${BASE_URL}/uploads/profiles/${req.files.licenseFront[0].filename}` : null,
-        licenseBack: req.files.licenseBack ? `${BASE_URL}/uploads/profiles/${req.files.licenseBack[0].filename}` : null
-      }
+      uploadedFiles
     });
   } catch (err) {
     console.error('License upload error:', err);

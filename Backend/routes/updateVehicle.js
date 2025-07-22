@@ -8,23 +8,13 @@ const { isAdmin } = require("../middleware/auth");
 const multer = require('multer');
 const path = require('path');
 
-// Configure multer for vehicle image uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './uploads/vehicles'); // Make sure this directory exists
-  },
-  filename: function (req, file, cb) {
-    // Generate unique filename
-    const timestamp = Date.now();
-    const ext = path.extname(file.originalname);
-    cb(null, timestamp + ext);
-  }
-});
+const { vehicleStorage } = require("../utils/cloudinary");
 
+// Configure multer for vehicle image uploads using Cloudinary
 const upload = multer({ 
-  storage: storage,
+  storage: vehicleStorage, // Use vehicle-specific Cloudinary storage
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
+    fileSize: 10 * 1024 * 1024 // 10MB limit
   },
   fileFilter: function (req, file, cb) {
     // Check file type
@@ -137,22 +127,20 @@ router.post("/update-vehicle-image", verifyToken, isAdmin, upload.single('vehicl
       return res.status(400).json({ message: "No image file provided" });
     }
 
-    // Store just the filename to be consistent with vehicleAdd route
+    // For Cloudinary, use the full URL; for local storage, use filename
+    const imageUrl = req.file.path || req.file.filename;
     const filename = req.file.filename;
 
-    // Update the vehicle with the new image
+    // Update the vehicle with the new image URL
     const updated = await Vehicle.findByIdAndUpdate(
       vehicleId,
-      { image: filename },
+      { image: imageUrl },
       { new: true }
     );
 
     if (!updated) {
       return res.status(404).json({ message: "Vehicle not found" });
     }
-
-    // Return full URL for frontend but store only filename in DB
-    const imageUrl = `http://localhost:3001/uploads/vehicles/${filename}`;
 
     res.status(200).json({ 
       message: "Vehicle image updated successfully", 
@@ -163,7 +151,7 @@ router.post("/update-vehicle-image", verifyToken, isAdmin, upload.single('vehicl
   } catch (err) {
     console.error("Update vehicle image error:", err);
     if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ message: "File size too large. Maximum 5MB allowed." });
+      return res.status(400).json({ message: "File size too large. Maximum 10MB allowed." });
     }
     res.status(500).json({ message: "Internal Server Error" });
   }

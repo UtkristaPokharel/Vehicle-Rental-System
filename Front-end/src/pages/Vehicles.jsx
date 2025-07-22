@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { FaRegHeart, FaHeart } from "react-icons/fa";
-import Navbar from '../components/Navbar';
-import Footer from '../components/footer';
 import { useNavigate } from 'react-router-dom';
 import { getApiUrl, getImageUrl } from "../config/api";
 
@@ -192,9 +190,7 @@ const VehicleBrowse = () => {
 	});
 
 	return (
-		<>
-			<Navbar />
-			<div className="min-h-screen bg-gray-100">
+		<div className="min-h-screen bg-gray-100">
 				<main className="container mx-auto px-4 py-8">
 					<Motion.div
 						className="flex flex-col lg:flex-row items-center justify-between gap-4 mb-8"
@@ -260,8 +256,6 @@ const VehicleBrowse = () => {
 					)}
 				</main>
 			</div>
-			<Footer />
-		</>
 	);
 };
 
