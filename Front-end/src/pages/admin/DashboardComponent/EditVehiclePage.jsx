@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { getApiUrl, getImageUrl } from "../../../config/api";
 
 export default function EditVehicleForm({ initialData = null, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
@@ -47,15 +48,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
       });
 
       if (initialData.image) {
-        let imageUrl;
-        if (initialData.image.startsWith('http')) {
-          imageUrl = initialData.image;
-        } else if (initialData.image.startsWith('uploads/')) {
-          imageUrl = `http://localhost:3001/${initialData.image}`;
-        } else {
-          imageUrl = `http://localhost:3001/uploads/vehicles/${initialData.image}`;
-        }
-        setImagePreview(imageUrl);
+        setImagePreview(getImageUrl(initialData.image));
       }
     }
   }, [initialData]);
@@ -163,7 +156,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
     const newStatus = !formData.isActive;
     
     try {
-      const res = await fetch(`http://localhost:3001/api/toggle-vehicle-status/${initialData._id}`, {
+      const res = await fetch(getApiUrl(`api/toggle-vehicle-status/${initialData._id}`), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -253,7 +246,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
           mileage: parseFloat(formData.mileage),
         };
 
-        const res = await fetch("http://localhost:3001/api/update-vehicle", {
+        const res = await fetch(getApiUrl("api/update-vehicle"), {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -286,7 +279,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         submission.append("createdById", userId || "admin");
         submission.append("isActive", true); // Always set to true for admin-created vehicles
 
-        const res = await fetch("http://localhost:3001/api/user/add-vehicle", {
+        const res = await fetch(getApiUrl("api/user/add-vehicle"), {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,

@@ -5,6 +5,7 @@ import { MdSubscriptions } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
 import axios from "axios";
 import Logout from "../pages/Api/Logout.jsx";
+import { getApiUrl } from "../config/api";
 
 const defaultProfile = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
 
@@ -33,7 +34,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
         const token = localStorage.getItem("token") || localStorage.getItem("adminToken");
         if (!token) return;
         try {
-          const res = await axios.get("http://localhost:3001/api/fetch/users/me", {
+          const res = await axios.get(getApiUrl("api/fetch/users/me"), {
             headers: { Authorization: `Bearer ${token}` },
           });
           setName(res.data.name);
@@ -135,7 +136,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
         if (email) updateData.email = email;
         if (password) updateData.password = password;
         
-        await axios.put("http://localhost:3001/api/fetch/users/me", updateData, {
+        await axios.put(getApiUrl("api/fetch/users/me"), updateData, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
@@ -145,7 +146,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
         const formData = new FormData();
         formData.append("profileImage", profileImage);
         const res = await axios.post(
-          "http://localhost:3001/api/fetch/users/upload-profile",
+          getApiUrl("api/fetch/users/upload-profile"),
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -162,7 +163,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
         if (licenseFront) formData.append("licenseFront", licenseFront);
         if (licenseBack) formData.append("licenseBack", licenseBack);
         await axios.post(
-          "http://localhost:3001/api/fetch/users/upload-license",
+          getApiUrl("api/fetch/users/upload-license"),
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );

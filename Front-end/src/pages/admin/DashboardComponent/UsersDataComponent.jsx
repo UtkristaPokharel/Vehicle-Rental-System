@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import axios from "axios";
 import toast,{ Toaster } from "react-hot-toast";
+import { getApiUrl, getProfileImageUrl } from "../../../config/api";
 // UserDetailModal component
 function UserDetailModal({ user, onClose, onUserUpdate }) {
   const defaultProfileImg = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
@@ -18,7 +19,7 @@ function UserDetailModal({ user, onClose, onUserUpdate }) {
     try {
       const newVerifiedStatus = !user.isVerified;
       
-      const response = await fetch(`http://localhost:3001/api/fetch/users/verify/${user._id}`, {
+      const response = await fetch(getApiUrl(`api/fetch/users/verify/${user._id}`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -63,7 +64,7 @@ function UserDetailModal({ user, onClose, onUserUpdate }) {
     if (!imgUrl) return defaultProfileImg;
     if (imgUrl.startsWith('http')) return imgUrl;
     // For profile images, they're stored as filenames and need the full path
-    const fullUrl = `http://localhost:3001/uploads/profiles/${imgUrl}`;
+    const fullUrl = getProfileImageUrl(imgUrl);
     console.log("Constructed profile image URL:", fullUrl); // Debug log
     return fullUrl;
   };
@@ -73,7 +74,7 @@ function UserDetailModal({ user, onClose, onUserUpdate }) {
     if (!licenseImg) return null;
     if (licenseImg.startsWith('http')) return licenseImg;
     // For license images, they're stored as filenames and need the full path
-    return `http://localhost:3001/uploads/profiles/${licenseImg}`;
+    return getProfileImageUrl(licenseImg);
   };
 
   return (
@@ -264,7 +265,7 @@ function UsersDataComponent() {
     },[])
 
     const fetchUsers = () => {
-        axios.get("http://localhost:3001/api/fetch/users")
+        axios.get(getApiUrl("api/fetch/users"))
         .then(res=>setUsers(res.data.reverse()))
         .catch(err=>toast.error("Error fetching users:", err));
     };
@@ -300,7 +301,7 @@ function UsersDataComponent() {
             return;
         }
         try {
-            const response = await axios.delete(`http://localhost:3001/api/fetch/users/delete-user/${userToDelete._id}`, {
+            const response = await axios.delete(getApiUrl(`api/fetch/users/delete-user/${userToDelete._id}`), {
                 headers: { Authorization: `Bearer ${token}` },
             });
             if (response.status === 200) {
@@ -350,7 +351,7 @@ function UsersDataComponent() {
                   if (!imgUrl) return defaultProfileImg;
                   if (imgUrl.startsWith('http')) return imgUrl;
                   // For profile images, they're stored as filenames and need the full path
-                  const fullUrl = `http://localhost:3001/uploads/profiles/${imgUrl}`;
+                  const fullUrl = getProfileImageUrl(imgUrl);
                   console.log("Table row - Constructed profile image URL:", fullUrl); // Debug log
                   return fullUrl;
                 };

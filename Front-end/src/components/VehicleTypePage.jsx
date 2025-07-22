@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import VehicleCard from './VehicleCard';
 import { FaChevronDown } from "react-icons/fa";
+import { getApiUrl } from "../config/api";
 
 const VehicleTypePage = () => {
   const { type } = useParams();
@@ -13,7 +14,7 @@ const VehicleTypePage = () => {
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
-        const res = await fetch(`http://localhost:3001/api/vehicles/type/${type.toLowerCase()}`);
+        const res = await fetch(getApiUrl(`api/vehicles/type/${type.toLowerCase()}`));
         const data = await res.json();
         const activeVehicles = data.filter(vehicle => vehicle.isActive === true);
         setVehicles(activeVehicles);

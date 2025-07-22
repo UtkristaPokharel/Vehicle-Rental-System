@@ -8,6 +8,7 @@ import VehicleCard from "../components/VehicleCard";
 // import vehicleData from '../assets/Sample.json';
 // import { useRef } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import { getApiUrl } from "../config/api";
 
 
 const vehicleTypes = [
@@ -64,7 +65,7 @@ export const SuggestedVehicle = () => {
   useEffect(() => {
     async function getVehicles() {
       try {
-        const res = await fetch("http://localhost:3001/api/vehicles");
+        const res = await fetch(getApiUrl("api/vehicles"));
         const data = await res.json();
         // Filter only active vehicles
         const activeVehicles = data.filter(vehicle => vehicle.isActive === true);

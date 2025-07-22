@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { getApiUrl } from "../../config/api";
 
 export default function AddVehicle({ onSubmit }) {
   
@@ -185,7 +186,7 @@ export default function AddVehicle({ onSubmit }) {
       submission.append("createdById", userId || "admin");
       submission.append("isActive", formData.isActive);
 
-      const res = await fetch("http://localhost:3001/api/user/add-vehicle", {
+      const res = await fetch(getApiUrl("api/user/add-vehicle"), {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

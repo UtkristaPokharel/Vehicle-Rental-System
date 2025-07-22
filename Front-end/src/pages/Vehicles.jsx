@@ -4,6 +4,7 @@ import { FaRegHeart, FaHeart } from "react-icons/fa";
 import Navbar from '../components/Navbar';
 import Footer from '../components/footer';
 import { useNavigate } from 'react-router-dom';
+import { getApiUrl, getImageUrl } from "../config/api";
 
 const VehicleCard = ({ vehicle }) => {
 	const navigate = useNavigate();
@@ -11,7 +12,7 @@ const VehicleCard = ({ vehicle }) => {
 
 	const trackClick = async () => {
 		try {
-			await fetch(`http://localhost:3001/api/public/track-click/${vehicle._id}`, {
+			await fetch(getApiUrl(`api/public/track-click/${vehicle._id}`), {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -47,7 +48,7 @@ const VehicleCard = ({ vehicle }) => {
 			
 			<div className="relative">
 				<img 
-					src={`http://localhost:3001/uploads/vehicles/${vehicle.image}`} 
+					src={getImageUrl(vehicle.image)} 
 					alt={vehicle.name} 
 					className="w-full h-52 sm:h-56 object-cover object-center transition-transform duration-300 group-hover:scale-105"
 				/>
@@ -116,7 +117,7 @@ const VehicleBrowse = () => {
 	useEffect(() => {
 		const fetchVehicles = async () => {
 			try {
-				const res = await fetch('http://localhost:3001/api/vehicles');
+				const res = await fetch(getApiUrl('api/vehicles'));
 				const data = await res.json();
 				const activeVehicles = data.filter(vehicle => vehicle.isActive === true);
 				setVehicles(activeVehicles);
