@@ -1,6 +1,7 @@
 import { FaPhoneAlt, FaMapMarkerAlt, FaEnvelope } from "react-icons/fa";
 import { FaWhatsapp } from "react-icons/fa6";
 import { useState } from "react";
+import { getApiUrl } from "../config/api";
 // import Navbar from "../components/Navbar";
 // import Footer from "../components/Footer";
 
@@ -112,7 +113,7 @@ const ContactUs = () => {
 			setIsSubmitting(true);
 			
 			try {
-				const response = await fetch('http://localhost:3001/api/contact', {
+				const response = await fetch(getApiUrl('api/contact'), {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',

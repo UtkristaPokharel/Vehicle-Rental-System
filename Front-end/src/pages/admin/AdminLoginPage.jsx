@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast,{ Toaster } from "react-hot-toast";
+import { getApiUrl } from "../../config/api";
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState("");
@@ -17,7 +18,7 @@ export default function AdminLoginPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:3001/admin/login", {
+      const res = await fetch(getApiUrl("admin/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),

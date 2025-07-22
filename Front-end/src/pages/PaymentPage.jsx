@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { FaLock, FaArrowLeft, FaCheck, FaCreditCard, FaPaypal, FaApplePay, FaGooglePay } from "react-icons/fa";
 import { MdSecurity, MdInfo } from "react-icons/md";
+import { getApiUrl, getImageUrl as getVehicleImageUrl } from "../config/api";
 
 function PaymentPage() {
 	const location = useLocation();
@@ -69,7 +70,7 @@ function PaymentPage() {
 			if (vehicleId) {
 				setLoading(true);
 				try {
-					const response = await fetch(`http://localhost:3001/api/vehicles/${vehicleId}`);
+					const response = await fetch(getApiUrl(`api/vehicles/${vehicleId}`));
 					if (response.ok) {
 						const data = await response.json();
 						console.log("Fetched complete vehicle data:", data);
@@ -201,8 +202,7 @@ function PaymentPage() {
 	// Handle image URL
 	const getImageUrl = (image) => {
 		if (!image) return "/api/placeholder/80/60";
-		if (image.startsWith('http')) return image;
-		return `http://localhost:3001/uploads/vehicles/${image}`;
+		return getVehicleImageUrl(image);
 	};
 
 	if (loading) {

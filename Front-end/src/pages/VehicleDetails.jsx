@@ -5,6 +5,7 @@ import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { useState, useEffect } from "react";
 import { FaPen, FaSpinner } from "react-icons/fa";
 import toast,{ Toaster } from "react-hot-toast";
+import { getApiUrl, getImageUrl as getVehicleImageUrl } from "../config/api";
 
 
 function VehicleDetails() {
@@ -31,7 +32,7 @@ function VehicleDetails() {
       if (id) {
         try {
           console.log("Fetching complete vehicle data with ID:", id);
-          const response = await fetch(`http://localhost:3001/api/vehicles/${id}`);
+          const response = await fetch(getApiUrl(`api/vehicles/${id}`));
           if (response.ok) {
             const data = await response.json();
             console.log("Fetched complete vehicle data:", data);
@@ -164,21 +165,11 @@ function VehicleDetails() {
       return imagePath;
     }
 
-    // If it starts with uploads/, use it as is
-    if (imagePath.startsWith('uploads/')) {
-      const url = `http://localhost:3001/${imagePath}`;
-      console.log("Using uploads path:", url);
-      return url;
-    }
-
-    // For vehicle images, they are stored in uploads/vehicles/ folder
-    // and only the filename is saved in the database
-    const url = `http://localhost:3001/uploads/vehicles/${imagePath}`;
-    console.log("Using vehicles folder:", url);
-    return url;
+    // Use the centralized image URL helper
+    return getVehicleImageUrl(imagePath);
   };
 
-  const imageUrl = getImageUrl(vehicleData?.image);
+  const imageUrl = getVehicleImageUrl(vehicleData?.image);
 
   console.log("Vehicle image field:", vehicleData?.image);
   console.log("Final constructed image URL:", imageUrl);

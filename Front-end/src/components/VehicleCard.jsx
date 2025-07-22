@@ -1,13 +1,14 @@
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { getApiUrl, getImageUrl } from "../config/api";
 
 const VehicleCard = ({ vehicle, type }) => {
   const [liked, setLiked] = useState(false);
 
   const trackClick = async () => {
     try {
-      await fetch(`http://localhost:3001/api/public/track-click/${vehicle._id}`, {
+      await fetch(getApiUrl(`api/public/track-click/${vehicle._id}`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,7 +37,7 @@ const VehicleCard = ({ vehicle, type }) => {
         <div className="relative">
           <img
             className="w-full h-52 sm:h-56 object-cover object-center transition-transform duration-300 group-hover:scale-105"
-            src={`http://localhost:3001/uploads/vehicles/${vehicle.image}`}
+            src={getImageUrl(vehicle.image)}
             alt={vehicle.name}
           />
           

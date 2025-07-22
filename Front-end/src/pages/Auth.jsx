@@ -7,9 +7,11 @@ import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../context/UserContext";
 import axios from "axios";
 import toast,{Toaster} from "react-hot-toast"
+import { API_BASE_URL } from "../config/api";
+
 // Create axios instance with credentials enabled for cookies
 const api = axios.create({
-  baseURL: 'http://localhost:3001/api',
+  baseURL: `${API_BASE_URL}/api`,
   timeout: 10000,
   withCredentials: true, // This is crucial for cookies
   headers: {

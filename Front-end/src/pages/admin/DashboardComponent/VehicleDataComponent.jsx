@@ -3,6 +3,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import axios from "axios";
 import toast from "react-hot-toast";
 import EditVehicleForm from './EditVehiclePage'; // Reusable Add/Edit form
+import { getApiUrl } from "../../../config/api";
 
 export default function VehicleDataComponent() {
 
@@ -17,7 +18,7 @@ export default function VehicleDataComponent() {
   }, []);
 
   const fetchVehicles = () => {
-    axios.get("http://localhost:3001/api/vehicles")
+    axios.get(getApiUrl("api/vehicles"))
       .then(res => setVehicles(res.data.reverse()))
       .catch(err => toast.error("Error fetching vehicles",err));
   };
@@ -35,7 +36,7 @@ export default function VehicleDataComponent() {
     }
     try {
       const response = await axios.put(
-        `http://localhost:3001/api/update-vehicle`,
+        getApiUrl(`api/update-vehicle`),
         updatedVehicle,
         {
           headers: {
@@ -71,7 +72,7 @@ export default function VehicleDataComponent() {
       return;
     }
     try {
-      const response = await axios.delete(`http://localhost:3001/api/delete-vehicle/${vehicleToDelete._id}`, {
+      const response = await axios.delete(getApiUrl(`api/delete-vehicle/${vehicleToDelete._id}`), {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.status === 200) {

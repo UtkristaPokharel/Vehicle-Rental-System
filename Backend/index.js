@@ -22,6 +22,7 @@ app.use(
       "http://localhost:3000",
       "http://localhost:5173",
       "http://localhost:5174",
+      "https://vehicle-rental-system-lwna.vercel.app",
     ],
     credentials: true, // This is crucial for cookies
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
@@ -63,8 +64,8 @@ const generateToken = (userId) => {
 const setAuthCookies = (res, token, email) => {
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // true in production
-    sameSite: "lax",
+    secure: true, // Always true for production (HTTPS)
+    sameSite: "none", // Required for cross-origin cookies
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   };
 
@@ -308,8 +309,14 @@ app.get("/api/auth/check", authenticateToken, (req, res) => {
 
 // Logout route
 app.post("/api/auth/logout", (req, res) => {
-  res.clearCookie("token");
-  res.clearCookie("email");
+  const cookieOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  };
+  
+  res.clearCookie("token", cookieOptions);
+  res.clearCookie("email", cookieOptions);
   res.json({ message: "Logged out successfully" });
 });
 
@@ -369,7 +376,8 @@ app.post('/api/contact', async (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📡 API available at http://localhost:${PORT}/api`);
+  console.log(`📡 API available at http://0.0.0.0:${PORT}/api`);
 });
+

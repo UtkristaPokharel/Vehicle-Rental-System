@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
+import { API_BASE_URL } from "../../config/api";
 
 function Logout() {
   const [showPrompt, setShowPrompt] = useState(false);
@@ -8,7 +9,7 @@ function Logout() {
   const promptRef = useRef(null);
 
   const api = axios.create({
-    baseURL: 'http://localhost:3001/api',
+    baseURL: `${API_BASE_URL}/api`,
     timeout: 10000,
     withCredentials: true,
     headers: {
