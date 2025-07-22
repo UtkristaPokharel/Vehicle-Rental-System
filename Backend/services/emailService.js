@@ -2,16 +2,15 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT),
-  secure: false, 
-  requireTLS: true,
+  host: 'smtp.zoho.com',
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.EMAIL_USER_Auth,
-    pass: process.env.EMAIL_PASS_Auth,
+    user: process.env.EMAIL_USER_Auth, 
+    pass: process.env.EMAIL_PASS_Auth, 
   },
   tls: {
-    rejectUnauthorized: false // Accept self-signed certificates
+    rejectUnauthorized: false 
   }
 });
 
