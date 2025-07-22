@@ -64,8 +64,8 @@ const generateToken = (userId) => {
 const setAuthCookies = (res, token, email) => {
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // true in production
-    sameSite: "lax",
+    secure: true, // Always true for production (HTTPS)
+    sameSite: "none", // Required for cross-origin cookies
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   };
 
@@ -309,8 +309,14 @@ app.get("/api/auth/check", authenticateToken, (req, res) => {
 
 // Logout route
 app.post("/api/auth/logout", (req, res) => {
-  res.clearCookie("token");
-  res.clearCookie("email");
+  const cookieOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  };
+  
+  res.clearCookie("token", cookieOptions);
+  res.clearCookie("email", cookieOptions);
   res.json({ message: "Logged out successfully" });
 });
 
