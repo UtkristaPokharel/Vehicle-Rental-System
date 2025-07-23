@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import BackButton from '../components/BackButton';
 
 const faqs = [
   {
@@ -43,6 +44,11 @@ function FAQPage() {
   return (
     <>
       <div className="px-6 py-12 max-w-5xl mx-auto">
+        {/* Back Button */}
+        <div className="mb-6">
+          <BackButton />
+        </div>
+        
         <section id="faq-section" className="py-5">
           <h2 className="text-4xl font-bold text-center mb-12">Frequently Asked Questions</h2>
           <div className="space-y-4">

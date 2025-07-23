@@ -1,8 +1,14 @@
+import BackButton from "../components/BackButton";
+
 const AboutUs = () => {
 	return (
 		<div className="min-h-screen bg-black text-white font-sans">
+			{/* Back Button */}
+			<div className="absolute top-4 left-4 z-20">
+				<BackButton variant="floating" showText={false} className="text-white hover:text-red-500" />
+			</div>
 
-				<section className="relative bg-gradient-to-br from-red-700 via-black to-red-800 py-24 overflow-hidden">
+			<section className="relative bg-gradient-to-br from-red-700 via-black to-red-800 py-24 overflow-hidden">
 					<div className="absolute inset-0 bg-[url('butwal.jpeg')] opacity-20 bg-cover bg-center"></div>
 					<div className="container mx-auto px-4 text-center relative z-10">
 						<h1 className="text-5xl md:text-6xl font-extrabold mb-6 tracking-tight animate-fade-in-down">
