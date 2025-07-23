@@ -349,6 +349,10 @@ app.use("/api/fetch/users", fetchUsers);
 const favoritesRoutes = require("./routes/favorites");
 app.use("/api/favorites", favoritesRoutes);
 
+// Payment routes
+const paymentRoutes = require("./routes/payment");
+app.use("/api/payment", paymentRoutes);
+
 // Contact form endpoint
 app.post('/api/contact', async (req, res) => {
   try {

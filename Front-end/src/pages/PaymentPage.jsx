@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
 import { FaLock, FaCheck, FaCreditCard, FaPaypal, FaApplePay, FaGooglePay } from "react-icons/fa";
 import { MdSecurity, MdInfo } from "react-icons/md";
 import { getApiUrl, getImageUrl as getVehicleImageUrl } from "../config/api";
-import { generateEsewaParams, initiateEsewaPayment } from "../config/esewa";
 import BackButton from "../components/BackButton";
 
 function PaymentPage() {
@@ -30,6 +28,12 @@ function PaymentPage() {
 	const [errors, setErrors] = useState({});
 	const [loading, setLoading] = useState(false);
 	const [currentVehicleData, setCurrentVehicleData] = useState(vehicleData);
+	const [userInfo, setUserInfo] = useState({
+		name: "",
+		email: "",
+		phone: "",
+		userId: null
+	});
 
 	// Calculate total price based on booking duration and vehicle price
 	const calculateTotalPrice = () => {
@@ -135,14 +139,30 @@ function PaymentPage() {
 			}
 		}
 
-		if (!billingAddress.address.trim()) {
-			newErrors.address = "Please enter billing address";
-		}
-		if (!billingAddress.city.trim()) {
-			newErrors.city = "Please enter city";
-		}
-		if (!billingAddress.zipCode.trim()) {
-			newErrors.zipCode = "Please enter zip code";
+		// For eSewa, only validate billing address and user info
+		if (paymentMethod !== "esewa") {
+			if (!billingAddress.address.trim()) {
+				newErrors.address = "Please enter billing address";
+			}
+			if (!billingAddress.city.trim()) {
+				newErrors.city = "Please enter city";
+			}
+			if (!billingAddress.zipCode.trim()) {
+				newErrors.zipCode = "Please enter zip code";
+			}
+		} else {
+			// For eSewa, validate user information
+			if (!userInfo.name.trim()) {
+				newErrors.userName = "Please enter your full name";
+			}
+			if (!userInfo.email.trim()) {
+				newErrors.userEmail = "Please enter your email address";
+			} else if (!/\S+@\S+\.\S+/.test(userInfo.email)) {
+				newErrors.userEmail = "Please enter a valid email address";
+			}
+			if (!userInfo.phone.trim()) {
+				newErrors.userPhone = "Please enter your phone number";
+			}
 		}
 
 		setErrors(newErrors);
@@ -152,18 +172,99 @@ function PaymentPage() {
 	// Handle form submission
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		
-		// For eSewa payment, skip form validation and redirect to eSewa
-		if (paymentMethod === "esewa") {
-			handleEsewaPayment();
-			return;
-		}
-		
 		if (!validateForm()) return;
 
 		setIsProcessing(true);
 
-		// Simulate payment processing for other methods
+		// Handle eSewa payment
+		if (paymentMethod === "esewa") {
+			try {
+				console.log('Initiating eSewa payment with data:', {
+					amount: priceBreakdown.total,
+					bookingData,
+					vehicleData: currentVehicleData,
+					billingAddress
+				});
+
+				const apiUrl = getApiUrl('api/payment/esewa/initiate');
+				console.log('API URL:', apiUrl);
+
+				const response = await fetch(apiUrl, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						amount: priceBreakdown.total,
+						bookingData,
+						vehicleData: currentVehicleData,
+						billingAddress,
+						userInfo
+					})
+				});
+
+				console.log('Response status:', response.status);
+				console.log('Response headers:', response.headers);
+
+				if (response.ok) {
+					const contentType = response.headers.get('Content-Type');
+					
+					// Check if response is HTML (eSewa form) or JSON
+					if (contentType && contentType.includes('text/html')) {
+						// Response is HTML form, display it
+						const htmlContent = await response.text();
+						const newWindow = window.open('', '_self');
+						newWindow.document.write(htmlContent);
+						newWindow.document.close();
+					} else {
+						// Response is JSON
+						const data = await response.json();
+						if (data.paymentUrl) {
+							window.location.href = data.paymentUrl;
+						} else {
+							alert('Payment URL not received from server');
+							setIsProcessing(false);
+						}
+					}
+				} else {
+					const contentType = response.headers.get('Content-Type');
+					let errorMessage = 'Payment initiation failed';
+					
+					try {
+						if (contentType && contentType.includes('application/json')) {
+							const errorData = await response.json();
+							errorMessage = errorData.message || errorData.error || errorMessage;
+						} else {
+							const errorText = await response.text();
+							errorMessage = errorText || errorMessage;
+						}
+					} catch (parseError) {
+						console.error('Error parsing response:', parseError);
+						errorMessage = `Server error (${response.status}): ${response.statusText}`;
+					}
+					
+					console.error('Payment initiation failed:', errorMessage);
+					alert(`Payment initiation failed: ${errorMessage}`);
+					setIsProcessing(false);
+				}
+			} catch (error) {
+				console.error('Network error during eSewa payment initiation:', error);
+				let errorMessage = 'Network error: ';
+				
+				if (error.name === 'TypeError' && error.message.includes('fetch')) {
+					errorMessage += 'Cannot connect to server. Please ensure the backend is running on port 3001.';
+				} else {
+					errorMessage += error.message;
+				}
+				
+				alert(errorMessage);
+				setIsProcessing(false);
+			}
+			return;
+		}
+
+		// Handle other payment methods (existing logic)
+		// Simulate payment processing
 		setTimeout(() => {
 			setIsProcessing(false);
 			// Navigate to confirmation page
@@ -178,30 +279,6 @@ function PaymentPage() {
 				}
 			});
 		}, 3000);
-	};
-
-	// Handle eSewa payment
-	const handleEsewaPayment = () => {
-		try {
-			// Store booking data in localStorage for retrieval after payment
-			const paymentData = {
-				bookingData,
-				vehicleData: currentVehicleData,
-				priceBreakdown,
-				paymentMethod: "esewa",
-				timestamp: Date.now()
-			};
-			localStorage.setItem('pendingPayment', JSON.stringify(paymentData));
-
-			// Generate eSewa payment parameters
-			const esewaParams = generateEsewaParams(bookingData, currentVehicleData, priceBreakdown);
-			
-			// Initiate eSewa payment
-			initiateEsewaPayment(esewaParams);
-		} catch (error) {
-			console.error('eSewa payment initialization failed:', error);
-			alert('Failed to initialize eSewa payment. Please try again.');
-		}
 	};
 
 	const handleCardInputChange = (field, value) => {
@@ -232,6 +309,18 @@ function PaymentPage() {
 		}
 	};
 
+	const handleUserInfoChange = (field, value) => {
+		setUserInfo(prev => ({ ...prev, [field]: value }));
+
+		// Clear error when user starts typing
+		const errorField = field === 'name' ? 'userName' : 
+						   field === 'email' ? 'userEmail' : 
+						   field === 'phone' ? 'userPhone' : field;
+		if (errors[errorField]) {
+			setErrors(prev => ({ ...prev, [errorField]: "" }));
+		}
+	};
+
 	// Handle image URL
 	const getImageUrl = (image) => {
 		if (!image) return "/api/placeholder/80/60";
@@ -250,7 +339,7 @@ function PaymentPage() {
 
 	return (
 		<>
-		<div className="min-h-screen bg-gray-50 py-8">
+			<div className="min-h-screen bg-gray-50 py-8">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					{/* Header */}
 					<div className="mb-8">
@@ -272,7 +361,7 @@ function PaymentPage() {
 								<div className="bg-white rounded-lg shadow-sm p-6">
 									<h2 className="text-xl font-semibold mb-4">Payment Method</h2>
 
-									<div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
+									<div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
 										<button
 											type="button"
 											onClick={() => setPaymentMethod("card")}
@@ -283,18 +372,6 @@ function PaymentPage() {
 										>
 											<FaCreditCard className="text-2xl mb-2" />
 											<span className="text-sm font-medium">Credit Card</span>
-										</button>
-
-										<button
-											type="button"
-											onClick={() => setPaymentMethod("esewa")}
-											className={`p-4 border rounded-lg flex flex-col items-center justify-center ${paymentMethod === "esewa"
-												? "border-green-500 bg-green-50"
-												: "border-gray-300 hover:border-gray-400"
-												}`}
-										>
-											<div className="text-2xl mb-2 font-bold text-green-600">eSewa</div>
-											<span className="text-sm font-medium">eSewa</span>
 										</button>
 
 										<button
@@ -331,6 +408,19 @@ function PaymentPage() {
 										>
 											<FaGooglePay className="text-2xl mb-2" />
 											<span className="text-sm font-medium">Google Pay</span>
+										</button>
+										<button
+											type="button"
+											onClick={() => setPaymentMethod("esewa")}
+											className={`p-4 border rounded-lg flex flex-col items-center justify-center ${paymentMethod === "esewa"
+												? "border-green-500 bg-green-50"
+												: "border-gray-300 hover:border-gray-400"
+												}`}
+										>
+											<div className="w-8 h-8 mb-2 bg-green-600 text-white rounded flex items-center justify-center font-bold text-sm">
+												e
+											</div>
+											<span className="text-sm font-medium">eSewa</span>
 										</button>
 
 									</div>
@@ -414,18 +504,6 @@ function PaymentPage() {
 									)}
 
 									{/* Alternative Payment Methods */}
-									{paymentMethod === "esewa" && (
-										<div className="text-center py-8">
-											<div className="text-6xl font-bold text-green-600 mx-auto mb-4">eSewa</div>
-											<p className="text-gray-600 mb-4">You will be redirected to eSewa to complete your payment</p>
-											<div className="text-sm text-gray-500">
-												<p>• Secure payment gateway</p>
-												<p>• No additional charges</p>
-												<p>• Instant payment confirmation</p>
-											</div>
-										</div>
-									)}
-
 									{paymentMethod === "paypal" && (
 										<div className="text-center py-8">
 											<FaPaypal className="text-6xl text-blue-600 mx-auto mb-4" />
@@ -447,98 +525,187 @@ function PaymentPage() {
 										</div>
 									)}
 
+									{paymentMethod === "esewa" && (
+										<div className="text-center py-8">
+											<div className="w-20 h-20 bg-green-600 text-white rounded-lg flex items-center justify-center font-bold text-3xl mx-auto mb-4">
+												e
+											</div>
+											<h3 className="text-lg font-semibold mb-2">eSewa Payment</h3>
+											<p className="text-gray-600 mb-4">You will be redirected to eSewa to complete your payment securely</p>
+											<div className="bg-green-50 p-4 rounded-lg">
+												<p className="text-sm text-green-700">
+													✓ Secure payment through eSewa<br/>
+													✓ Instant payment confirmation<br/>
+													✓ Support for all major banks in Nepal
+												</p>
+											</div>
+										</div>
+									)}
+
 								</div>
 
-								{/* Billing Address */}
-								<div className="bg-white rounded-lg shadow-sm p-6">
-									<h2 className="text-xl font-semibold mb-4">Billing Address</h2>
+								{/* User Information for eSewa */}
+								{paymentMethod === "esewa" && (
+									<div className="bg-white rounded-lg shadow-sm p-6">
+										<h2 className="text-xl font-semibold mb-4">Your Information</h2>
+										<p className="text-sm text-gray-600 mb-4">Please provide your contact information for booking confirmation</p>
 
-									<div className="space-y-4">
-										<div>
-											<label className="block text-sm font-medium text-gray-700 mb-1">
-												Address
-											</label>
-											<input
-												type="text"
-												value={billingAddress.address}
-												onChange={(e) => handleBillingChange("address", e.target.value)}
-												placeholder="eg. Jyotinagar"
-												className={`w-full p-3 border rounded-lg ${errors.address ? "border-red-500" : "border-gray-300"
-													} focus:outline-none focus:ring-2 focus:ring-blue-500`}
-											/>
-											{errors.address && (
-												<p className="text-red-500 text-sm mt-1">{errors.address}</p>
-											)}
-										</div>
-
-										<div className="grid grid-cols-2 gap-4">
+										<div className="space-y-4">
 											<div>
 												<label className="block text-sm font-medium text-gray-700 mb-1">
-													City
+													Full Name <span className="text-red-500">*</span>
 												</label>
 												<input
 													type="text"
-													value={billingAddress.city}
-													onChange={(e) => handleBillingChange("city", e.target.value)}
-													placeholder="Butwal"
-													className={`w-full p-3 border rounded-lg ${errors.city ? "border-red-500" : "border-gray-300"
-														} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+													value={userInfo.name}
+													onChange={(e) => handleUserInfoChange("name", e.target.value)}
+													placeholder="Enter your full name"
+													className={`w-full p-3 border rounded-lg ${errors.userName ? "border-red-500" : "border-gray-300"
+														} focus:outline-none focus:ring-2 focus:ring-green-500`}
 												/>
-												{errors.city && (
-													<p className="text-red-500 text-sm mt-1">{errors.city}</p>
+												{errors.userName && (
+													<p className="text-red-500 text-sm mt-1">{errors.userName}</p>
 												)}
 											</div>
 
-											<div>
-												<label className="block text-sm font-medium text-gray-700 mb-1">
-													State/Province
-												</label>
-												<input
-													type="text"
-													value={billingAddress.state}
-													onChange={(e) => handleBillingChange("state", e.target.value)}
-													placeholder="Lumbini"
-													className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-												/>
-											</div>
-										</div>
+											<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+												<div>
+													<label className="block text-sm font-medium text-gray-700 mb-1">
+														Email Address <span className="text-red-500">*</span>
+													</label>
+													<input
+														type="email"
+														value={userInfo.email}
+														onChange={(e) => handleUserInfoChange("email", e.target.value)}
+														placeholder="your.email@example.com"
+														className={`w-full p-3 border rounded-lg ${errors.userEmail ? "border-red-500" : "border-gray-300"
+															} focus:outline-none focus:ring-2 focus:ring-green-500`}
+													/>
+													{errors.userEmail && (
+														<p className="text-red-500 text-sm mt-1">{errors.userEmail}</p>
+													)}
+												</div>
 
-										<div className="grid grid-cols-2 gap-4">
-											<div>
-												<label className="block text-sm font-medium text-gray-700 mb-1">
-													ZIP Code
-												</label>
-												<input
-													type="text"
-													value={billingAddress.zipCode}
-													onChange={(e) => handleBillingChange("zipCode", e.target.value)}
-													placeholder="32400"
-													className={`w-full p-3 border rounded-lg ${errors.zipCode ? "border-red-500" : "border-gray-300"
-														} focus:outline-none focus:ring-2 focus:ring-blue-500`}
-												/>
-												{errors.zipCode && (
-													<p className="text-red-500 text-sm mt-1">{errors.zipCode}</p>
-												)}
+												<div>
+													<label className="block text-sm font-medium text-gray-700 mb-1">
+														Phone Number <span className="text-red-500">*</span>
+													</label>
+													<input
+														type="tel"
+														value={userInfo.phone}
+														onChange={(e) => handleUserInfoChange("phone", e.target.value)}
+														placeholder="98XXXXXXXX"
+														className={`w-full p-3 border rounded-lg ${errors.userPhone ? "border-red-500" : "border-gray-300"
+															} focus:outline-none focus:ring-2 focus:ring-green-500`}
+													/>
+													{errors.userPhone && (
+														<p className="text-red-500 text-sm mt-1">{errors.userPhone}</p>
+													)}
+												</div>
 											</div>
 
-											<div>
-												<label className="block text-sm font-medium text-gray-700 mb-1">
-													Country
-												</label>
-												<select
-													value={billingAddress.country}
-													onChange={(e) => handleBillingChange("country", e.target.value)}
-													className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-												>
-													<option value="Nepal">Nepal</option>
-													<option value="India">India</option>
-													<option value="USA">United States</option>
-													<option value="UK">United Kingdom</option>
-												</select>
+											<div className="bg-blue-50 p-4 rounded-lg">
+												<p className="text-sm text-blue-700">
+													<strong>Note:</strong> This information will be used for booking confirmation and communication. 
+													A booking confirmation will be sent to your email address.
+												</p>
 											</div>
 										</div>
 									</div>
-								</div>
+								)}
+
+								{/* Billing Address */}
+								{paymentMethod !== "esewa" && (
+									<div className="bg-white rounded-lg shadow-sm p-6">
+										<h2 className="text-xl font-semibold mb-4">Billing Address</h2>
+
+										<div className="space-y-4">
+											<div>
+												<label className="block text-sm font-medium text-gray-700 mb-1">
+													Address
+												</label>
+												<input
+													type="text"
+													value={billingAddress.address}
+													onChange={(e) => handleBillingChange("address", e.target.value)}
+													placeholder="eg. Jyotinagar"
+													className={`w-full p-3 border rounded-lg ${errors.address ? "border-red-500" : "border-gray-300"
+														} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+												/>
+												{errors.address && (
+													<p className="text-red-500 text-sm mt-1">{errors.address}</p>
+												)}
+											</div>
+
+											<div className="grid grid-cols-2 gap-4">
+												<div>
+													<label className="block text-sm font-medium text-gray-700 mb-1">
+														City
+													</label>
+													<input
+														type="text"
+														value={billingAddress.city}
+														onChange={(e) => handleBillingChange("city", e.target.value)}
+														placeholder="Butwal"
+														className={`w-full p-3 border rounded-lg ${errors.city ? "border-red-500" : "border-gray-300"
+															} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+													/>
+													{errors.city && (
+														<p className="text-red-500 text-sm mt-1">{errors.city}</p>
+													)}
+												</div>
+
+												<div>
+													<label className="block text-sm font-medium text-gray-700 mb-1">
+														State/Province
+													</label>
+													<input
+														type="text"
+														value={billingAddress.state}
+														onChange={(e) => handleBillingChange("state", e.target.value)}
+														placeholder="Lumbini"
+														className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+													/>
+												</div>
+											</div>
+
+											<div className="grid grid-cols-2 gap-4">
+												<div>
+													<label className="block text-sm font-medium text-gray-700 mb-1">
+														ZIP Code
+													</label>
+													<input
+														type="text"
+														value={billingAddress.zipCode}
+														onChange={(e) => handleBillingChange("zipCode", e.target.value)}
+														placeholder="32400"
+														className={`w-full p-3 border rounded-lg ${errors.zipCode ? "border-red-500" : "border-gray-300"
+															} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+													/>
+													{errors.zipCode && (
+														<p className="text-red-500 text-sm mt-1">{errors.zipCode}</p>
+													)}
+												</div>
+
+												<div>
+													<label className="block text-sm font-medium text-gray-700 mb-1">
+														Country
+													</label>
+													<select
+														value={billingAddress.country}
+														onChange={(e) => handleBillingChange("country", e.target.value)}
+														className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+													>
+														<option value="Nepal">Nepal</option>
+														<option value="India">India</option>
+														<option value="USA">United States</option>
+														<option value="UK">United Kingdom</option>
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+								)}
 
 								{/* Terms and Conditions */}
 								<div className="bg-white rounded-lg shadow-sm p-6">
@@ -571,12 +738,12 @@ function PaymentPage() {
 									{isProcessing ? (
 										<div className="flex items-center justify-center">
 											<div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-											Processing Payment...
+											{paymentMethod === "esewa" ? "Redirecting to eSewa..." : "Processing Payment..."}
 										</div>
-									) : paymentMethod === "esewa" ? (
-										`Pay with eSewa - रु${priceBreakdown.total.toLocaleString()}`
 									) : (
-										`Complete Payment - रु${priceBreakdown.total.toLocaleString()}`
+										paymentMethod === "esewa" ? 
+											`Pay with eSewa - रु${priceBreakdown.total.toLocaleString()}` :
+											`Complete Payment - रु${priceBreakdown.total.toLocaleString()}`
 									)}
 								</button>
 							</form>

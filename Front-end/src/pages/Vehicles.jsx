@@ -3,7 +3,6 @@ import { motion as Motion } from 'framer-motion';
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { getApiUrl, getImageUrl } from "../config/api";
-import BackButton from '../components/BackButton';
 
 const VehicleCard = ({ vehicle }) => {
 	const navigate = useNavigate();
@@ -258,12 +257,7 @@ const VehicleBrowse = () => {
 
 	return (
 		<div className="min-h-screen bg-gray-100">
-			{/* Back Button */}
-			<div className="absolute top-4 left-4 z-10">
-				<BackButton />
-			</div>
-			
-			<main className="container mx-auto px-4 py-8">
+				<main className="container mx-auto px-4 py-8">
 					<Motion.div
 						className="flex flex-col lg:flex-row items-center justify-between gap-4 mb-8"
 						initial={{ opacity: 0 }}
