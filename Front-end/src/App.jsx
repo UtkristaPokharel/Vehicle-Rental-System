@@ -17,7 +17,6 @@ import { Toaster } from 'react-hot-toast';
 import ProfileSidebar from './components/ProfileSidebar.jsx';
 import Layout from './components/Layout.jsx';
 import FavoritesPage from './pages/FavoritesPage.jsx';
-
 import Logout from './pages/Api/Logout.jsx';
 import { UserProvider } from "./context/UserContext.jsx"
 import { ProfileSidebarProvider, useProfileSidebar } from "./context/ProfileSidebarContext.jsx"
@@ -44,7 +43,7 @@ function AppContent() {
           <Route path="faq" element={<FAQPage />} />
           <Route path="add-vehicle" element={<AddVehiclePage/>} />
           <Route path="payment" element={<PaymentPage/>} />
-          <Route path="payment/success" element={<PaymentSuccess/>} />
+          <Route path="payment/esewa/success" element={<PaymentSuccess/>} />
           <Route path="payment/failure" element={<PaymentFailure/>} />
           <Route path="contact" element={<ContactUs />} />
           <Route path="browse" element={<Vehicle />} />

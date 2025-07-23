@@ -5,23 +5,26 @@ export default function EsewaPayment({
   amount = 100,
   productCode = "veh123",
   merchantCode = "EPAYTEST", // default for sandbox
-  backendVerifyURL = "http://localhost:5000/api/verify-esewa"
+  backendVerifyURL = "http://localhost:5000/api/payment/esewa/verify"
 }) {
   const formRef = useRef();
   const location = useLocation();
   const [params] = useSearchParams();
   const [statusMessage, setStatusMessage] = useState("");
 
-  const successUrl = "http://localhost:5173/esewa-payment?status=success";
-  const failureUrl = "http://localhost:5173/esewa-payment?status=failure";
+  const successUrl = "http://localhost:5173/payment/esewa/success";
+  const failureUrl = "http://localhost:5173/payment/failure";
 
   const uniqueOrderId = "ORDER" + Date.now();
 
   // Redirected back from eSewa - handle verification
   useEffect(() => {
     const query = Object.fromEntries([...params]);
+    
+    console.log('eSewa callback received:', query);
 
     if (query.status === "success" && query.oid && query.refId && query.amt) {
+      console.log('Verifying payment with backend...');
       // Call backend to verify
       fetch(backendVerifyURL, {
         method: "POST",
@@ -34,17 +37,24 @@ export default function EsewaPayment({
       })
         .then((res) => res.json())
         .then((data) => {
+          console.log('Verification response:', data);
           if (data.verified) {
             setStatusMessage("✅ Payment Verified and Completed.");
           } else {
-            setStatusMessage("❌ Payment failed to verify.");
+            setStatusMessage(`❌ Payment verification failed: ${data.message || 'Unknown error'}`);
           }
         })
-        .catch(() => setStatusMessage("❌ Error verifying payment."));
+        .catch((error) => {
+          console.error('Verification error:', error);
+          setStatusMessage("❌ Error verifying payment.");
+        });
     } else if (query.status === "failure") {
       setStatusMessage("❌ Payment Failed.");
+    } else if (Object.keys(query).length > 0) {
+      console.log('Unrecognized callback format:', query);
+      setStatusMessage("❌ Invalid payment callback format.");
     }
-  }, [location]);
+  }, [location, backendVerifyURL, params]);
 
   if (statusMessage) {
     return (
