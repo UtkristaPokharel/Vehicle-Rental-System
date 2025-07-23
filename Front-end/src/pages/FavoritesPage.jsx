@@ -136,7 +136,7 @@ const FavoritesPage = () => {
             <h2 className="text-xl font-semibold text-gray-700 mb-2">No favorites yet</h2>
             <p className="text-gray-500 mb-6">Start adding vehicles to your favorites</p>
             <Link
-              to="/vehicles"
+              to="/browse"
               className="inline-flex items-center gap-2 bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors"
             >
               <FaHeart />
