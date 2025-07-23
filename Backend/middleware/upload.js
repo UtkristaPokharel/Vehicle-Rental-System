@@ -1,6 +1,6 @@
 const multer = require('multer');
 const path = require('path');
-const { vehicleStorage, profileStorage } = require('../utils/cloudinary');
+const { vehicleStorage, profileStorage, licenseStorage } = require('../utils/cloudinary');
 
 // Removed local storage configurations as we're using Cloudinary
 const fileFilter = (req, file, cb) => {
@@ -24,4 +24,10 @@ const vehicleUpload = multer({
   fileFilter,
 });
 
-module.exports = { profileUpload, vehicleUpload };
+const licenseUpload = multer({
+  storage: licenseStorage, // Use license-specific storage
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter,
+});
+
+module.exports = { profileUpload, vehicleUpload, licenseUpload };

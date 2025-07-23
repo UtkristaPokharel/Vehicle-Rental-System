@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/User'); // adjust path
 const verifyToken = require('../middleware/auth');
 const { isAdmin } = require('../middleware/auth');
-const { profileUpload } = require('../middleware/upload');
+const { profileUpload, licenseUpload } = require('../middleware/upload');
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
 
 // Debug route to test token
@@ -96,12 +96,12 @@ router.get('/me', verifyToken, async (req, res) => {
     
     let licenseFront = user.licenseFront;
     if (licenseFront && !licenseFront.startsWith('http')) {
-      licenseFront = `${BASE_URL}/uploads/profiles/${licenseFront}`;
+      licenseFront = `${BASE_URL}/uploads/licenses/${licenseFront}`;
     }
     
     let licenseBack = user.licenseBack;
     if (licenseBack && !licenseBack.startsWith('http')) {
-      licenseBack = `${BASE_URL}/uploads/profiles/${licenseBack}`;
+      licenseBack = `${BASE_URL}/uploads/licenses/${licenseBack}`;
     }
     
     res.json({
@@ -154,7 +154,7 @@ router.post('/upload-profile-image', verifyToken, profileUpload.single('profileI
 });
 
 // Upload license images (front/back)
-router.post('/upload-license', verifyToken, profileUpload.fields([
+router.post('/upload-license', verifyToken, licenseUpload.fields([
   { name: 'licenseFront', maxCount: 1 },
   { name: 'licenseBack', maxCount: 1 },
 ]), async (req, res) => {
@@ -166,13 +166,13 @@ router.post('/upload-license', verifyToken, profileUpload.fields([
     let uploadedFiles = {};
     
     if (req.files.licenseFront) {
-      const frontUrl = req.files.licenseFront[0].path || `${BASE_URL}/uploads/profiles/${req.files.licenseFront[0].filename}`;
+      const frontUrl = req.files.licenseFront[0].path || `${BASE_URL}/uploads/licenses/${req.files.licenseFront[0].filename}`;
       update.licenseFront = frontUrl;
       uploadedFiles.licenseFront = frontUrl;
     }
     
     if (req.files.licenseBack) {
-      const backUrl = req.files.licenseBack[0].path || `${BASE_URL}/uploads/profiles/${req.files.licenseBack[0].filename}`;
+      const backUrl = req.files.licenseBack[0].path || `${BASE_URL}/uploads/licenses/${req.files.licenseBack[0].filename}`;
       update.licenseBack = backUrl;
       uploadedFiles.licenseBack = backUrl;
     }
