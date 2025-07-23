@@ -43,6 +43,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  favorites: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Vehicle'
+  }],
   isActive: {
     type: Boolean,
     default: true,
