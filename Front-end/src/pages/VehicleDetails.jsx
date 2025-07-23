@@ -377,42 +377,82 @@ export const BookingSection = ({
                 value={booking.startDate}
                 onChange={(e) => handleChange("startDate", e.target.value)}
                 min={getTodayDate()}
-                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer hover:bg-gray-50 transition-colors"
                 style={{
                   colorScheme: 'light',
                   WebkitAppearance: 'none',
                   MozAppearance: 'textfield'
                 }}
-                onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                onClick={(e) => {
+                  e.target.showPicker && e.target.showPicker();
+                  e.target.focus();
+                }}
+                onFocus={(e) => e.target.showPicker && e.target.showPicker()}
                 required
               />
             </div>
-            <input
-              type="time"
-              value={booking.startTime}
-              onChange={(e) => handleChange("startTime", e.target.value)}
-              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
+            <div className="w-1/2 relative">
+              <input
+                type="time"
+                value={booking.startTime}
+                onChange={(e) => handleChange("startTime", e.target.value)}
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer hover:bg-gray-50 transition-colors"
+                style={{
+                  colorScheme: 'light',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'textfield'
+                }}
+                onClick={(e) => {
+                  e.target.showPicker && e.target.showPicker();
+                  e.target.focus();
+                }}
+                onFocus={(e) => e.target.showPicker && e.target.showPicker()}
+                required
+              />
+            </div>
           </div>
 
           <label className="text-sm text-gray-700">Trip end</label>
           <div className="flex gap-2 mt-1 mb-3">
-            <input
-              type="date"
-              value={booking.endDate}
-              onChange={(e) => handleChange("endDate", e.target.value)}
-              min={booking.startDate || getTodayDate()}
-              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <input
-              type="time"
-              value={booking.endTime}
-              onChange={(e) => handleChange("endTime", e.target.value)}
-              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
+            <div className="w-1/2 relative">
+              <input
+                type="date"
+                value={booking.endDate}
+                onChange={(e) => handleChange("endDate", e.target.value)}
+                min={booking.startDate || getTodayDate()}
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer hover:bg-gray-50 transition-colors"
+                style={{
+                  colorScheme: 'light',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'textfield'
+                }}
+                onClick={(e) => {
+                  e.target.showPicker && e.target.showPicker();
+                  e.target.focus();
+                }}
+                onFocus={(e) => e.target.showPicker && e.target.showPicker()}
+                required
+              />
+            </div>
+            <div className="w-1/2 relative">
+              <input
+                type="time"
+                value={booking.endTime}
+                onChange={(e) => handleChange("endTime", e.target.value)}
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer hover:bg-gray-50 transition-colors"
+                style={{
+                  colorScheme: 'light',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'textfield'
+                }}
+                onClick={(e) => {
+                  e.target.showPicker && e.target.showPicker();
+                  e.target.focus();
+                }}
+                onFocus={(e) => e.target.showPicker && e.target.showPicker()}
+                required
+              />
+            </div>
           </div>
         </div>
 
