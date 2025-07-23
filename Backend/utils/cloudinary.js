@@ -43,7 +43,16 @@ const profileStorage = new CloudinaryStorage({
   },
 });
 
+// Storage configuration for license images
+const licenseStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'license-uploads',
+    allowed_formats: ['jpeg', 'jpg', 'png'],
+  },
+});
+
 // Default storage (for backward compatibility)
 const storage = vehicleStorage;
 
-module.exports = { cloudinary, storage, vehicleStorage, profileStorage };
+module.exports = { cloudinary, storage, vehicleStorage, profileStorage, licenseStorage };

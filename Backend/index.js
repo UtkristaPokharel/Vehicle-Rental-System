@@ -345,6 +345,10 @@ app.use("/api/public", addVehicle);
 const fetchUsers = require("./routes/fetchuser");
 app.use("/api/fetch/users", fetchUsers);
 
+// Favorites routes
+const favoritesRoutes = require("./routes/favorites");
+app.use("/api/favorites", favoritesRoutes);
+
 // Contact form endpoint
 app.post('/api/contact', async (req, res) => {
   try {

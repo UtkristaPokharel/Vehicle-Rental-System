@@ -14,6 +14,7 @@ import ScrollToTop from './components/ScrollToTop.jsx';
 import { Toaster } from 'react-hot-toast';
 import ProfileSidebar from './components/ProfileSidebar.jsx';
 import Layout from './components/Layout.jsx';
+import FavoritesPage from './pages/FavoritesPage.jsx';
 
 import Logout from './pages/Api/Logout.jsx';
 import { UserProvider } from "./context/UserContext.jsx"
@@ -43,6 +44,7 @@ function AppContent() {
           <Route path="payment" element={<PaymentPage/>} />
           <Route path="contact" element={<ContactUs />} />
           <Route path="browse" element={<Vehicle />} />
+          <Route path="favorites" element={<FavoritesPage />} />
           <Route path="map" element={<Map/>} />
         </Route>
         
