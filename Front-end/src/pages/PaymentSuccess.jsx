@@ -13,29 +13,71 @@ const PaymentSuccess = () => {
   const [error, setError] = useState(null);
   const [redirectCountdown, setRedirectCountdown] = useState(10); // Auto redirect in 10 seconds
   
-  // Get transaction ID from URL params
-  const searchParams = new URLSearchParams(location.search);
-  const transactionId = searchParams.get('transactionId');
-  const status = searchParams.get('status');
-
   useEffect(() => {
     const fetchTransactionAndBookingDetails = async () => {
       try {
-        if (transactionId) {
-          console.log('Fetching transaction details for:', transactionId);
+        // Get transaction ID from URL params
+        const searchParams = new URLSearchParams(location.search);
+        
+        // eSewa might use different parameter names, try all possibilities
+        const transactionId = searchParams.get('transactionId') || 
+                             searchParams.get('transaction_uuid') || 
+                             searchParams.get('oid');
+        const status = searchParams.get('status');
+        
+        // Also check if transaction data is in base64 encoded 'data' parameter
+        const dataParam = searchParams.get('data');
+        let transactionIdFromData = null;
+        if (dataParam) {
+          try {
+            const decodedData = atob(dataParam);
+            const parsedData = JSON.parse(decodedData);
+            transactionIdFromData = parsedData.transaction_uuid;
+          } catch (decodeError) {
+            console.log('Could not decode data parameter:', decodeError.message);
+          }
+        }
+        
+        const finalTransactionId = transactionId || transactionIdFromData;
+        
+        console.log('=== PaymentSuccess Debug Info ===');
+        console.log('Current URL:', window.location.href);
+        console.log('Search params:', location.search);
+        console.log('Transaction ID from transactionId param:', searchParams.get('transactionId'));
+        console.log('Transaction ID from transaction_uuid param:', searchParams.get('transaction_uuid'));
+        console.log('Transaction ID from oid param:', searchParams.get('oid'));
+        console.log('Transaction ID from data param:', transactionIdFromData);
+        console.log('Final Transaction ID:', finalTransactionId);
+        console.log('Status from URL:', status);
+        console.log('All URL params:', Object.fromEntries(searchParams.entries()));
+        
+        if (finalTransactionId) {
+          console.log('Fetching transaction details for:', finalTransactionId);
           
           // Fetch transaction details
-          const transactionResponse = await fetch(getApiUrl(`api/payment/esewa/status/${transactionId}`));
+          const transactionApiUrl = getApiUrl(`api/payment/esewa/status/${finalTransactionId}`);
+          console.log('Transaction API URL:', transactionApiUrl);
+          
+          const transactionResponse = await fetch(transactionApiUrl);
+          console.log('Transaction response status:', transactionResponse.status);
+          
           if (transactionResponse.ok) {
             const transactionData = await transactionResponse.json();
             console.log('Transaction data received:', transactionData);
             setTransactionDetails(transactionData.transaction);
           } else {
-            console.log('Failed to fetch transaction details:', transactionResponse.status);
+            const errorText = await transactionResponse.text();
+            console.log('Failed to fetch transaction details:', transactionResponse.status, errorText);
+            setError(`Failed to fetch transaction details: ${transactionResponse.status}`);
           }
 
           // Fetch booking details
-          const bookingResponse = await fetch(getApiUrl(`api/payment/esewa/booking/${transactionId}`));
+          const bookingApiUrl = getApiUrl(`api/payment/esewa/booking/${finalTransactionId}`);
+          console.log('Booking API URL:', bookingApiUrl);
+          
+          const bookingResponse = await fetch(bookingApiUrl);
+          console.log('Booking response status:', bookingResponse.status);
+          
           if (bookingResponse.ok) {
             const bookingData = await bookingResponse.json();
             console.log('Booking data received:', bookingData);
@@ -44,7 +86,8 @@ const PaymentSuccess = () => {
             console.log('Booking not found, might still be processing');
           }
         } else {
-          setError('Transaction ID not found');
+          console.log('❌ No transaction ID found in any URL parameter');
+          setError('Transaction ID not found in URL parameters. Please check the payment callback URL.');
         }
       } catch (error) {
         console.error('Error fetching details:', error);
@@ -55,7 +98,7 @@ const PaymentSuccess = () => {
     };
 
     fetchTransactionAndBookingDetails();
-  }, [transactionId]);
+  }, [location.search]);
 
   // Auto redirect countdown
   useEffect(() => {
@@ -72,7 +115,7 @@ const PaymentSuccess = () => {
 
       return () => clearInterval(interval);
     }
-  }, [loading, error, status, navigate]);
+  }, [loading, error, navigate]);
 
   if (loading) {
     return (
