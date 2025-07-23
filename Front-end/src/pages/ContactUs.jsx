@@ -2,6 +2,7 @@ import { FaPhoneAlt, FaMapMarkerAlt, FaEnvelope } from "react-icons/fa";
 import { FaWhatsapp } from "react-icons/fa6";
 import { useState } from "react";
 import { getApiUrl } from "../config/api";
+import BackButton from "../components/BackButton";
 // import Navbar from "../components/Navbar";
 // import Footer from "../components/Footer";
 
@@ -153,6 +154,11 @@ const ContactUs = () => {
 			{/* <div className="bg-white min-h-screen"> */}
 			<div className=" w-full flex flex-col justify-center items-center " id="contactus-section"
 			>
+			{/* Back Button */}
+			<div className="w-[80vw] pt-4">
+				<BackButton />
+			</div>
+			
 			<div className="w-[80vw] rounded-t-lg shadow-xl md:flex-row bg-blue-700 text-white py-10 px-4 md:px-10 mt-20 text-center md:text-left relative max-w-screen-2xl mx-auto" >			
 				<div className="flex flex-col ml-10 items-center md:items-start w-full md:w-1/2">
 					<h1 className="text-3xl md:text-4xl font-bold">Contact us</h1>

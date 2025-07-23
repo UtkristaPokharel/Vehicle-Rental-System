@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { FaHeart, FaArrowLeft } from 'react-icons/fa';
+import { FaHeart } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import FavoriteVehicleCard from '../components/FavoriteVehicleCard';
+import BackButton from '../components/BackButton';
 import { getApiUrl } from '../config/api';
 
 const FavoritesPage = () => {
@@ -98,7 +99,12 @@ const FavoritesPage = () => {
             to="/"
             className="inline-flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
           >
-            <FaArrowLeft />
+            <BackButton 
+              to="/" 
+              variant="minimal" 
+              className="text-white hover:text-white" 
+              showText={false}
+            />
             Go Back Home
           </Link>
         </div>
@@ -112,12 +118,7 @@ const FavoritesPage = () => {
         {/* Simple Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <Link
-              to="/"
-              className="text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              <FaArrowLeft />
-            </Link>
+            <BackButton variant="minimal" showText={false} />
             <FaHeart className="text-red-500 text-xl" />
             <h1 className="text-2xl font-bold text-gray-800">My Favorites</h1>
             {favorites.length > 0 && (
