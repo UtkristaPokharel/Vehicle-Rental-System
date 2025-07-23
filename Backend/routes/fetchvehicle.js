@@ -6,7 +6,12 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
 
 // Helper function to process vehicle image URLs
 const processVehicleImageUrl = (vehicle) => {
-  if (vehicle.image && !vehicle.image.startsWith('http')) {
+  if (vehicle.image) {
+    // If it's already a full URL (Cloudinary or external), keep it as is
+    if (vehicle.image.startsWith('http')) {
+      return vehicle;
+    }
+    // If it's a local filename, construct the local URL
     vehicle.image = `${BASE_URL}/uploads/vehicles/${vehicle.image}`;
   }
   return vehicle;

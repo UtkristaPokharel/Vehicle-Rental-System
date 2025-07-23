@@ -152,6 +152,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
         );
         if (res.data.imgUrl) {
           setProfileImg(res.data.imgUrl);
+          setProfileImagePreview(res.data.imgUrl);
           localStorage.setItem("profileImg", res.data.imgUrl);
           window.dispatchEvent(new Event('profileImageUpdated'));
         }
@@ -162,11 +163,19 @@ export default function ProfileSidebar({ isOpen, onClose }) {
         const formData = new FormData();
         if (licenseFront) formData.append("licenseFront", licenseFront);
         if (licenseBack) formData.append("licenseBack", licenseBack);
-        await axios.post(
+        const res = await axios.post(
           getApiUrl("api/fetch/users/upload-license"),
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        if (res.data.uploadedFiles) {
+          if (res.data.uploadedFiles.licenseFront) {
+            setLicenseFrontPreview(res.data.uploadedFiles.licenseFront);
+          }
+          if (res.data.uploadedFiles.licenseBack) {
+            setLicenseBackPreview(res.data.uploadedFiles.licenseBack);
+          }
+        }
       }
       setSuccessMsg("Profile updated successfully!");
       setPassword("");

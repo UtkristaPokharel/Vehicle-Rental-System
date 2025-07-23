@@ -17,7 +17,8 @@ const processVehicleImageUrl = (vehicle) => {
 router.post('/add-vehicle', vehicleUpload.single('vehicleImage'), async (req, res) => {
   try {
     const { name, type, brand, price, location, features, description, capacity, fuelType, mileage, transmission, isActive, createdById } = req.body;
-    const image = req.file ? req.file.filename : null;
+    // For Cloudinary, use the full URL; for local storage, use filename
+    const image = req.file ? (req.file.path || req.file.filename) : null;
 
     if (!image) {
       return res.status(400).json({ message: 'Vehicle image is required' });

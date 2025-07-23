@@ -1,11 +1,6 @@
-import Navbar from '../components/Navbar';
-import Footer from '../components/footer';
-
 const AboutUs = () => {
 	return (
-		<>
-			<Navbar />
-			<div className="min-h-screen bg-black text-white font-sans">
+		<div className="min-h-screen bg-black text-white font-sans">
 
 				<section className="relative bg-gradient-to-br from-red-700 via-black to-red-800 py-24 overflow-hidden">
 					<div className="absolute inset-0 bg-[url('butwal.jpeg')] opacity-20 bg-cover bg-center"></div>
@@ -150,8 +145,6 @@ const AboutUs = () => {
 					}
       			`}</style>
 			</div>
-			<Footer />
-		</>
 	);
 };
 

@@ -12,9 +12,12 @@ import AdminLoginPage from './pages/admin/AdminLoginPage.jsx';
 import PaymentPage from './pages/PaymentPage.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import { Toaster } from 'react-hot-toast';
+import ProfileSidebar from './components/ProfileSidebar.jsx';
+import Layout from './components/Layout.jsx';
 
 import Logout from './pages/Api/Logout.jsx';
 import { UserProvider } from "./context/UserContext.jsx"
+import { ProfileSidebarProvider, useProfileSidebar } from "./context/ProfileSidebarContext.jsx"
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 
 import Map from "./utils/map.jsx"
@@ -22,74 +25,88 @@ import Map from "./utils/map.jsx"
 import FAQPage from './pages/FAQPage.jsx';
 import AddVehiclePage from './pages/renter/AddVehiclePage.jsx';
 
-
-export default function App() {
+function AppContent() {
+  const { isProfileSidebarOpen, closeProfileSidebar } = useProfileSidebar();
 
   return (
+    <Router>
+      <ScrollToTop />
+      <Routes>
+        {/* Routes with Layout (Navbar + Footer) */}
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="about" element={<AboutUs />} />
+          <Route path="vehicles/:type" element={<VehicleTypePage />} />
+          <Route path="vehicle/:type/:id" element={<VehicleDetails />} />
+          <Route path="faq" element={<FAQPage />} />
+          <Route path="add-vehicle" element={<AddVehiclePage/>} />
+          <Route path="payment" element={<PaymentPage/>} />
+          <Route path="contact" element={<ContactUs />} />
+          <Route path="browse" element={<Vehicle />} />
+          <Route path="map" element={<Map/>} />
+        </Route>
+        
+        {/* Routes without Layout (Admin and Auth pages) */}
+        <Route path="/login" element={<AuthForm />} />
+        <Route path="/admin-login" element={<AdminLoginPage />} />
+        <Route path="/dashboard" element={<AdminDashboard />} />
+        <Route path="/logout" element={<Logout/>} />
+      </Routes>
 
-    <UserProvider>
-      {/* Global toast container */}
-      <Toaster
-        position="top-center"
-        reverseOrder={false}
-        gutter={8}
-        containerClassName=""
-        containerStyle={{}}
-        toastOptions={{
-          // Define default options
-          className: '',
-          duration: 4000,
-          style: {
-            background: '#ffffff',
-            color: '#363636',
-            fontSize: '14px',
-            fontWeight: '500',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          },
-          // Default options for specific types
-          success: {
-            duration: 3000,
-            style: {
-              background: '#ffffff',
-              color: '#00000',
-            },
-          },
-          error: {
-            duration: 5000,
-            style: {
-              background: '#ffffff',
-              color: '#000000',
-            },
-          },
-        }}
+      {/* Global ProfileSidebar */}
+      <ProfileSidebar 
+        isOpen={isProfileSidebarOpen} 
+        onClose={closeProfileSidebar} 
       />
-
-      <Router>
-        <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<AuthForm />} />
-          <Route path="/vehicles/:type" element={<VehicleTypePage />} />
-          <Route path="/vehicle/:type/:id" element={<VehicleDetails />} />
-          <Route path="/faq" element={<FAQPage />} />
-          <Route path="/add-vehicle" element={<AddVehiclePage/>} />
-          <Route path="/payment" element={<PaymentPage/>} />
-          <Route path="/contact" element={<ContactUs />} />
-          <Route path="/about" element={<AboutUs />} />
-          <Route path="/browse" element={<Vehicle />} />
-          <Route path="/admin-login" element={<AdminLoginPage />} />
-          <Route path="/dashboard" element={<AdminDashboard />} />
-          <Route path="/logout" element={<Logout/>} />
-          
-          <Route path="/map" element={<Map/>} />  
-          {/* Fallback route for 404 */}
+    </Router>
+  );
+}
 
 
-        </Routes>
-      </Router>
-
+export default function App() {
+  return (
+    <UserProvider>
+      <ProfileSidebarProvider>
+        {/* Global toast container */}
+        <Toaster
+          position="top-center"
+          reverseOrder={false}
+          gutter={8}
+          containerClassName=""
+          containerStyle={{}}
+          toastOptions={{
+            // Define default options
+            className: '',
+            duration: 4000,
+            style: {
+              background: '#ffffff',
+              color: '#363636',
+              fontSize: '14px',
+              fontWeight: '500',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            },
+            // Default options for specific types
+            success: {
+              duration: 3000,
+              style: {
+                background: '#ffffff',
+                color: '#00000',
+              },
+            },
+            error: {
+              duration: 5000,
+              style: {
+                background: '#ffffff',
+                color: '#000000',
+              },
+            },
+          }}
+        />
+        
+        <AppContent />
+      </ProfileSidebarProvider>
     </UserProvider>
   )
 }

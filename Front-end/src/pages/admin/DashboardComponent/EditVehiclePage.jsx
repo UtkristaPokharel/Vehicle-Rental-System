@@ -134,8 +134,8 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
       const allowed = ['image/jpeg', 'image/png', 'image/jpg'];
       if (!allowed.includes(image.type)) {
         newErrors.image = "Invalid image type.";
-      } else if (image.size > 5 * 1024 * 1024) {
-        newErrors.image = "Image must be < 5MB.";
+      } else if (image.size > 10 * 1024 * 1024) {
+        newErrors.image = "Image must be < 10MB.";
       }
     }
 
@@ -692,7 +692,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
                             <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                           </svg>
                           <p className="text-sm text-blue-700">
-                            Upload a clear, high-quality image of your vehicle. Supported formats: JPG, PNG. Max size: 5MB.
+                            Upload a clear, high-quality image of your vehicle. Supported formats: JPG, PNG. Max size: 10MB.
                           </p>
                         </div>
                       </div>

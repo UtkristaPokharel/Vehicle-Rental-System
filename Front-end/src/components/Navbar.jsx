@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { IoMenu, IoClose } from "react-icons/io5";
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useProfileSidebar } from '../context/ProfileSidebarContext.jsx';
 
-export default function Navbar({ onProfileClick }) {
+export default function Navbar() {
     const defaultProfile = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
     
     const [isOpen, setIsOpen] = useState(false);
@@ -10,16 +11,15 @@ export default function Navbar({ onProfileClick }) {
     const menuref = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
+    const { openProfileSidebar } = useProfileSidebar();
 
     useEffect(() => {
         const stored = localStorage.getItem("profileImg");
-        console.log('Navbar - stored profile image:', stored); // Debug log
         if (stored && stored.trim() !== "") {
             // Check if the stored URL is a complete URL or just a filename
             const processedUrl = stored.startsWith('http') 
                 ? stored 
                 : `http://localhost:3001/uploads/profiles/${stored}`;
-            console.log('Navbar - processed URL:', processedUrl); // Debug log
             setImgUrl(processedUrl);
         }
         // If no stored image, keep the default profile that was already set in state
@@ -29,13 +29,11 @@ export default function Navbar({ onProfileClick }) {
     useEffect(() => {
         const handleProfileUpdate = () => {
             const stored = localStorage.getItem("profileImg");
-            console.log('Navbar - profile update event, stored:', stored); // Debug log
             if (stored && stored.trim() !== "") {
                 // Check if the stored URL is a complete URL or just a filename
                 const processedUrl = stored.startsWith('http') 
                     ? stored 
                     : `http://localhost:3001/uploads/profiles/${stored}`;
-                console.log('Navbar - update processed URL:', processedUrl); // Debug log
                 setImgUrl(processedUrl);
             } else {
                 setImgUrl(defaultProfile);
@@ -69,13 +67,8 @@ export default function Navbar({ onProfileClick }) {
     const handleProfileClick = () => {
         const token = localStorage.getItem("token");
         if (token) {
-            // If user is logged in and onProfileClick is provided, use sidebar
-            if (onProfileClick) {
-                onProfileClick();
-            } else {
-                // Fallback to navigation for backward compatibility
-                navigate("/profile");
-            }
+            // If user is logged in, use the global ProfileSidebar
+            openProfileSidebar();
         } else {
             // Not logged in, go to login
             navigate("/login");
@@ -140,11 +133,7 @@ export default function Navbar({ onProfileClick }) {
                     <img
                         src={imgUrl}
                         onError={(e) => {
-                            console.log('Navbar - Image load error, src was:', e.currentTarget.src);
                             e.currentTarget.src = defaultProfile;
-                        }}
-                        onLoad={() => {
-                            console.log('Navbar - Image loaded successfully:', imgUrl);
                         }}
                         className='w-10 h-10 rounded-full bg-white'
                         alt="profile"
