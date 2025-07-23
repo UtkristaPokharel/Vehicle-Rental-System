@@ -1,4 +1,4 @@
-const { sendLoginEmail, sendSignupEmail } = require('./services/emailService');
+const { sendLoginEmail, sendSignupEmail } = require('../services/emailService');
 
 async function testEmails() {
   console.log('🧪 Testing email functionality...');

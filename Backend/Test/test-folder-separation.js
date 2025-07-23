@@ -1,6 +1,6 @@
 // Test script to verify Cloudinary folder separation
 require('dotenv').config();
-const { vehicleStorage, profileStorage } = require('./utils/cloudinary');
+const { vehicleStorage, profileStorage } = require('../utils/cloudinary');
 
 console.log('Testing Cloudinary folder separation...');
 

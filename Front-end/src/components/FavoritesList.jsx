@@ -129,7 +129,7 @@ const FavoritesList = ({ limit = 5, showHeader = true, className = "" }) => {
               <div className="text-4xl mb-3">💔</div>
               <p className="text-gray-500 text-sm mb-3">No favorites yet</p>
               <Link
-                to="/browse"
+                to="/vehicles"
                 className="inline-block bg-red-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-600 transition-colors"
               >
                 Browse Vehicles

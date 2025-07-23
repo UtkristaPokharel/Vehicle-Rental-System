@@ -10,9 +10,6 @@ import ContactUs from './pages/ContactUs.jsx';
 import Vehicle from './pages/Vehicles.jsx';
 import AdminLoginPage from './pages/admin/AdminLoginPage.jsx';
 import PaymentPage from './pages/PaymentPage.jsx';
-import PaymentSuccess from './pages/PaymentSuccess.jsx';
-import PaymentFailure from './pages/PaymentFailure.jsx';
-import BookingConfirmation from './pages/BookingConfirmation.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import { Toaster } from 'react-hot-toast';
 import ProfileSidebar from './components/ProfileSidebar.jsx';
@@ -45,9 +42,6 @@ function AppContent() {
           <Route path="faq" element={<FAQPage />} />
           <Route path="add-vehicle" element={<AddVehiclePage/>} />
           <Route path="payment" element={<PaymentPage/>} />
-          <Route path="payment-success" element={<PaymentSuccess/>} />
-          <Route path="payment-failure" element={<PaymentFailure/>} />
-          <Route path="booking-confirmation" element={<BookingConfirmation/>} />
           <Route path="contact" element={<ContactUs />} />
           <Route path="browse" element={<Vehicle />} />
           <Route path="favorites" element={<FavoritesPage />} />

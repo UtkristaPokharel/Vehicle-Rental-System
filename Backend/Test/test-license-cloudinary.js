@@ -1,6 +1,6 @@
 // Test script to verify Cloudinary license storage configuration
 require('dotenv').config();
-const { vehicleStorage, profileStorage, licenseStorage } = require('./utils/cloudinary');
+const { vehicleStorage, profileStorage, licenseStorage } = require('../utils/cloudinary');
 
 console.log('Testing Cloudinary license storage configuration...');
 

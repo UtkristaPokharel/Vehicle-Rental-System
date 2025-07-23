@@ -4,7 +4,6 @@ import Navbar from "../components/Navbar";
 import { FaLock, FaCheck, FaCreditCard, FaPaypal, FaApplePay, FaGooglePay } from "react-icons/fa";
 import { MdSecurity, MdInfo } from "react-icons/md";
 import { getApiUrl, getImageUrl as getVehicleImageUrl } from "../config/api";
-import { generateEsewaParams, initiateEsewaPayment } from "../config/esewa";
 import BackButton from "../components/BackButton";
 
 function PaymentPage() {
@@ -152,18 +151,11 @@ function PaymentPage() {
 	// Handle form submission
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		
-		// For eSewa payment, skip form validation and redirect to eSewa
-		if (paymentMethod === "esewa") {
-			handleEsewaPayment();
-			return;
-		}
-		
 		if (!validateForm()) return;
 
 		setIsProcessing(true);
 
-		// Simulate payment processing for other methods
+		// Simulate payment processing
 		setTimeout(() => {
 			setIsProcessing(false);
 			// Navigate to confirmation page
@@ -178,30 +170,6 @@ function PaymentPage() {
 				}
 			});
 		}, 3000);
-	};
-
-	// Handle eSewa payment
-	const handleEsewaPayment = () => {
-		try {
-			// Store booking data in localStorage for retrieval after payment
-			const paymentData = {
-				bookingData,
-				vehicleData: currentVehicleData,
-				priceBreakdown,
-				paymentMethod: "esewa",
-				timestamp: Date.now()
-			};
-			localStorage.setItem('pendingPayment', JSON.stringify(paymentData));
-
-			// Generate eSewa payment parameters
-			const esewaParams = generateEsewaParams(bookingData, currentVehicleData, priceBreakdown);
-			
-			// Initiate eSewa payment
-			initiateEsewaPayment(esewaParams);
-		} catch (error) {
-			console.error('eSewa payment initialization failed:', error);
-			alert('Failed to initialize eSewa payment. Please try again.');
-		}
 	};
 
 	const handleCardInputChange = (field, value) => {
@@ -241,6 +209,7 @@ function PaymentPage() {
 	if (loading) {
 		return (
 			<>
+				<Navbar />
 				<div className="min-h-screen bg-gray-50 flex items-center justify-center">
 					<div className="text-xl">Loading...</div>
 				</div>
@@ -250,7 +219,8 @@ function PaymentPage() {
 
 	return (
 		<>
-		<div className="min-h-screen bg-gray-50 py-8">
+			<Navbar />
+			<div className="min-h-screen bg-gray-50 py-8">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					{/* Header */}
 					<div className="mb-8">
@@ -272,7 +242,7 @@ function PaymentPage() {
 								<div className="bg-white rounded-lg shadow-sm p-6">
 									<h2 className="text-xl font-semibold mb-4">Payment Method</h2>
 
-									<div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
+									<div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
 										<button
 											type="button"
 											onClick={() => setPaymentMethod("card")}
@@ -283,18 +253,6 @@ function PaymentPage() {
 										>
 											<FaCreditCard className="text-2xl mb-2" />
 											<span className="text-sm font-medium">Credit Card</span>
-										</button>
-
-										<button
-											type="button"
-											onClick={() => setPaymentMethod("esewa")}
-											className={`p-4 border rounded-lg flex flex-col items-center justify-center ${paymentMethod === "esewa"
-												? "border-green-500 bg-green-50"
-												: "border-gray-300 hover:border-gray-400"
-												}`}
-										>
-											<div className="text-2xl mb-2 font-bold text-green-600">eSewa</div>
-											<span className="text-sm font-medium">eSewa</span>
 										</button>
 
 										<button
@@ -332,6 +290,17 @@ function PaymentPage() {
 											<FaGooglePay className="text-2xl mb-2" />
 											<span className="text-sm font-medium">Google Pay</span>
 										</button>
+										{/* <button
+											type="button"
+											onClick={() => setPaymentMethod("esewa")}
+											className={`p-4 border rounded-lg flex flex-col items-center justify-center ${paymentMethod === "esewa"
+												? "border-green-500 bg-green-50"
+												: "border-gray-300 hover:border-gray-400"
+												}`}
+										>
+											<img src="/esewa-logo.png" alt="eSewa" className="w-6 h-6 mb-2" />
+											<span className="text-sm font-medium">eSewa</span>
+										</button> */}
 
 									</div>
 
@@ -414,18 +383,6 @@ function PaymentPage() {
 									)}
 
 									{/* Alternative Payment Methods */}
-									{paymentMethod === "esewa" && (
-										<div className="text-center py-8">
-											<div className="text-6xl font-bold text-green-600 mx-auto mb-4">eSewa</div>
-											<p className="text-gray-600 mb-4">You will be redirected to eSewa to complete your payment</p>
-											<div className="text-sm text-gray-500">
-												<p>• Secure payment gateway</p>
-												<p>• No additional charges</p>
-												<p>• Instant payment confirmation</p>
-											</div>
-										</div>
-									)}
-
 									{paymentMethod === "paypal" && (
 										<div className="text-center py-8">
 											<FaPaypal className="text-6xl text-blue-600 mx-auto mb-4" />
@@ -573,8 +530,6 @@ function PaymentPage() {
 											<div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
 											Processing Payment...
 										</div>
-									) : paymentMethod === "esewa" ? (
-										`Pay with eSewa - रु${priceBreakdown.total.toLocaleString()}`
 									) : (
 										`Complete Payment - रु${priceBreakdown.total.toLocaleString()}`
 									)}
