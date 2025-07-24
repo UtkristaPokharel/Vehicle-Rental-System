@@ -357,6 +357,10 @@ app.use("/api/favorites", favoritesRoutes);
 const paymentRoutes = require("./routes/payment");
 app.use("/api/payment", paymentRoutes);
 
+// Booking routes
+const bookingRoutes = require("./routes/bookings");
+app.use("/api/bookings", bookingRoutes);
+
 // Contact form endpoint
 app.post('/api/contact', async (req, res) => {
   try {
