@@ -128,7 +128,7 @@ const ContentFilteringDemo = () => {
         <div className="bg-white rounded-lg p-8 shadow-lg mb-12">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Content Filtering Features</h2>
           
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto hide-scrollbar">
             <table className="w-full table-auto">
               <thead>
                 <tr className="bg-gray-100">

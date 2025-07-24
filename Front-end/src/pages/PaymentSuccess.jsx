@@ -187,7 +187,7 @@ const PaymentSuccess = () => {
             {responseData.decodedData && (
               <div className="border-t pt-4">
                 <h3 className="font-medium text-gray-900 mb-3">Decoded eSewa Data</h3>
-                <pre className="bg-gray-50 p-4 rounded text-xs overflow-x-auto">
+                <pre className="bg-gray-50 p-4 rounded text-xs overflow-x-auto hide-scrollbar">
                   {JSON.stringify(responseData.decodedData, null, 2)}
                 </pre>
               </div>
@@ -196,7 +196,7 @@ const PaymentSuccess = () => {
             {/* Raw Response (for debugging) */}
             <div className="border-t pt-4 mt-4">
               <h3 className="font-medium text-gray-900 mb-3">Complete Response Object</h3>
-              <pre className="bg-gray-50 p-4 rounded text-xs overflow-x-auto">
+              <pre className="bg-gray-50 p-4 rounded text-xs overflow-x-auto hide-scrollbar">
                 {JSON.stringify(responseData, null, 2)}
               </pre>
             </div>

@@ -263,26 +263,36 @@ router.get('/success', async (req, res) => {
             const bookingRecord = {
               userName: transaction.userInfo?.name || transaction.billingAddress?.name || 'Guest User',
               userEmail: transaction.userInfo?.email || transaction.billingAddress?.email || 'guest@example.com',
-              userPhone: transaction.userInfo?.phone || transaction.billingAddress?.phone,
+              userPhone: transaction.userInfo?.phone || transaction.billingAddress?.phone || '',
               userId: transaction.userInfo?.userId || null,
-              vehicleId: transaction.vehicleData._id || transaction.vehicleData.id,
-              vehicleName: transaction.vehicleData.name,
-              vehicleModel: transaction.vehicleData.model,
-              vehicleType: transaction.vehicleData.type,
-              vehicleLocation: transaction.vehicleData.location,
-              vehicleImage: transaction.vehicleData.image,
-              pricePerDay: transaction.vehicleData.price,
+              vehicleId: transaction.vehicleData._id || transaction.vehicleData.id || '000000000000000000000000', // Use valid ObjectId format as fallback
+              vehicleName: transaction.vehicleData.name || 'Unknown Vehicle',
+              vehicleModel: transaction.vehicleData.model || '',
+              vehicleType: transaction.vehicleData.type || 'Car',
+              vehicleLocation: transaction.bookingData?.location || transaction.vehicleData.location || 'Unknown',
+              vehicleImage: transaction.vehicleData.image || '',
+              pricePerDay: transaction.vehicleData.price || 0,
               startDate: new Date(transaction.bookingData.startDate),
               endDate: new Date(transaction.bookingData.endDate),
               startTime: transaction.bookingData.startTime,
               endTime: transaction.bookingData.endTime,
+              duration: {
+                days: Math.max(1, Math.ceil((new Date(transaction.bookingData.endDate) - new Date(transaction.bookingData.startDate)) / (1000 * 60 * 60 * 24))),
+                hours: 0
+              },
               pricing: {
                 basePrice: transaction.amount - 200 - Math.round((transaction.amount - 200) * 0.05),
                 serviceFee: 200,
                 taxes: Math.round((transaction.amount - 200) * 0.05),
                 totalAmount: transaction.amount
               },
-              billingAddress: transaction.billingAddress,
+              billingAddress: {
+                address: transaction.billingAddress?.address || 'Unknown Address',
+                city: transaction.billingAddress?.city || 'Unknown City',
+                state: transaction.billingAddress?.state || '',
+                zipCode: transaction.billingAddress?.zipCode || '00000',
+                country: transaction.billingAddress?.country || 'Nepal'
+              },
               paymentMethod: 'esewa',
               paymentStatus: 'completed',
               transactionId: transaction.uuid,
@@ -293,11 +303,18 @@ router.get('/success', async (req, res) => {
             };
 
             try {
-              const booking = new Booking(bookingRecord);
-              await booking.save();
-              console.log('✅ Booking created successfully:', booking.bookingId);
+              // Check if booking already exists for this transaction
+              const existingBooking = await Booking.findOne({ transactionId: transaction.uuid });
+              if (!existingBooking) {
+                const booking = new Booking(bookingRecord);
+                await booking.save();
+                console.log('✅ Booking created successfully:', booking.bookingId);
+              } else {
+                console.log('ℹ️  Booking already exists for transaction:', transaction.uuid);
+              }
             } catch (bookingError) {
-              console.error('❌ Error creating booking:', bookingError);
+              console.error('❌ Error creating booking:', bookingError.message);
+              // Continue with payment success even if booking creation fails
             }
           }
 
@@ -818,6 +835,100 @@ router.post('/debug/complete-all-pending', async (req, res) => {
     
   } catch (error) {
     console.error('Failed to complete pending transactions:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Debug route - Create bookings for all completed transactions
+router.post('/debug/create-bookings', async (req, res) => {
+  try {
+    console.log('Creating bookings for all completed transactions...');
+    
+    // Get all completed transactions
+    const completedTransactions = await Transaction.find({ status: 'completed' });
+    console.log(`Found ${completedTransactions.length} completed transactions`);
+    
+    const bookingsCreated = [];
+    const errors = [];
+    
+    for (const transaction of completedTransactions) {
+      try {
+        // Check if booking already exists for this transaction
+        const existingBooking = await Booking.findOne({ transactionId: transaction.uuid });
+        if (existingBooking) {
+          console.log(`Booking already exists for transaction ${transaction.uuid}`);
+          continue;
+        }
+        
+        // Create booking record
+        const bookingRecord = {
+          userName: transaction.userInfo?.name || transaction.billingAddress?.name || 'Guest User',
+          userEmail: transaction.userInfo?.email || transaction.billingAddress?.email || 'guest@example.com',
+          userPhone: transaction.userInfo?.phone || transaction.billingAddress?.phone || '',
+          userId: transaction.userInfo?.userId || null,
+          vehicleId: transaction.vehicleData._id || transaction.vehicleData.id || '000000000000000000000000', // Use valid ObjectId format as fallback
+          vehicleName: transaction.vehicleData.name || 'Unknown Vehicle',
+          vehicleModel: transaction.vehicleData.model || '',
+          vehicleType: transaction.vehicleData.type || 'Car',
+          vehicleLocation: transaction.bookingData?.location || 'Unknown',
+          vehicleImage: transaction.vehicleData.image || '',
+          pricePerDay: transaction.vehicleData.price || 0,
+          startDate: new Date(transaction.bookingData?.startDate || new Date()),
+          endDate: new Date(transaction.bookingData?.endDate || new Date()),
+          startTime: transaction.bookingData?.startTime || '00:00',
+          endTime: transaction.bookingData?.endTime || '00:00',
+          duration: {
+            days: Math.max(1, Math.ceil((new Date(transaction.bookingData?.endDate || new Date()) - new Date(transaction.bookingData?.startDate || new Date())) / (1000 * 60 * 60 * 24))),
+            hours: 0
+          },
+          pricing: {
+            basePrice: transaction.amount - 200 - Math.round((transaction.amount - 200) * 0.05),
+            serviceFee: 200,
+            taxes: Math.round((transaction.amount - 200) * 0.05),
+            totalAmount: transaction.amount
+          },
+          billingAddress: {
+            address: transaction.billingAddress?.address || 'Unknown Address',
+            city: transaction.billingAddress?.city || 'Unknown City',
+            state: transaction.billingAddress?.state || '',
+            zipCode: transaction.billingAddress?.zipCode || '00000',
+            country: transaction.billingAddress?.country || 'Nepal'
+          },
+          paymentMethod: 'esewa',
+          paymentStatus: 'completed',
+          transactionId: transaction.uuid,
+          esewaTransactionCode: transaction.transactionCode || 'UNKNOWN',
+          paymentDate: transaction.completedAt || new Date(),
+          bookingStatus: 'confirmed'
+        };
+
+        const booking = new Booking(bookingRecord);
+        await booking.save();
+        bookingsCreated.push(booking.bookingId);
+        console.log(`✅ Booking created successfully: ${booking.bookingId} for transaction ${transaction.uuid}`);
+        
+      } catch (bookingError) {
+        console.error(`❌ Error creating booking for transaction ${transaction.uuid}:`, bookingError);
+        errors.push({
+          transactionId: transaction.uuid,
+          error: bookingError.message
+        });
+      }
+    }
+    
+    res.json({
+      success: true,
+      message: `Processed ${completedTransactions.length} transactions`,
+      bookingsCreated: bookingsCreated.length,
+      bookingIds: bookingsCreated,
+      errors: errors
+    });
+    
+  } catch (error) {
+    console.error('Failed to create bookings:', error);
     res.status(500).json({
       success: false,
       error: error.message

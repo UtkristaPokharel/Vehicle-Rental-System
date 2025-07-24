@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UsersDataComponent from "./DashboardComponent/UsersDataComponent.jsx";
 import VehicleDataComponent from './DashboardComponent/VehicleDataComponent.jsx';
+import BookingDataComponent from './DashboardComponent/BookingDataComponent.jsx';
 import AddVehicleForm from '../renter/AddVehicleForm.jsx';
 import EditVehicleForm from './DashboardComponent/EditVehiclePage.jsx'; // Reusable Add/Edit form
 import VehicleAnalyticsDashboard from '../../components/VehicleAnalyticsDashboard.jsx';
@@ -75,6 +76,15 @@ const AddVehicle = () => (
   </div>
 );
 
+const VehicleBooking = () => (
+  <div className="p-6">
+    <h2 className="text-2xl font-bold mb-4">Vehicle Bookings</h2>
+    <div className="bg-white p-4 rounded-lg shadow">
+      <BookingDataComponent />
+    </div>
+  </div>
+);
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   useEffect(() => {
@@ -97,6 +107,8 @@ const AdminDashboard = () => {
         return <Analytics />;
       case 'add-vehicle':
         return <AddVehicle  />;
+      case 'vehicle-booking':
+        return <VehicleBooking />;
       default:
         return <VehicleListing  />;
     }
