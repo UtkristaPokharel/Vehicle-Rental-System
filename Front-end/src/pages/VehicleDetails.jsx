@@ -147,24 +147,8 @@ function VehicleDetails() {
     );
   }
 
-  // Function to construct proper image URL
-  const getImageUrl = (imagePath) => {
-    if (!imagePath || imageError) {
-      console.log("No image path provided or image error occurred");
-      return "/placeholder-vehicle.jpg";
-    }
-
-    // If it's already a full URL
-    if (imagePath.startsWith('http')) {
-      console.log("Using full URL:", imagePath);
-      return imagePath;
-    }
-
-    // Use the centralized image URL helper
-    return getVehicleImageUrl(imagePath);
-  };
-
-  const imageUrl = getVehicleImageUrl(vehicleData?.image);
+  // Use imageError state to provide fallback image
+  const imageUrl = imageError ? "/placeholder-vehicle.jpg" : getVehicleImageUrl(vehicleData?.image);
 
   console.log("Vehicle image field:", vehicleData?.image);
   console.log("Final constructed image URL:", imageUrl);
