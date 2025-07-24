@@ -415,9 +415,9 @@ const VehiclesBrowsePage = () => {
 					transition={{ duration: 0.6 }}
 				>
 					<h1 className="text-4xl font-bold text-gray-800 mb-2">Find Your Perfect Vehicle</h1>
-					<p className="text-gray-600">
+					{/* <p className="text-gray-600">
 						Discover from {allVehicles.length} vehicles with advanced filtering options
-					</p>
+					</p> */}
 				</Motion.div>
 
 				{/* Filter Component */}

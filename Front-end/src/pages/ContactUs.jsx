@@ -152,14 +152,9 @@ const ContactUs = () => {
 	return (
 		<>
 			{/* <div className="bg-white min-h-screen"> */}
-			<div className=" w-full flex flex-col justify-center items-center " id="contactus-section"
-			>
-			{/* Back Button */}
-			<div className="w-[80vw] pt-4">
-				<BackButton />
-			</div>
+			<div className=" w-full flex flex-col justify-center items-center " id="contactus-section">
 			
-			<div className="w-[80vw] rounded-t-lg shadow-xl md:flex-row bg-blue-700 text-white py-10 px-4 md:px-10 mt-20 text-center md:text-left relative max-w-screen-2xl mx-auto" >			
+			<div className="w-[80vw] rounded-t-lg shadow-xl md:flex-row bg-blue-700 text-white py-10 px-4 md:px-10 mt-10 text-center md:text-left relative max-w-screen-2xl mx-auto" >			
 				<div className="flex flex-col ml-10 items-center md:items-start w-full md:w-1/2">
 					<h1 className="text-3xl md:text-4xl font-bold">Contact us</h1>
 					<p className="text-base md:text-lg mt-2">Ask your queries with us for free.</p>

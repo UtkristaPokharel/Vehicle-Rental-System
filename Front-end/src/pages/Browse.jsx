@@ -68,17 +68,6 @@ export default function VehicleBrowse() {
           </li>
         ))}
       </ul>
-
-      {/* Enhanced Search Button */}
-      <div className="mt-5">
-        <button
-          onClick={() => navigate('/vehicles')}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-        >
-          🔍 Advanced Search & Filters
-        </button>
-      </div>
-
       <SuggestedVehicle />
 
     </div>
@@ -297,7 +286,7 @@ export const SuggestedVehicle = () => {
           </button>
         </div>
         {isPersonalized && (
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-gray-600 mt-5">
             Most popular vehicles + new discoveries • Click refresh to update
           </p>
         )}
