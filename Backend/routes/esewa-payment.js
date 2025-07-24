@@ -9,10 +9,16 @@ const router = express.Router();
 const ESEWA_CONFIG = {
   merchantId: 'EPAYTEST', // Use 'EPAYTEST' for testing, replace with actual merchant ID for production
   secretKey: '8gBm/:&EnhH.1/q', // eSewa secret key for testing
-  successUrl: process.env.FRONTEND_URL + '/payment/esewa/success',
-  failureUrl: process.env.FRONTEND_URL + '/payment/esewa/failure',
+  successUrl: (process.env.FRONTEND_URL || 'http://localhost:5173') + '/payment/esewa/success',
+  failureUrl: (process.env.FRONTEND_URL || 'http://localhost:5173') + '/payment/failure',
   baseUrl: 'https://rc-epay.esewa.com.np/api/epay/main/v2/form' // Testing URL
 };
+
+console.log('eSewa Config URLs:', {
+  successUrl: ESEWA_CONFIG.successUrl,
+  failureUrl: ESEWA_CONFIG.failureUrl,
+  frontendUrl: process.env.FRONTEND_URL
+});
 
 // Helper function to generate signature
 const generateSignature = (message, secretKey) => {
@@ -147,21 +153,53 @@ router.post('/initiate', async (req, res) => {
 // Handle eSewa success callback
 router.get('/success', async (req, res) => {
   try {
-    console.log('eSewa success callback received:', req.query);
-    const { data } = req.query;
+    console.log('=== eSewa Success Callback Debug ===');
+    console.log('Request URL:', req.url);
+    console.log('Request query params:', req.query);
+    console.log('Request headers:', req.headers);
     
-    if (!data) {
-      console.log('No data parameter in success callback');
+    const { data, oid, refId, amt } = req.query;
+    
+    // Handle both eSewa API formats
+    let transactionData;
+    
+    if (data) {
+      // Format 1: Base64 encoded data parameter (main payment flow)
+      console.log('Using base64 data format');
+      try {
+        const decodedData = Buffer.from(data, 'base64').toString('utf-8');
+        transactionData = JSON.parse(decodedData);
+        console.log('Decoded transaction data:', transactionData);
+      } catch (error) {
+        console.log('❌ Failed to decode data parameter:', error.message);
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Invalid transaction data format',
+          error: error.message
+        });
+      }
+    } else if (oid && refId && amt) {
+      // Format 2: Direct parameters (utility component format)
+      console.log('Using direct parameters format');
+      transactionData = {
+        transaction_uuid: oid,
+        transaction_code: refId,
+        total_amount: parseFloat(amt)
+      };
+      console.log('Constructed transaction data:', transactionData);
+    } else {
+      console.log('❌ No valid transaction data found');
+      console.log('Available query params:', Object.keys(req.query));
       return res.status(400).json({ 
         success: false, 
-        message: 'No transaction data received' 
+        message: 'No valid transaction data received',
+        receivedParams: req.query,
+        expectedFormats: [
+          'Format 1: ?data=<base64_encoded_data>',
+          'Format 2: ?oid=<transaction_id>&refId=<esewa_ref>&amt=<amount>'
+        ]
       });
     }
-
-    // Decode the base64 data
-    const decodedData = Buffer.from(data, 'base64').toString('utf-8');
-    const transactionData = JSON.parse(decodedData);
-    console.log('Decoded transaction data:', transactionData);
     
     // Verify the transaction with eSewa
     const verificationResponse = await verifyEsewaTransaction(
@@ -248,7 +286,9 @@ router.get('/success', async (req, res) => {
       }
 
       // Redirect to success page with transaction details
-      const successUrl = `${process.env.FRONTEND_URL}/payment/success?transactionId=${transactionData.transaction_uuid}&status=success`;
+      const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const successUrl = `${baseUrl}/payment/esewa/success?transactionId=${transactionData.transaction_uuid}&status=success&amount=${transactionData.total_amount}`;
+      console.log('✅ Redirecting to success URL:', successUrl);
       res.redirect(successUrl);
     } else {
       // Payment verification failed
@@ -303,6 +343,11 @@ router.get('/failure', async (req, res) => {
 // Verify eSewa transaction
 const verifyEsewaTransaction = async (transactionCode, totalAmount, transactionUuid) => {
   try {
+    console.log('=== eSewa Verification Debug ===');
+    console.log('Transaction Code:', transactionCode);
+    console.log('Total Amount:', totalAmount);
+    console.log('Transaction UUID:', transactionUuid);
+    
     const verificationUrl = 'https://rc-epay.esewa.com.np/api/epay/transaction/status/';
     
     const verificationData = {
@@ -310,6 +355,9 @@ const verifyEsewaTransaction = async (transactionCode, totalAmount, transactionU
       total_amount: totalAmount,
       transaction_uuid: transactionUuid
     };
+    
+    console.log('Verification URL:', verificationUrl);
+    console.log('Verification data being sent:', verificationData);
 
     const response = await fetch(verificationUrl, {
       method: 'POST',
@@ -318,12 +366,26 @@ const verifyEsewaTransaction = async (transactionCode, totalAmount, transactionU
       },
       body: JSON.stringify(verificationData)
     });
+    
+    console.log('eSewa verification response status:', response.status);
+    console.log('eSewa verification response headers:', response.headers);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.log('eSewa verification failed with status:', response.status);
+      console.log('Error response body:', errorText);
+      throw new Error(`eSewa verification failed: ${response.status} - ${errorText}`);
+    }
 
     const result = await response.json();
+    console.log('eSewa verification result:', result);
+    console.log('Verification status:', result.status);
+    
     return result;
 
   } catch (error) {
-    console.error('eSewa verification error:', error);
+    console.error('❌ eSewa verification error:', error.message);
+    console.error('Error details:', error);
     throw error;
   }
 };
@@ -518,6 +580,217 @@ router.get('/debug/transactions', async (req, res) => {
       error: error.message 
     });
   }
+});
+
+// Verification endpoint for utility component
+router.post('/verify', async (req, res) => {
+  try {
+    console.log('eSewa verification request:', req.body);
+    const { amt, refId, oid } = req.body;
+    
+    if (!amt || !refId || !oid) {
+      return res.status(400).json({
+        verified: false,
+        message: 'Missing required parameters: amt, refId, oid'
+      });
+    }
+    
+    // Verify the transaction with eSewa
+    const verificationResponse = await verifyEsewaTransaction(
+      refId, // transaction_code
+      parseFloat(amt), // total_amount
+      oid // transaction_uuid
+    );
+    console.log('eSewa verification response:', verificationResponse);
+    
+    if (verificationResponse.status === 'COMPLETE') {
+      // Update transaction status if it exists
+      const updateResult = await Transaction.updateOne(
+        { uuid: oid },
+        { 
+          status: 'completed',
+          transactionCode: refId,
+          completedAt: new Date()
+        }
+      );
+      console.log('Transaction update result:', updateResult);
+      
+      res.json({
+        verified: true,
+        message: 'Payment verified successfully',
+        transactionId: oid,
+        amount: amt
+      });
+    } else {
+      res.json({
+        verified: false,
+        message: 'Payment verification failed',
+        details: verificationResponse
+      });
+    }
+    
+  } catch (error) {
+    console.error('eSewa verification error:', error);
+    res.status(500).json({
+      verified: false,
+      message: 'Verification process failed',
+      error: error.message
+    });
+  }
+});
+
+// Test endpoint to check if payment flow works
+router.post('/test-initiate', async (req, res) => {
+  try {
+    console.log('=== TEST PAYMENT INITIATION ===');
+    console.log('Request body:', req.body);
+    
+    // Minimal test transaction
+    const transactionUuid = uuidv4();
+    const amount = 1000;
+    
+    const testTransaction = new Transaction({
+      uuid: transactionUuid,
+      amount: amount,
+      status: 'pending',
+      paymentMethod: 'esewa',
+      userInfo: {
+        name: 'Test User',
+        email: 'test@example.com',
+        phone: '9800000000'
+      },
+      vehicleData: {
+        _id: 'test-vehicle',
+        name: 'Test Vehicle',
+        type: 'Car',
+        price: 800
+      },
+      bookingData: {
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 86400000)
+      },
+      billingAddress: {
+        name: 'Test User',
+        email: 'test@example.com'
+      }
+    });
+    
+    await testTransaction.save();
+    console.log('✅ Test transaction created:', transactionUuid);
+    
+    res.json({
+      success: true,
+      message: 'Test transaction created successfully',
+      transactionId: transactionUuid,
+      testUrl: `http://localhost:5173/payment/esewa/success?transactionId=${transactionUuid}&status=success&amount=${amount}`
+    });
+    
+  } catch (error) {
+    console.error('Test initiation error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Test endpoint to manually complete a transaction
+router.post('/test-complete/:uuid', async (req, res) => {
+  try {
+    const { uuid } = req.params;
+    console.log('Manually completing transaction:', uuid);
+    
+    const updateResult = await Transaction.updateOne(
+      { uuid },
+      { 
+        status: 'completed',
+        transactionCode: 'TEST-CODE-' + Date.now(),
+        completedAt: new Date()
+      }
+    );
+    
+    console.log('Update result:', updateResult);
+    
+    res.json({
+      success: true,
+      message: 'Transaction marked as completed',
+      uuid: uuid,
+      updateResult: updateResult
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Debug route - Manually trigger verification for a transaction
+router.post('/debug/verify/:uuid', async (req, res) => {
+  try {
+    const { uuid } = req.params;
+    console.log('Manual verification requested for UUID:', uuid);
+    
+    // Get transaction from database
+    const transaction = await Transaction.findOne({ uuid });
+    if (!transaction) {
+      return res.status(404).json({
+        success: false,
+        message: 'Transaction not found',
+        uuid: uuid
+      });
+    }
+    
+    console.log('Found transaction:', {
+      uuid: transaction.uuid,
+      status: transaction.status,
+      amount: transaction.amount,
+      transactionCode: transaction.transactionCode
+    });
+    
+    // Mock transaction data for testing (you can override with real data if available)
+    const mockTransactionCode = req.body.transactionCode || 'test-code-123';
+    
+    // Try verification
+    const verificationResult = await verifyEsewaTransaction(
+      mockTransactionCode,
+      transaction.amount,
+      transaction.uuid
+    );
+    
+    res.json({
+      success: true,
+      transaction: transaction,
+      verificationResult: verificationResult,
+      message: 'Manual verification completed'
+    });
+    
+  } catch (error) {
+    console.error('Manual verification error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: 'Manual verification failed'
+    });
+  }
+});
+
+// Test callback endpoint
+router.get('/test-callback', (req, res) => {
+  console.log('Test callback endpoint reached');
+  console.log('Query params:', req.query);
+  res.json({
+    success: true,
+    message: 'Callback endpoint is working',
+    timestamp: new Date().toISOString(),
+    receivedParams: req.query,
+    frontendUrl: process.env.FRONTEND_URL || 'Not set',
+    config: {
+      successUrl: (process.env.FRONTEND_URL || 'http://localhost:5173') + '/payment/esewa/success',
+      failureUrl: (process.env.FRONTEND_URL || 'http://localhost:5173') + '/payment/failure'
+    }
+  });
 });
 
 module.exports = router;
