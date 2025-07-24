@@ -4,11 +4,13 @@ import UsersDataComponent from "./DashboardComponent/UsersDataComponent.jsx";
 import VehicleDataComponent from './DashboardComponent/VehicleDataComponent.jsx';
 import AddVehicleForm from '../renter/AddVehicleForm.jsx';
 import EditVehicleForm from './DashboardComponent/EditVehiclePage.jsx'; // Reusable Add/Edit form
+import VehicleAnalyticsDashboard from '../../components/VehicleAnalyticsDashboard.jsx';
 
 const Sidebar = ({ selectedMenu, setSelectedMenu }) => {
   const menuItems = [
     { id: 'vehicles', name: 'Vehicle Listing' },
     { id: 'users', name: 'Users' },
+    { id: 'analytics', name: 'Analytics' },
     { id: 'add-vehicle', name: 'Add Vehicle' },
     {id: "vehicle-booking", name:"Vehicle Booking"},
   ];
@@ -57,6 +59,12 @@ const Users = () => (
   </div>
 );
 
+const Analytics = () => (
+  <div className="p-6">
+    <VehicleAnalyticsDashboard />
+  </div>
+);
+
 const AddVehicle = () => (
   <div className="p-6">
     <h2 className="text-2xl font-bold mb-4">Add Vehicle</h2>
@@ -85,6 +93,8 @@ const AdminDashboard = () => {
         return <VehicleListing  />;
       case 'users':
         return <Users />;
+      case 'analytics':
+        return <Analytics />;
       case 'add-vehicle':
         return <AddVehicle  />;
       default:

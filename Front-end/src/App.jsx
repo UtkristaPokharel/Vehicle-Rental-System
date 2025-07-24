@@ -8,6 +8,8 @@ import VehicleDetails from './pages/VehicleDetails.jsx';
 import AboutUs from './pages/AboutUs.jsx';
 import ContactUs from './pages/ContactUs.jsx';
 import Vehicle from './pages/Vehicles.jsx';
+import VehiclesBrowsePage from './pages/VehiclesBrowsePage.jsx';
+import ContentFilteringDemo from './pages/ContentFilteringDemo.jsx';
 import AdminLoginPage from './pages/admin/AdminLoginPage.jsx';
 import PaymentPage from './pages/PaymentPage.jsx';
 import PaymentSuccess from './pages/PaymentSuccess.jsx';
@@ -48,6 +50,8 @@ function AppContent() {
           <Route path="payment/failure" element={<PaymentFailure/>} />
           <Route path="contact" element={<ContactUs />} />
           <Route path="browse" element={<Vehicle />} />
+          <Route path="vehicles" element={<VehiclesBrowsePage />} />
+          <Route path="content-filtering-demo" element={<ContentFilteringDemo />} />
           <Route path="favorites" element={<FavoritesPage />} />
           <Route path="map" element={<Map/>} />
         </Route>

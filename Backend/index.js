@@ -339,6 +339,10 @@ app.use("/api", updateVehicle);
 const fetchVehicle = require("./routes/fetchvehicle");
 app.use("/api/vehicles", fetchVehicle);
 
+// Content-based filtering and recommendations
+const contentFilterRoutes = require("./routes/content-filter");
+app.use("/api/content", contentFilterRoutes);
+
 // Public routes for click tracking (no authentication required)
 app.use("/api/public", addVehicle);
 

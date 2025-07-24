@@ -6,6 +6,7 @@ import { FaPen, FaSpinner } from "react-icons/fa";
 import toast,{ Toaster } from "react-hot-toast";
 import { getApiUrl, getImageUrl as getVehicleImageUrl } from "../config/api";
 import BackButton from "../components/BackButton";
+import SimilarVehiclesRecommendation from "../components/SimilarVehiclesRecommendation";
 
 
 function VehicleDetails() {
@@ -220,6 +221,11 @@ function VehicleDetails() {
             <div className="lg:col-span-3 row-span-3 order-3 lg:order-3">
               <VehicleFeatures features={vehicleData.features || features} />
             </div>
+          </div>
+
+          {/* Similar Vehicles Recommendation */}
+          <div className="mt-12">
+            <SimilarVehiclesRecommendation currentVehicle={vehicleData} limit={4} />
           </div>
         </div>
       </div>
