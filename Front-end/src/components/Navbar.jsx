@@ -120,7 +120,7 @@ export default function Navbar() {
                 <ul className='flex space-x-6'>
                     <li><Link to="/" className={getLinkClass('/')}>Home</Link></li>
                     <li><Link to="/about" className={getLinkClass('/about')}>About us</Link></li>
-                    <li><Link to="/browse" className={getLinkClass('/browse')}>Vehicles</Link></li>
+                    <li><Link to="/vehicles" className={getLinkClass('/vehicles')}>Vehicles</Link></li>
                     <li><button onClick={handleContactUsClick} className="hover:underline decoration-3 hover:decoration-red-600 hover:underline-offset-8">Contact Us</button></li>
                     <li><button onClick={handleFAQClick} className="hover:underline decoration-3 hover:decoration-red-600 hover:underline-offset-8">FAQ</button></li>
                 </ul>
@@ -174,7 +174,7 @@ export default function Navbar() {
                     </button>
                     <Link to="/" onClick={handleToggle} className="hover:text-red-400">Home</Link>
                     <Link to="/about" onClick={handleToggle} className="hover:text-red-400">About Us</Link>
-                    <Link to="/browse" onClick={handleToggle} className="hover:text-red-400">Vehicles</Link>
+                    <Link to="/vehicles" onClick={handleToggle} className="hover:text-red-400">Vehicles</Link>
                     <button onClick={handleContactUsClick} className="hover:text-red-400">Contact Us</button>
                     <button onClick={handleFAQClick} className="hover:text-red-400">FAQ</button>
                     <button onClick={() => { handleToggle(); navigate("/add-vehicle"); }} className="bg-red-600 text-white px-4 py-2 rounded-xl mt-4">
