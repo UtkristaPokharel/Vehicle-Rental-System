@@ -407,7 +407,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
 
   return (
     <div className="bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg w-full overflow-y-auto">
+      <div className="bg-white rounded-lg w-full overflow-y-auto hide-scrollbar">
         <div className="px-6 py-2">
           <Toaster />
           <div className="flex justify-between items-center mb-4">

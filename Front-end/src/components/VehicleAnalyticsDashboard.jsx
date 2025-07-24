@@ -189,7 +189,7 @@ const VehicleAnalyticsDashboard = () => {
           <FaCalendar className="text-blue-500 mr-2" />
           Recently Added Vehicles
         </h3>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto hide-scrollbar">
           <table className="min-w-full table-auto">
             <thead>
               <tr className="bg-gray-100">

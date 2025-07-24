@@ -69,7 +69,7 @@ function UserDetailModal({ user, onClose, onUserUpdate }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-      <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
+      <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto hide-scrollbar relative">
         <button onClick={onClose} className="absolute top-2 right-4 text-2xl text-gray-400 hover:text-gray-700">&times;</button>
         
         <div className="flex flex-col gap-6">
@@ -317,7 +317,7 @@ function UsersDataComponent() {
     };
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto hide-scrollbar">
         <table className='w-full'>
             <thead>
          <tr className="text-left text-sm font-medium text-gray-500 border-b">

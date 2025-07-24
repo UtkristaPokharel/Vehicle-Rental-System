@@ -159,7 +159,7 @@ const VehicleFilter = ({ vehicles, onFilterChange, onReset }) => {
   const FilterSection = ({ title, options, filterType, selectedValue, selectedValues, singleSelect = false }) => (
     <div className="mb-6">
       <h4 className="font-semibold text-gray-800 mb-3">{title}</h4>
-      <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+      <div className="space-y-2 max-h-48 overflow-y-auto hide-scrollbar">
         {options.map(option => (
           <label key={option} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors">
             <input
