@@ -21,8 +21,33 @@ const vehicleTypes = [
 export default function VehicleBrowse() {
   const navigate = useNavigate();
 
+  // Helper function to format vehicle type for URL (same as in SuggestedVehicle)
+  const formatVehicleType = (type) => {
+    if (!type) return 'car'; // fallback
+    
+    const typeMap = {
+      'Two-Wheeler': 'two-wheeler',
+      'two-wheeler': 'two-wheeler',
+      'Two Wheeler': 'two-wheeler',
+      'Car': 'car',
+      'car': 'car',
+      'Pickup': 'pickup',
+      'pickup': 'pickup',
+      'Truck': 'truck',
+      'truck': 'truck',
+      'Bus': 'bus',
+      'bus': 'bus'
+    };
+    
+    if (typeMap[type]) {
+      return typeMap[type];
+    }
+    
+    return type.toLowerCase().replace(/\s+/g, '-');
+  };
+
   const handleClick = (type) => {
-    navigate(`/vehicles/${type}`);
+    navigate(`/vehicles/${formatVehicleType(type)}`);
   };
 
   return (
@@ -68,6 +93,34 @@ export const SuggestedVehicle = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const scrollRef = useRef(null);
 
+  // Helper function to format vehicle type for URL
+  const formatVehicleType = (type) => {
+    if (!type) return 'car'; // fallback
+    
+    // Handle specific cases
+    const typeMap = {
+      'Two-Wheeler': 'two-wheeler',
+      'two-wheeler': 'two-wheeler',
+      'Two Wheeler': 'two-wheeler',
+      'Car': 'car',
+      'car': 'car',
+      'Pickup': 'pickup',
+      'pickup': 'pickup',
+      'Truck': 'truck',
+      'truck': 'truck',
+      'Bus': 'bus',
+      'bus': 'bus'
+    };
+    
+    // Check if type exists in map
+    if (typeMap[type]) {
+      return typeMap[type];
+    }
+    
+    // Fallback: convert to lowercase and replace spaces with dashes
+    return type.toLowerCase().replace(/\s+/g, '-');
+  };
+
   // Fetch all vehicles
   useEffect(() => {
     async function getVehicles() {
@@ -87,6 +140,23 @@ export const SuggestedVehicle = () => {
   // Function to refresh suggestions
   const refreshSuggestions = () => {
     setRefreshKey(prev => prev + 1);
+  };
+
+  // Handle vehicle click to update local state immediately
+  const handleVehicleClick = (vehicleId) => {
+    // Update the clicked vehicle's count in local state
+    setVehicles(prevVehicles => 
+      prevVehicles.map(vehicle => 
+        vehicle._id === vehicleId 
+          ? { ...vehicle, clickCount: (vehicle.clickCount || 0) + 1 }
+          : vehicle
+      )
+    );
+    
+    // Refresh suggestions after a short delay to show updated counts
+    setTimeout(() => {
+      refreshSuggestions();
+    }, 100);
   };
 
   // Add event listener for focus to refresh suggestions when user returns to page
@@ -248,7 +318,8 @@ export const SuggestedVehicle = () => {
           <div key={vehicle._id} className="min-w-[300px] relative">
             <VehicleCard
               vehicle={vehicle}
-              type={vehicle.type === 'two-wheeler' ? 'two-wheeler' : vehicle.type.toLowerCase()}
+              type={formatVehicleType(vehicle.type)}
+              onVehicleClick={handleVehicleClick}
             />
             {isPersonalized && vehicle.clickCount > 0 && (
               <div className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-400 to-red-500 text-white text-xs px-2 py-1 rounded-full">

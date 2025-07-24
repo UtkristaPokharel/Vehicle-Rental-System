@@ -29,6 +29,8 @@ function VehicleDetails() {
 
   useEffect(() => {
     const fetchVehicleData = async () => {
+      setLoading(true); // Set loading to true at the start of each fetch
+      
       // Always fetch complete data from backend to ensure we have all vehicle specifications
       if (id) {
         try {
@@ -61,11 +63,8 @@ function VehicleDetails() {
       setLoading(false);
     };
 
-    // Only fetch if we're still loading
-    if (loading) {
-      fetchVehicleData();
-    }
-  }, [id, loading, location.state]); // Removed vehicleData from dependencies to prevent infinite loop
+    fetchVehicleData(); // Always call fetchVehicleData when dependencies change
+  }, [id, location.state]); // Removed loading from dependencies
 
   // Function to handle continue to payment
   const handleContinueToPayment = () => {
