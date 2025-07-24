@@ -5,8 +5,6 @@ import { FaCar, FaBus } from "react-icons/fa";
 import { PiTruckTrailerFill } from "react-icons/pi";
 import { PiTruckFill } from "react-icons/pi";
 import VehicleCard from "../components/VehicleCard";
-// import vehicleData from '../assets/Sample.json';
-// import { useRef } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { getApiUrl } from "../config/api";
 
@@ -22,11 +20,11 @@ const vehicleTypes = [
 
 export default function VehicleBrowse() {
   const navigate = useNavigate();
-  
+
   const handleClick = (type) => {
     navigate(`/vehicles/${type}`);
   };
-  
+
   return (
     <div className="vehicle-browse flex justify-center items-center flex-col my-10 p-3  w-[90vw] md:w-[80vw]">
       <h2 className="text-3xl font-bold text-center m-12">
@@ -36,9 +34,9 @@ export default function VehicleBrowse() {
       <ul className="flex flex-wrap justify-center items-center gap-20 list-none mb-4 text-2xl">
         {vehicleTypes.map((vehicle, index) => (
           <li
-          key={index}
-          className="text-center cursor-pointer  flex flex-col items-center "
-          onClick={() => handleClick(vehicle.name)}
+            key={index}
+            className="text-center cursor-pointer  flex flex-col items-center "
+            onClick={() => handleClick(vehicle.name)}
           >
             {vehicle.icon}
             <h1 className="mt-1 text-sm font-bold">{vehicle.name}</h1>
@@ -46,6 +44,15 @@ export default function VehicleBrowse() {
         ))}
       </ul>
 
+      {/* Enhanced Search Button */}
+      <div className="mt-5">
+        <button
+          onClick={() => navigate('/vehicles')}
+          className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+        >
+          🔍 Advanced Search & Filters
+        </button>
+      </div>
 
       <SuggestedVehicle />
 
@@ -109,7 +116,7 @@ export const SuggestedVehicle = () => {
             groups[count].push(vehicle);
             return groups;
           }, {});
-        
+
         // Sort click counts in descending order and flatten with randomization within each group
         const sortedClickedVehicles = Object.keys(vehiclesWithClicks)
           .map(Number)
@@ -120,29 +127,29 @@ export const SuggestedVehicle = () => {
             return shuffledGroup;
           })
           .slice(0, 5); // Max 5 vehicles
-        
+
         if (sortedClickedVehicles.length > 0) {
           const clickedVehicleIds = sortedClickedVehicles.map(v => v._id);
-          
+
           // Get unclicked vehicles (clickCount = 0 or undefined)
-          const unclickedVehicles = vehicles.filter(v => 
-            !clickedVehicleIds.includes(v._id) && 
+          const unclickedVehicles = vehicles.filter(v =>
+            !clickedVehicleIds.includes(v._id) &&
             v.isActive &&
             (!v.clickCount || v.clickCount === 0)
           );
-          
+
           // Check if we have unclicked vehicles
           if (unclickedVehicles.length > 0) {
             // Calculate remaining slots needed (total 8)
             const remainingSlotsNeeded = 8 - sortedClickedVehicles.length;
-            
+
             // Get random unclicked vehicles to fill remaining slots
             const shuffledUnclicked = [...unclickedVehicles].sort(() => 0.5 - Math.random());
             const randomUnclickedVehicles = shuffledUnclicked.slice(0, remainingSlotsNeeded);
-            
+
             // Combine clicked vehicles (priority order with randomization) + random unclicked vehicles
             const mixedSuggestions = [...sortedClickedVehicles, ...randomUnclickedVehicles];
-            
+
             setSuggestedVehicles(mixedSuggestions);
             setIsPersonalized(true);
             return;
@@ -158,7 +165,7 @@ export const SuggestedVehicle = () => {
                 groups[count].push(vehicle);
                 return groups;
               }, {});
-            
+
             const allClickedByPriorityWithShuffle = Object.keys(allClickedGrouped)
               .map(Number)
               .sort((a, b) => b - a) // Descending order (priority)
@@ -168,19 +175,19 @@ export const SuggestedVehicle = () => {
                 return shuffledGroup;
               })
               .slice(0, 8);
-            
+
             setSuggestedVehicles(allClickedByPriorityWithShuffle);
             setIsPersonalized(true);
             return;
           }
         }
-        
+
         // Fallback: Show random vehicles if no click data
         const count = Math.min(8, vehicles.length);
         const shuffled = [...vehicles].sort(() => 0.5 - Math.random());
         setSuggestedVehicles(shuffled.slice(0, count));
         setIsPersonalized(false);
-        
+
       } catch (error) {
         console.error('Error generating suggestions:', error);
         // Fallback to random vehicles
@@ -225,7 +232,7 @@ export const SuggestedVehicle = () => {
           </p>
         )}
       </div>
-    
+
       <button
         onClick={() => scroll("left")}
         className="absolute left-2 top-1/2 z-10 -translate-y-1/2 bg-white shadow-md p-2 rounded-full hover:bg-gray-100"
@@ -239,8 +246,8 @@ export const SuggestedVehicle = () => {
       >
         {suggestedVehicles.map((vehicle) => (
           <div key={vehicle._id} className="min-w-[300px] relative">
-            <VehicleCard 
-              vehicle={vehicle} 
+            <VehicleCard
+              vehicle={vehicle}
               type={vehicle.type === 'two-wheeler' ? 'two-wheeler' : vehicle.type.toLowerCase()}
             />
             {isPersonalized && vehicle.clickCount > 0 && (
