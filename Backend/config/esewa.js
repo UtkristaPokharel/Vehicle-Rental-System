@@ -27,9 +27,31 @@ module.exports = {
     return this[env];
   },
   
-  // Success and failure URLs
-  successUrl: (process.env.BACKEND_URL || 'http://localhost:3001') + '/api/payment/esewa/success',
-  failureUrl: (process.env.BACKEND_URL || 'http://localhost:3001') + '/api/payment/esewa/failure',
+  // Success and failure URLs - dynamically set based on environment
+  getSuccessUrl() {
+    const backendUrl = process.env.BACKEND_URL || 
+                      (process.env.NODE_ENV === 'production' 
+                        ? 'https://vehicle-rental-system-rjvj.onrender.com' 
+                        : 'http://localhost:3001');
+    return `${backendUrl}/api/payment/esewa/success`;
+  },
+  
+  getFailureUrl() {
+    const backendUrl = process.env.BACKEND_URL || 
+                      (process.env.NODE_ENV === 'production' 
+                        ? 'https://vehicle-rental-system-rjvj.onrender.com' 
+                        : 'http://localhost:3001');
+    return `${backendUrl}/api/payment/esewa/failure`;
+  },
+  
+  // Legacy properties for backward compatibility
+  get successUrl() {
+    return this.getSuccessUrl();
+  },
+  
+  get failureUrl() {
+    return this.getFailureUrl();
+  },
   
   // Payment configuration
   currency: 'NPR',
