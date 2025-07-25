@@ -22,6 +22,7 @@ import { Toaster } from 'react-hot-toast';
 import ProfileSidebar from './components/ProfileSidebar.jsx';
 import Layout from './components/Layout.jsx';
 import FavoritesPage from './pages/FavoritesPage.jsx';
+import BookingHistoryPage from './pages/BookingHistoryPage.jsx';
 import Logout from './pages/Api/Logout.jsx';
 import { UserProvider } from "./context/UserContext.jsx"
 import { ProfileSidebarProvider, useProfileSidebar } from "./context/ProfileSidebarContext.jsx"
@@ -55,9 +56,13 @@ function AppContent() {
           <Route path="vehicles" element={<VehiclesBrowsePage />} />
           <Route path="content-filtering-demo" element={<ContentFilteringDemo />} />
           <Route path="favorites" element={<FavoritesPage />} />
+
+          <Route path="booking-history" element={<BookingHistoryPage />} />
+
           <Route path="bookings" element={<BookingHistory />} />
           <Route path="bookings/:bookingId" element={<BookingDetails />} />
           <Route path="host-dashboard" element={<HostDashboard />} />
+
           <Route path="map" element={<Map/>} />
         </Route>
         

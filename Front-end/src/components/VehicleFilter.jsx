@@ -239,7 +239,7 @@ const VehicleFilter = ({ vehicles, onFilterChange, onReset }) => {
           <FaChevronDown className={`text-gray-600 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
         </button>
 
-        {/* Search Input */}
+        {/* Search Input  */}
         <div className="flex-1 relative">
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input

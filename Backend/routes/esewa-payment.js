@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const Transaction = require('../models/Transaction');
 const Booking = require('../models/Booking');
 const esewaConfig = require('../config/esewa');
+const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -558,11 +559,39 @@ router.get('/booking/:transactionId', async (req, res) => {
 });
 
 // Get all bookings for a user
-router.get('/bookings/user/:userId', async (req, res) => {
+router.get('/bookings/user/:userId', authMiddleware, async (req, res) => {
   try {
     const { userId } = req.params;
+    const requestingUserId = req.user?.id || req.admin?.id;
     
-    const bookings = await Booking.findByUser(userId);
+    console.log('Bookings request - userId param:', userId);
+    console.log('Requesting user/admin ID:', requestingUserId);
+    console.log('User object:', req.user);
+    console.log('Admin object:', req.admin);
+    
+    // Allow users to see their own bookings, or admins to see any bookings
+    if (!req.admin && (!req.user || req.user.id !== userId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. You can only view your own bookings.'
+      });
+    }
+    
+    // Find bookings by userId and also by userEmail (for guest bookings)
+    let bookings = await Booking.findByUser(userId);
+    
+    // If user is authenticated, also find bookings by their email
+    if (req.user && bookings.length === 0) {
+      // Get user email from the database or token if available
+      const User = require('../models/User');
+      const user = await User.findById(userId);
+      if (user && user.email) {
+        const emailBookings = await Booking.find({ userEmail: user.email }).populate('vehicleId').sort({ createdAt: -1 });
+        bookings = [...bookings, ...emailBookings];
+      }
+    }
+    
+    console.log('Found bookings count:', bookings.length);
     
     res.json({
       success: true,
@@ -572,6 +601,77 @@ router.get('/bookings/user/:userId', async (req, res) => {
 
   } catch (error) {
     console.error('Get user bookings error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to get user bookings',
+      error: error.message 
+    });
+  }
+});
+
+// Get bookings for the currently authenticated user
+router.get('/bookings/my-bookings', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user?.id || req.admin?.id;
+    
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
+      });
+    }
+    
+    console.log('🔍 My bookings request for userId:', userId);
+    console.log('🔑 Auth user object:', req.user);
+    console.log('🔑 Auth admin object:', req.admin);
+    
+    // Check total bookings in database first
+    const totalBookings = await Booking.countDocuments();
+    console.log('📊 Total bookings in database:', totalBookings);
+    
+    // Find bookings by userId - with additional debug
+    console.log('🔍 Searching for bookings with userId:', userId);
+    let bookings = await Booking.findByUser(userId);
+    console.log('📝 Found bookings by userId:', bookings.length);
+    
+    // Also try direct query to debug
+    const directBookings = await Booking.find({ userId: userId }).populate('vehicleId').sort({ createdAt: -1 });
+    console.log('📝 Direct query found bookings:', directBookings.length);
+    
+    // Try searching for bookings with any userId
+    const allUserBookings = await Booking.find({ userId: { $exists: true } }).limit(5);
+    console.log('📝 Sample bookings with userId:', allUserBookings.map(b => ({ userId: b.userId, userName: b.userName, bookingId: b.bookingId })));
+    
+    // If user is authenticated and no bookings found by userId, try by email
+    if (req.user && bookings.length === 0) {
+      const User = require('../models/User');
+      console.log('🔍 No bookings found by userId, trying email lookup...');
+      const user = await User.findById(userId);
+      console.log('👤 Found user by ID:', user ? { id: user._id, email: user.email, name: user.name } : 'Not found');
+      
+      if (user && user.email) {
+        console.log('📧 Searching for bookings by email:', user.email);
+        const emailBookings = await Booking.find({ userEmail: user.email }).populate('vehicleId').sort({ createdAt: -1 });
+        console.log('📧 Found bookings by email:', emailBookings.length);
+        bookings = [...bookings, ...emailBookings];
+        
+        // Also try case-insensitive email search
+        const emailRegex = new RegExp(user.email, 'i');
+        const caseInsensitiveEmailBookings = await Booking.find({ userEmail: emailRegex }).populate('vehicleId').sort({ createdAt: -1 });
+        console.log('📧 Found bookings by case-insensitive email:', caseInsensitiveEmailBookings.length);
+      }
+    }
+    
+    console.log('📋 Final bookings count:', bookings.length);
+    
+    res.json({
+      success: true,
+      bookings: bookings,
+      total: bookings.length
+    });
+
+  } catch (error) {
+    console.error('Get my bookings error:', error);
     res.status(500).json({ 
       success: false, 
       message: 'Failed to get user bookings',

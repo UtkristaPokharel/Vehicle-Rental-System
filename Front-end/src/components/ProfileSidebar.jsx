@@ -466,9 +466,11 @@ function SidebarSettingsItem({ icon: Icon, label, to }) {
 
 const sidebarMenuItems = [
   { label: "Favourites", to: "/favorites", icon: FaHeart },
+
   { label: "Your vehicles", to: "/add-vehicle", icon: FaMapMarkerAlt },
   { label: "Booking History", to: "/bookings", icon: FaHistory },
   { label: "Clear cache", to: "/", icon: FaTrashAlt },
+
 ];
 
 function SidebarSettingsMenu({ isHost }) {
