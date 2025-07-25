@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getApiUrl } from '../../../config/api';
+import toast from 'react-hot-toast';
 
 const BookingDataComponent = () => {
   const [bookings, setBookings] = useState([]);
@@ -99,9 +100,9 @@ const BookingDataComponent = () => {
 
       // Refresh bookings list
       await fetchBookings();
-      alert('Booking status updated successfully!');
+      toast.success('Booking status updated successfully!');
     } catch (err) {
-      alert('Error updating booking status: ' + err.message);
+      toast.error('Error updating booking status: ' + err.message);
     }
   };
 
