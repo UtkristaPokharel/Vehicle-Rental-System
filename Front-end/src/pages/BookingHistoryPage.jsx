@@ -26,6 +26,49 @@ const BookingHistoryPage = () => {
     fetchUserBookings();
   };
 
+  const cancelBooking = async (bookingId, reason = 'Cancelled by user') => {
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
+      
+      if (!token) {
+        throw new Error('No authentication token found. Please log in.');
+      }
+
+      const apiUrl = getApiUrl(`api/payment/esewa/booking/${bookingId}/status`);
+      console.log('🚫 Cancelling booking:', bookingId);
+      
+      const response = await fetch(apiUrl, {
+        method: 'PATCH',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          status: 'cancelled',
+          reason: reason
+        })
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Failed to cancel booking:', response.status, errorText);
+        throw new Error(`Failed to cancel booking: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Booking cancelled successfully');
+      
+      // Refresh bookings after successful cancellation
+      fetchUserBookings();
+      
+      return data;
+    } catch (err) {
+      console.error('❌ Error cancelling booking:', err);
+      throw err;
+    }
+  };
+
   const fetchUserBookings = useCallback(async () => {
     try {
       setLoading(true);
@@ -77,6 +120,37 @@ const BookingHistoryPage = () => {
       setLoading(false);
     }
   }, []);
+
+  // Helper function to check if booking can be cancelled
+  const canCancelBooking = (booking) => {
+    const cancellableStatuses = ['confirmed', 'pending'];
+    const startDate = new Date(booking.startDate);
+    const now = new Date();
+    const hoursUntilStart = (startDate - now) / (1000 * 60 * 60);
+    
+    // Can cancel if booking is in cancellable status and starts more than 24 hours from now
+    return cancellableStatuses.includes(booking.bookingStatus) && hoursUntilStart > 24;
+  };
+
+  // Handle cancel booking with confirmation
+  const handleCancelBooking = async (booking) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to cancel the booking for ${booking.vehicleName}?\n\n` +
+      `Booking ID: ${booking.bookingId}\n` +
+      `Start Date: ${formatDate(booking.startDate)}\n` +
+      `Amount: ${formatCurrency(booking.pricing.totalAmount)}\n\n` +
+      `This action cannot be undone.`
+    );
+    
+    if (confirmed) {
+      try {
+        await cancelBooking(booking.bookingId);
+        alert('Booking cancelled successfully!');
+      } catch (error) {
+        alert('Failed to cancel booking: ' + error.message);
+      }
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
@@ -255,7 +329,10 @@ const BookingHistoryPage = () => {
 
             {/* Status Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Status Filter</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Status Filter
+                <span className="text-xs text-gray-500 ml-2">(or click boxes above)</span>
+              </label>
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
@@ -300,16 +377,28 @@ const BookingHistoryPage = () => {
             const count = status === 'all' 
               ? bookings.length 
               : bookings.filter(b => b.bookingStatus === status).length;
+            const isActive = filterStatus === status;
             return (
-              <div key={status} className={`bg-gradient-to-br ${color} rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105`}>
+              <button
+                key={status}
+                onClick={() => setFilterStatus(status)}
+                className={`bg-gradient-to-br ${color} rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 ${
+                  isActive ? 'ring-4 ring-white ring-opacity-50 scale-105' : ''
+                } cursor-pointer focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-30`}
+              >
                 <div className="flex items-center justify-between">
-                  <div>
+                  <div className="text-left">
                     <div className="text-3xl font-bold mb-1">{count}</div>
                     <div className="text-sm opacity-90">{label}</div>
                   </div>
                   <div className="text-2xl opacity-80">{icon}</div>
                 </div>
-              </div>
+                {isActive && (
+                  <div className="mt-2 text-xs bg-white bg-opacity-20 rounded-full px-2 py-1">
+                    Active Filter
+                  </div>
+                )}
+              </button>
             );
           })}
         </div>
@@ -456,6 +545,45 @@ const BookingHistoryPage = () => {
                           )}
                         </div>
                       </div>
+
+                      {/* Cancel Button or Status Info */}
+                      {canCancelBooking(booking) ? (
+                        <div className="bg-red-50 rounded-xl p-4 border border-red-100">
+                          <button
+                            onClick={() => handleCancelBooking(booking)}
+                            className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+                          >
+                            <MdCancel className="w-4 h-4" />
+                            Cancel Booking
+                          </button>
+                          <p className="text-xs text-red-600 mt-2 text-center">
+                            Cancel up to 24h before start time
+                          </p>
+                        </div>
+                      ) : booking.bookingStatus === 'cancelled' ? (
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                          <div className="flex items-center justify-center gap-2 text-gray-600 text-sm">
+                            <MdCancel className="w-4 h-4" />
+                            Booking Cancelled
+                          </div>
+                        </div>
+                      ) : booking.bookingStatus === 'completed' ? (
+                        <div className="bg-green-50 rounded-xl p-4 border border-green-100">
+                          <div className="flex items-center justify-center gap-2 text-green-600 text-sm">
+                            <MdDone className="w-4 h-4" />
+                            Trip Completed
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="bg-yellow-50 rounded-xl p-4 border border-yellow-100">
+                          <div className="text-center text-yellow-700 text-xs">
+                            {booking.bookingStatus === 'in-progress' 
+                              ? 'Trip in progress - Cannot cancel'
+                              : 'Cancellation not available\n(Less than 24h to start)'
+                            }
+                          </div>
+                        </div>
+                      )}
 
                       {/* Booking Date */}
                       <div className="text-center text-xs text-gray-500">

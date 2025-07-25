@@ -14,8 +14,6 @@ import AdminLoginPage from './pages/admin/AdminLoginPage.jsx';
 import PaymentPage from './pages/PaymentPage.jsx';
 import PaymentSuccess from './pages/PaymentSuccess.jsx';
 import PaymentFailure from './pages/PaymentFailure.jsx';
-import BookingHistory from './pages/BookingHistory.jsx';
-import BookingDetails from './pages/BookingDetails.jsx';
 import HostDashboard from './pages/HostDashboard.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import { Toaster } from 'react-hot-toast';
@@ -58,9 +56,6 @@ function AppContent() {
           <Route path="favorites" element={<FavoritesPage />} />
 
           <Route path="booking-history" element={<BookingHistoryPage />} />
-
-          <Route path="bookings" element={<BookingHistory />} />
-          <Route path="bookings/:bookingId" element={<BookingDetails />} />
           <Route path="host-dashboard" element={<HostDashboard />} />
 
           <Route path="map" element={<Map/>} />
