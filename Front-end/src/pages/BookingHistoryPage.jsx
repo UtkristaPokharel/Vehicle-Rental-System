@@ -12,16 +12,43 @@ const BookingHistoryPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('newest');
 
-  // Get user ID from localStorage
-  const userId = localStorage.getItem('userId') || localStorage.getItem('adminId');
+  // Get user name from localStorage for display
   const userName = localStorage.getItem('name') || localStorage.getItem('adminName');
+
+  // Debug function to set test token
+  const setTestToken = () => {
+    const testToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODgzYmQxN2ZjN2EzN2EzMWI4OTY5NTQiLCJpYXQiOjE3NTM0NjQwODcsImV4cCI6MTc1NDA2ODg4N30.jr1KHY2-LGkIodcq_kp8IvnTOrDWBKjHnLsPf1a85H0";
+    localStorage.setItem('token', testToken);
+    localStorage.setItem('name', 'Test User');
+    localStorage.setItem('email', 'abc@gmail.com');
+    localStorage.setItem('userId', '6883bd17fc7a37a31b896954');
+    console.log('🔧 Test token set! Refreshing bookings...');
+    fetchUserBookings();
+  };
 
   const fetchUserBookings = useCallback(async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
       
-      const response = await fetch(getApiUrl(`api/payment/esewa/bookings/user/${userId}`), {
+      if (!token) {
+        throw new Error('No authentication token found. Please log in.');
+      }
+      
+      // Debug: Show what we have in localStorage
+      console.log('📱 localStorage debug:', {
+        token: token ? 'Token available' : 'No token',
+        name: localStorage.getItem('name'),
+        email: localStorage.getItem('email'),
+        userId: localStorage.getItem('userId'),
+        adminName: localStorage.getItem('adminName')
+      });
+      
+      // Use the new my-bookings endpoint that doesn't require userId in URL
+      const apiUrl = getApiUrl('api/payment/esewa/bookings/my-bookings');
+      console.log('🔗 API URL:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -30,29 +57,37 @@ const BookingHistoryPage = () => {
         },
       });
       
+      console.log('📡 Response status:', response.status);
+      
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Failed to fetch bookings:', response.status, errorText);
         throw new Error(`Failed to fetch bookings: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
+      console.log('✅ Received bookings:', data.total || 0, 'bookings');
+      
       setBookings(data.bookings || []);
       setError(null);
     } catch (err) {
-      console.error('Error fetching user bookings:', err);
+      console.error('❌ Error fetching user bookings:', err);
       setError('Error fetching bookings: ' + err.message);
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
-    if (userId) {
+    const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
+    
+    if (token) {
       fetchUserBookings();
     } else {
-      setError('Please log in to view your booking history');
+      setError('Please log in to view your booking history. Authentication required.');
       setLoading(false);
     }
-  }, [userId, fetchUserBookings]);
+  }, [fetchUserBookings]);
 
   // Filter and search bookings
   useEffect(() => {
@@ -155,12 +190,20 @@ const BookingHistoryPage = () => {
           </div>
           <h3 className="text-xl font-semibold text-gray-800 mb-2">Unable to Load Bookings</h3>
           <p className="text-gray-600 mb-6">{error}</p>
-          <button
-            onClick={fetchUserBookings}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-          >
-            Try Again
-          </button>
+          <div className="space-y-3">
+            <button
+              onClick={fetchUserBookings}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={setTestToken}
+              className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm"
+            >
+              🔧 Use Test Token (Demo)
+            </button>
+          </div>
         </div>
       </div>
     );
