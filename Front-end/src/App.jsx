@@ -6,9 +6,9 @@ import VehicleTypePage from './components/VehicleTypePage';
 import AuthForm from './pages/Auth.jsx';
 import VehicleDetails from './pages/VehicleDetails.jsx';
 import AboutUs from './pages/AboutUs.jsx';
-import ContactUs from './pages/ContactUs.jsx';
+import ContactUs from './components/HomePage/ContactUs.jsx';
 import Vehicle from './pages/Vehicles.jsx';
-import VehiclesBrowsePage from './pages/VehiclesBrowsePage.jsx';
+import VehiclesBrowsePage from './components/HomePage/VehiclesBrowsePage.jsx';
 import ContentFilteringDemo from './pages/ContentFilteringDemo.jsx';
 import AdminLoginPage from './pages/admin/AdminLoginPage.jsx';
 import PaymentPage from './pages/PaymentPage.jsx';
@@ -26,7 +26,7 @@ import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 
 import Map from "./utils/map.jsx"
 
-import FAQPage from './pages/FAQPage.jsx';
+import FAQPage from './components/HomePage/FAQPage.jsx';
 import AddVehiclePage from './pages/renter/AddVehiclePage.jsx';
 
 function AppContent() {

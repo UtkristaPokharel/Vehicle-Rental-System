@@ -1,22 +1,20 @@
-import LandingPage from '../components/LandingPage.jsx';
-import PopularDest from "../components/Destination.jsx";
-import SubscriptionForm from "../components/SubscriptionPage.jsx";
-import VehicleBrowse from './Browse.jsx';
-import ContactUs from './ContactUs.jsx';
-import FAQPage from './FAQPage.jsx';
+import HeroSection from '../components/HomePage/HeroSection.jsx';
+import PopularDest from "../components/HomePage/Destination.jsx";
+import VehicleBrowse from '../components/HomePage/Browse.jsx';
+import ContactUs from '../components/HomePage/ContactUs.jsx';
+import FAQPage from '../components/HomePage/FAQPage.jsx';
 import { FaCarSide, FaRegHandshake, FaGift, FaBrain } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 
 function Home() {
   return (
     <div className="Home-page flex justify-center flex-col items-center">
-      <LandingPage />
+      <HeroSection />
       <VehicleBrowse />
       <PopularDest />
       <FeatureSection/>
       <ContactUs/>
       <FAQPage />
-      <SubscriptionForm />
     </div>
   );
 }

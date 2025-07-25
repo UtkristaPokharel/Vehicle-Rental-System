@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
-import { getApiUrl, getImageUrl } from "../config/api";
-import VehicleFilter from '../components/VehicleFilter';
+import { getApiUrl, getImageUrl } from "../../config/api";
+import VehicleFilter from '../VehicleFilter';
 
 const VehicleCard = ({ vehicle }) => {
 	const navigate = useNavigate();
