@@ -27,9 +27,43 @@ module.exports = {
     return this[env];
   },
   
-  // Success and failure URLs
-  successUrl: (process.env.BACKEND_URL || 'http://localhost:3001') + '/api/payment/esewa/success',
-  failureUrl: (process.env.BACKEND_URL || 'http://localhost:3001') + '/api/payment/esewa/failure',
+  // Success and failure URLs - dynamically set based on environment
+  getSuccessUrl() {
+    const backendUrl = process.env.BACKEND_URL || 
+                      (process.env.NODE_ENV === 'production' 
+                        ? 'https://vehicle-rental-system-rjvj.onrender.com' 
+                        : 'http://localhost:3001');
+    return `${backendUrl}/api/payment/esewa/success`;
+  },
+  
+  getFailureUrl() {
+    const backendUrl = process.env.BACKEND_URL || 
+                      (process.env.NODE_ENV === 'production' 
+                        ? 'https://vehicle-rental-system-rjvj.onrender.com' 
+                        : 'http://localhost:3001');
+    return `${backendUrl}/api/payment/esewa/failure`;
+  },
+  
+  // Frontend URL helper - for redirecting to frontend after payment
+  getFrontendUrl() {
+    return process.env.FRONTEND_URL || 
+           (process.env.NODE_ENV === 'production' 
+             ? 'https://vehicle-rental-system-lwna.vercel.app' // Your actual Vercel domain (no trailing slash)
+             : 'http://localhost:5173');
+  },
+  
+  // Legacy properties for backward compatibility
+  get successUrl() {
+    return this.getSuccessUrl();
+  },
+  
+  get failureUrl() {
+    return this.getFailureUrl();
+  },
+  
+  get frontendUrl() {
+    return this.getFrontendUrl();
+  },
   
   // Payment configuration
   currency: 'NPR',

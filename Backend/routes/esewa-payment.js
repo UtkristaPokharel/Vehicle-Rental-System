@@ -189,7 +189,7 @@ router.get('/success', async (req, res) => {
       console.log('Available query params:', Object.keys(req.query));
       
       // Redirect to failure page
-      const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const baseUrl = esewaConfig.getFrontendUrl();
       const failureUrl = `${baseUrl}/payment/failure?error=no_data_parameter`;
       return res.redirect(failureUrl);
     }
@@ -202,7 +202,7 @@ router.get('/success', async (req, res) => {
       console.log('✅ Decoded transaction data:', transactionData);
     } catch (error) {
       console.log('❌ Failed to decode data parameter:', error.message);
-      const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const baseUrl = esewaConfig.getFrontendUrl();
       const failureUrl = `${baseUrl}/payment/failure?error=invalid_data_format`;
       return res.redirect(failureUrl);
     }
@@ -319,7 +319,7 @@ router.get('/success', async (req, res) => {
           }
 
           // Redirect to success page
-          const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+          const baseUrl = esewaConfig.getFrontendUrl();
           const successUrl = `${baseUrl}/payment/esewa/success?transactionId=${transactionData.transaction_uuid}&status=success&amount=${transactionData.total_amount}`;
           console.log('✅ Redirecting to success URL:', successUrl);
           res.redirect(successUrl);
@@ -342,7 +342,7 @@ router.get('/success', async (req, res) => {
           }
         );
         
-        const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const baseUrl = esewaConfig.getFrontendUrl();
         const failureUrl = `${baseUrl}/payment/failure?error=verification_failed&message=${encodeURIComponent(verificationError.message)}`;
         res.redirect(failureUrl);
       }
@@ -360,14 +360,14 @@ router.get('/success', async (req, res) => {
         }
       );
       
-      const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const baseUrl = esewaConfig.getFrontendUrl();
       const failureUrl = `${baseUrl}/payment/failure?error=payment_not_complete&status=${transactionData.status}`;
       res.redirect(failureUrl);
     }
 
   } catch (error) {
     console.error('❌ eSewa success callback error:', error);
-    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const baseUrl = esewaConfig.getFrontendUrl();
     const failureUrl = `${baseUrl}/payment/failure?error=callback_error&message=${encodeURIComponent(error.message)}`;
     res.redirect(failureUrl);
   }
@@ -419,14 +419,14 @@ router.get('/failure', async (req, res) => {
     }
 
     // Redirect to failure page regardless
-    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const baseUrl = esewaConfig.getFrontendUrl();
     const failureUrl = `${baseUrl}/payment/failure?error=payment_cancelled_or_failed`;
     console.log('Redirecting to failure URL:', failureUrl);
     res.redirect(failureUrl);
 
   } catch (error) {
     console.error('❌ eSewa failure callback error:', error);
-    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const baseUrl = esewaConfig.getFrontendUrl();
     const failureUrl = `${baseUrl}/payment/failure?error=callback_error`;
     res.redirect(failureUrl);
   }
@@ -1082,10 +1082,10 @@ router.get('/test-callback', (req, res) => {
     message: 'Callback endpoint is working',
     timestamp: new Date().toISOString(),
     receivedParams: req.query,
-    frontendUrl: process.env.FRONTEND_URL || 'Not set',
+    frontendUrl: esewaConfig.getFrontendUrl(),
     config: {
-      successUrl: (process.env.FRONTEND_URL || 'http://localhost:5173') + '/payment/esewa/success',
-      failureUrl: (process.env.FRONTEND_URL || 'http://localhost:5173') + '/payment/failure'
+      successUrl: esewaConfig.getFrontendUrl() + '/payment/esewa/success',
+      failureUrl: esewaConfig.getFrontendUrl() + '/payment/failure'
     }
   });
 });
@@ -1099,7 +1099,7 @@ router.get('/test-success-redirect', (req, res) => {
   const testAmount = 1000;
   
   // Redirect to frontend success page with test data
-  const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+  const baseUrl = esewaConfig.getFrontendUrl();
   const successUrl = `${baseUrl}/payment/esewa/success?transactionId=${testTransactionId}&status=success&amount=${testAmount}&test=true`;
   
   console.log('Redirecting to test success URL:', successUrl);
