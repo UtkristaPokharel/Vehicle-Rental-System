@@ -35,7 +35,7 @@ const VehicleBookingCard = ({
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group hover:scale-[1.02]">
       <div className="relative">
         {/* Vehicle Image */}
-        <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
+        <div className="h-60 bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
           {vehicle.image ? (
             <img
               src={getImageUrl(vehicle.image)}
@@ -70,7 +70,7 @@ const VehicleBookingCard = ({
               </button>
               
               {showDropdown === index && (
-                <div className="absolute right-0 top-12 w-60 border bg-white border-gray-200 rounded-xl shadow-xl z-20">
+                <div className="absolute right-0 w-60 border bg-white border-gray-200 rounded-xl shadow-xl">
                   {showDeletePopover === index ? (
                     <div className="p-4">
                       <h2 className="text-base font-bold mb-2 text-center">Confirm Deletion</h2>
@@ -95,7 +95,7 @@ const VehicleBookingCard = ({
                     </div>
                   ) : (
                     <div className="py-2">
-                      <button 
+                      {/* <button 
                         onClick={() => onEdit(vehicle)} 
                         className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-2 transition-colors"
                       >
@@ -103,7 +103,7 @@ const VehicleBookingCard = ({
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                         Edit Vehicle
-                      </button>
+                      </button> */}
                       <button 
                         onClick={() => onDeleteClick(vehicle, index)} 
                         className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-2 text-red-600 transition-colors"
