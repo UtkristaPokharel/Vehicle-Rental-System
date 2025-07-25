@@ -1,20 +1,26 @@
 import { useState, useRef, useEffect } from 'react';
 import { IoMenu, IoClose } from "react-icons/io5";
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useProfileSidebar } from '../context/ProfileSidebarContext.jsx';
 
-export default function Navbar({ onProfileClick }) {
+export default function Navbar() {
     const defaultProfile = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
     
     const [isOpen, setIsOpen] = useState(false);
-    const [imgUrl, setImgUrl] = useState(defaultProfile); // Initialize with default profile image
+    const [imgUrl, setImgUrl] = useState(defaultProfile); 
     const menuref = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
+    const { openProfileSidebar } = useProfileSidebar();
 
     useEffect(() => {
         const stored = localStorage.getItem("profileImg");
         if (stored && stored.trim() !== "") {
-            setImgUrl(stored);
+            // Check if the stored URL is a complete URL or just a filename
+            const processedUrl = stored.startsWith('http') 
+                ? stored 
+                : `http://localhost:3001/uploads/profiles/${stored}`;
+            setImgUrl(processedUrl);
         }
         // If no stored image, keep the default profile that was already set in state
     }, []);
@@ -24,7 +30,11 @@ export default function Navbar({ onProfileClick }) {
         const handleProfileUpdate = () => {
             const stored = localStorage.getItem("profileImg");
             if (stored && stored.trim() !== "") {
-                setImgUrl(stored);
+                // Check if the stored URL is a complete URL or just a filename
+                const processedUrl = stored.startsWith('http') 
+                    ? stored 
+                    : `http://localhost:3001/uploads/profiles/${stored}`;
+                setImgUrl(processedUrl);
             } else {
                 setImgUrl(defaultProfile);
             }
@@ -57,13 +67,8 @@ export default function Navbar({ onProfileClick }) {
     const handleProfileClick = () => {
         const token = localStorage.getItem("token");
         if (token) {
-            // If user is logged in and onProfileClick is provided, use sidebar
-            if (onProfileClick) {
-                onProfileClick();
-            } else {
-                // Fallback to navigation for backward compatibility
-                navigate("/profile");
-            }
+            // If user is logged in, use the global ProfileSidebar
+            openProfileSidebar();
         } else {
             // Not logged in, go to login
             navigate("/login");
@@ -115,7 +120,7 @@ export default function Navbar({ onProfileClick }) {
                 <ul className='flex space-x-6'>
                     <li><Link to="/" className={getLinkClass('/')}>Home</Link></li>
                     <li><Link to="/about" className={getLinkClass('/about')}>About us</Link></li>
-                    <li><Link to="/browse" className={getLinkClass('/browse')}>Vehicles</Link></li>
+                    <li><Link to="/vehicles" className={getLinkClass('/vehicles')}>Vehicles</Link></li>
                     <li><button onClick={handleContactUsClick} className="hover:underline decoration-3 hover:decoration-red-600 hover:underline-offset-8">Contact Us</button></li>
                     <li><button onClick={handleFAQClick} className="hover:underline decoration-3 hover:decoration-red-600 hover:underline-offset-8">FAQ</button></li>
                 </ul>
@@ -127,7 +132,9 @@ export default function Navbar({ onProfileClick }) {
                 <button className='profile-icon' onClick={handleProfileClick}>
                     <img
                         src={imgUrl}
-                        onError={(e) => e.currentTarget.src = defaultProfile}
+                        onError={(e) => {
+                            e.currentTarget.src = defaultProfile;
+                        }}
                         className='w-10 h-10 rounded-full bg-white'
                         alt="profile"
                     />
@@ -139,7 +146,9 @@ export default function Navbar({ onProfileClick }) {
                 <button className='text-white' onClick={handleProfileClick}>
                     <img
                         src={imgUrl}
-                        onError={(e) => e.currentTarget.src = defaultProfile}
+                        onError={(e) => {
+                            e.currentTarget.src = defaultProfile;
+                        }}
                         className='w-9 h-9 rounded-full bg-white'
                         alt="profile"
                     />
@@ -161,7 +170,7 @@ export default function Navbar({ onProfileClick }) {
                     </button>
                     <Link to="/" onClick={handleToggle} className="hover:text-red-400">Home</Link>
                     <Link to="/about" onClick={handleToggle} className="hover:text-red-400">About Us</Link>
-                    <Link to="/browse" onClick={handleToggle} className="hover:text-red-400">Vehicles</Link>
+                    <Link to="/vehicles" onClick={handleToggle} className="hover:text-red-400">Vehicles</Link>
                     <button onClick={handleContactUsClick} className="hover:text-red-400">Contact Us</button>
                     <button onClick={handleFAQClick} className="hover:text-red-400">FAQ</button>
                     <button onClick={() => { handleToggle(); navigate("/add-vehicle"); }} className="bg-red-600 text-white px-4 py-2 rounded-xl mt-4">

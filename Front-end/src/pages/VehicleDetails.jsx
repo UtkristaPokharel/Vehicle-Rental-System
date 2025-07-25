@@ -1,10 +1,12 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import Navbar from "../components/Navbar";
 import { LocationPicker } from './LocationPicker';
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { useState, useEffect } from "react";
 import { FaPen, FaSpinner } from "react-icons/fa";
 import toast,{ Toaster } from "react-hot-toast";
+import { getApiUrl, getImageUrl as getVehicleImageUrl } from "../config/api";
+import BackButton from "../components/BackButton";
+import SimilarVehiclesRecommendation from "../components/SimilarVehiclesRecommendation";
 
 
 function VehicleDetails() {
@@ -27,11 +29,13 @@ function VehicleDetails() {
 
   useEffect(() => {
     const fetchVehicleData = async () => {
+      setLoading(true); // Set loading to true at the start of each fetch
+      
       // Always fetch complete data from backend to ensure we have all vehicle specifications
       if (id) {
         try {
           console.log("Fetching complete vehicle data with ID:", id);
-          const response = await fetch(`http://localhost:3001/api/vehicles/${id}`);
+          const response = await fetch(getApiUrl(`api/vehicles/${id}`));
           if (response.ok) {
             const data = await response.json();
             console.log("Fetched complete vehicle data:", data);
@@ -59,11 +63,8 @@ function VehicleDetails() {
       setLoading(false);
     };
 
-    // Only fetch if we're still loading
-    if (loading) {
-      fetchVehicleData();
-    }
-  }, [id, loading, location.state]); // Removed vehicleData from dependencies to prevent infinite loop
+    fetchVehicleData(); // Always call fetchVehicleData when dependencies change
+  }, [id, location.state]); // Removed loading from dependencies
 
   // Function to handle continue to payment
   const handleContinueToPayment = () => {
@@ -116,11 +117,17 @@ function VehicleDetails() {
       state: {
         bookingData: bookingData,
         vehicleData: {
+          ...vehicleData, // Pass all vehicle data
           name: vehicleData?.name,
           price: vehicleData?.price,
           image: vehicleData?.image,
           id: vehicleData?._id || vehicleData?.id,
-          dateRange: vehicleData?.dateRange
+          _id: vehicleData?._id || vehicleData?.id, // Ensure both id formats are available
+          dateRange: vehicleData?.dateRange,
+          type: vehicleData?.type,
+          brand: vehicleData?.brand,
+          location: vehicleData?.location,
+          capacity: vehicleData?.capacity
         },
         totalPrice: `रु${totalPrice.toLocaleString()}`,
         originalPrice: typeof vehicleData?.price === 'string' ? vehicleData.price : `रु${basePrice.toLocaleString()}`,
@@ -131,64 +138,36 @@ function VehicleDetails() {
 
   if (loading) {
     return (
-      <>
-        <Navbar />
-        <div className="detail-page flex justify-center items-center min-h-screen">
-          <div className="text-xl">Loading...</div>
-        </div>
-      </>
+      <div className="detail-page flex justify-center items-center min-h-screen">
+        <div className="text-xl">Loading...</div>
+      </div>
     );
   }
 
   if (!vehicleData) {
     return (
-      <>
-        <Navbar />
-        <div className="detail-page flex justify-center items-center min-h-screen">
-          <div className="text-xl">Vehicle not found</div>
-        </div>
-      </>
+      <div className="detail-page flex justify-center items-center min-h-screen">
+        <div className="text-xl">Vehicle not found</div>
+      </div>
     );
   }
 
-  // Function to construct proper image URL
-  const getImageUrl = (imagePath) => {
-    if (!imagePath || imageError) {
-      console.log("No image path provided or image error occurred");
-      return "/placeholder-vehicle.jpg";
-    }
-
-    // If it's already a full URL
-    if (imagePath.startsWith('http')) {
-      console.log("Using full URL:", imagePath);
-      return imagePath;
-    }
-
-    // If it starts with uploads/, use it as is
-    if (imagePath.startsWith('uploads/')) {
-      const url = `http://localhost:3001/${imagePath}`;
-      console.log("Using uploads path:", url);
-      return url;
-    }
-
-    // For vehicle images, they are stored in uploads/vehicles/ folder
-    // and only the filename is saved in the database
-    const url = `http://localhost:3001/uploads/vehicles/${imagePath}`;
-    console.log("Using vehicles folder:", url);
-    return url;
-  };
-
-  const imageUrl = getImageUrl(vehicleData?.image);
+  // Use imageError state to provide fallback image
+  const imageUrl = imageError ? "/placeholder-vehicle.jpg" : getVehicleImageUrl(vehicleData?.image);
 
   console.log("Vehicle image field:", vehicleData?.image);
   console.log("Final constructed image URL:", imageUrl);
 
   return (
     <>
-      <Navbar />
       <Toaster />
       <div className="detail-page flex justify-center items-center md:mb-5 mb-20">
         <div className="w-full md:w-[90vw] lg:w-[85vw] xl:w-[80vw] px-4 md:px-6 lg:px-10 mt-8 md:mt-12">
+          {/* Back Button */}
+          <div className="mb-4">
+            <BackButton />
+          </div>
+          
           <div className="py-4 md:py-6 flex justify-center items-center">
             <img 
               className="w-full max-w-[600px] lg:max-w-[650px] h-auto object-cover rounded-lg shadow-md" 
@@ -232,6 +211,11 @@ function VehicleDetails() {
               <VehicleFeatures features={vehicleData.features || features} />
             </div>
           </div>
+
+          {/* Similar Vehicles Recommendation */}
+          <div className="mt-12">
+            <SimilarVehiclesRecommendation currentVehicle={vehicleData} limit={4} />
+          </div>
         </div>
       </div>
     </>
@@ -240,7 +224,7 @@ function VehicleDetails() {
 
 export default VehicleDetails;
 
-export const BasicFeatures = ({ name, type, seats, fuelType, mileage , transmission = "Automatic" }) => {
+export const BasicFeatures = ({ name, type, capacity,seats, fuelType, mileage , transmission = "Automatic" }) => {
   const formatType = (vehicleType) => {
     if (!vehicleType) return "Vehicle";
     return vehicleType === 'two-wheeler' ? 'Two Wheeler' : 
@@ -248,8 +232,8 @@ export const BasicFeatures = ({ name, type, seats, fuelType, mileage , transmiss
   };
 
   const formatFuelType = (fuel) => {
-    if (!fuel) return "Gas (Regular)";
-    return fuel === "Gas" ? "Gas (Regular)" : fuel;
+    if (!fuel) return "Petrol (Regular)";
+    return fuel === "Petrol" ? "Petrol (Regular)" : fuel;
   };
 
   return (
@@ -260,7 +244,7 @@ export const BasicFeatures = ({ name, type, seats, fuelType, mileage , transmiss
       <div className="flex flex-wrap gap-2 md:gap-3 mt-4">
         <div className="flex items-center gap-2 px-2 md:px-3 py-2 bg-gray-200 rounded text-xs md:text-sm">
           <span>👤</span>
-          <span>{seats} seats</span>
+          <span>{seats || capacity }</span>
         </div>
         <div className="flex items-center gap-2 px-2 md:px-3 py-2 bg-gray-200 rounded text-xs md:text-sm">
           <span>⛽</span>
@@ -268,7 +252,7 @@ export const BasicFeatures = ({ name, type, seats, fuelType, mileage , transmiss
         </div>
         <div className="flex items-center gap-2 px-2 md:px-3 py-2 bg-gray-200 rounded text-xs md:text-sm">
           <span>🧳</span>
-          <span>{mileage} MPG</span>
+          <span>{mileage} KMPL</span>
         </div>
         <div className="flex items-center gap-2 px-2 md:px-3 py-2 bg-gray-200 rounded text-xs md:text-sm">
           <span>⚙️</span>
@@ -322,7 +306,6 @@ const getCurrentTime = () =>
 
 export const BookingSection = ({
   price = "रु3,116",
-  originalPrice = "रु5,079",
   location = "Butwal, Nepal",
   onBookingChange,
   onContinue
@@ -375,9 +358,6 @@ export const BookingSection = ({
 
           <div className="md:flex items-center justify-between max-w-lg   hidden">
             <div>
-              <p className="text-sm text-gray-400 line-through">
-                {originalPrice}
-              </p>
               <p className="text-lg font-bold text-black">{formatPrice(price)} total</p>
               <p className="text-xs text-gray-500">Before taxes</p>
             </div>
@@ -386,40 +366,88 @@ export const BookingSection = ({
 
           <label className="text-sm text-gray-700">Trip start</label>
           <div className="flex gap-2 mt-1 mb-3">
-            <input
-              type="date"
-              value={booking.startDate}
-              onChange={(e) => handleChange("startDate", e.target.value)}
-              min={getTodayDate()}
-              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <input
-              type="time"
-              value={booking.startTime}
-              onChange={(e) => handleChange("startTime", e.target.value)}
-              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
+            <div className="w-1/2 relative">
+              <input
+                type="date"
+                value={booking.startDate}
+                onChange={(e) => handleChange("startDate", e.target.value)}
+                min={getTodayDate()}
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer hover:bg-gray-50 transition-colors"
+                style={{
+                  colorScheme: 'light',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'textfield'
+                }}
+                onClick={(e) => {
+                  e.target.showPicker && e.target.showPicker();
+                  e.target.focus();
+                }}
+                onFocus={(e) => e.target.showPicker && e.target.showPicker()}
+                required
+              />
+            </div>
+            <div className="w-1/2 relative">
+              <input
+                type="time"
+                value={booking.startTime}
+                onChange={(e) => handleChange("startTime", e.target.value)}
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer hover:bg-gray-50 transition-colors"
+                style={{
+                  colorScheme: 'light',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'textfield'
+                }}
+                onClick={(e) => {
+                  e.target.showPicker && e.target.showPicker();
+                  e.target.focus();
+                }}
+                onFocus={(e) => e.target.showPicker && e.target.showPicker()}
+                required
+              />
+            </div>
           </div>
 
           <label className="text-sm text-gray-700">Trip end</label>
           <div className="flex gap-2 mt-1 mb-3">
-            <input
-              type="date"
-              value={booking.endDate}
-              onChange={(e) => handleChange("endDate", e.target.value)}
-              min={booking.startDate || getTodayDate()}
-              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <input
-              type="time"
-              value={booking.endTime}
-              onChange={(e) => handleChange("endTime", e.target.value)}
-              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
+            <div className="w-1/2 relative">
+              <input
+                type="date"
+                value={booking.endDate}
+                onChange={(e) => handleChange("endDate", e.target.value)}
+                min={booking.startDate || getTodayDate()}
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer hover:bg-gray-50 transition-colors"
+                style={{
+                  colorScheme: 'light',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'textfield'
+                }}
+                onClick={(e) => {
+                  e.target.showPicker && e.target.showPicker();
+                  e.target.focus();
+                }}
+                onFocus={(e) => e.target.showPicker && e.target.showPicker()}
+                required
+              />
+            </div>
+            <div className="w-1/2 relative">
+              <input
+                type="time"
+                value={booking.endTime}
+                onChange={(e) => handleChange("endTime", e.target.value)}
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer hover:bg-gray-50 transition-colors"
+                style={{
+                  colorScheme: 'light',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'textfield'
+                }}
+                onClick={(e) => {
+                  e.target.showPicker && e.target.showPicker();
+                  e.target.focus();
+                }}
+                onFocus={(e) => e.target.showPicker && e.target.showPicker()}
+                required
+              />
+            </div>
           </div>
         </div>
 
@@ -448,9 +476,6 @@ export const BookingSection = ({
       <div className="fixed bottom-0 left-0 right-0 bg-white shadow-inner md:hidden md:mt-6 p-4 border-t md:border-none z-50">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <div>
-            <p className="text-sm text-gray-400 line-through">
-              {originalPrice}
-            </p>
             <p className="text-lg font-bold text-black">{formatPrice(price)} total</p>
             <p className="text-xs text-gray-500">Before taxes</p>
           </div>

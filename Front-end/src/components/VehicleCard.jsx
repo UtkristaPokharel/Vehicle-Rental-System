@@ -1,18 +1,92 @@
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getApiUrl, getImageUrl } from "../config/api";
 
-const VehicleCard = ({ vehicle, type }) => {
+const VehicleCard = ({ vehicle, type, onVehicleClick }) => {
   const [liked, setLiked] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Check if vehicle is in favorites when component mounts
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      const token = localStorage.getItem("token") || localStorage.getItem("adminToken");
+      if (!token) return;
+
+      try {
+        const response = await fetch(getApiUrl(`api/favorites/check/${vehicle._id}`), {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setLiked(data.isFavorite);
+        }
+      } catch (error) {
+        console.error('Error checking favorite status:', error);
+      }
+    };
+
+    checkFavoriteStatus();
+  }, [vehicle._id]);
+
+  const handleFavoriteToggle = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const token = localStorage.getItem("token") || localStorage.getItem("adminToken");
+    if (!token) {
+      alert("Please login to add favorites");
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const url = liked 
+        ? getApiUrl(`api/favorites/remove/${vehicle._id}`)
+        : getApiUrl(`api/favorites/add/${vehicle._id}`);
+      
+      const method = liked ? 'DELETE' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setLiked(data.isFavorite);
+      } else {
+        const errorData = await response.json();
+        console.error('Error toggling favorite:', errorData.message);
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const trackClick = async () => {
     try {
-      await fetch(`http://localhost:3001/api/public/track-click/${vehicle._id}`, {
+      await fetch(getApiUrl(`api/public/track-click/${vehicle._id}`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
       });
+      
+      // Notify parent component about the click
+      if (onVehicleClick) {
+        onVehicleClick(vehicle._id);
+      }
     } catch (error) {
       console.error('Error tracking click:', error);
     }
@@ -36,22 +110,20 @@ const VehicleCard = ({ vehicle, type }) => {
         <div className="relative">
           <img
             className="w-full h-52 sm:h-56 object-cover object-center transition-transform duration-300 group-hover:scale-105"
-            src={`http://localhost:3001/uploads/vehicles/${vehicle.image}`}
+            src={getImageUrl(vehicle.image)}
             alt={vehicle.name}
           />
           
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              setLiked(!liked);
-            }}
+            onClick={handleFavoriteToggle}
+            disabled={loading}
             className={`absolute top-3 right-3 p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-105 z-20 ${
               liked 
                 ? 'bg-red-500 text-white' 
                 : 'bg-white text-red-500 hover:text-red-600'
-            }`}
+            } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {liked ? <FaHeart className="text-lg" /> : <FaRegHeart className="text-lg" />}
           </button>

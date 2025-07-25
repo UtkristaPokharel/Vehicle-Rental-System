@@ -1,69 +1,23 @@
-import Navbar from '../components/Navbar.jsx'
-import LandingPage from '../components/LandingPage.jsx';
-import PopularDest from "../components/Destination.jsx";
-import SubscriptionForm from "../components/SubscriptionPage.jsx";
-import Footer from "../components/footer.jsx"
-import VehicleBrowse from './Browse.jsx';
-import ContactUs from './ContactUs.jsx';
-import FAQPage from './FAQPage.jsx';
-import ProfileSidebar from '../components/ProfileSidebar.jsx';
-import { useState } from 'react';
-import { FaCarSide, FaRegHandshake, FaGift } from "react-icons/fa";
+import HeroSection from '../components/HomePage/HeroSection.jsx';
+import PopularDest from "../components/HomePage/Destination.jsx";
+import VehicleBrowse from '../components/HomePage/Browse.jsx';
+import ContactUs from '../components/HomePage/ContactUs.jsx';
+import FAQPage from '../components/HomePage/FAQPage.jsx';
+import { FaCarSide, FaRegHandshake, FaGift, FaBrain } from "react-icons/fa";
+import { Link } from 'react-router-dom';
 
 function Home() {
-  const [isProfileSidebarOpen, setIsProfileSidebarOpen] = useState(false);
-
-  const handleProfileClick = () => {
-    setIsProfileSidebarOpen(true);
-  };
-
-  const handleCloseSidebar = () => {
-    setIsProfileSidebarOpen(false);
-  };
-
   return (
-    <>
-      <Navbar onProfileClick={handleProfileClick} />
-      <div className="Home-page flex justify-center flex-col items-center">
-        <LandingPage />
-        <VehicleBrowse />
-        <PopularDest />
-
-        {/* info-boxes */}
-        {/* <div className="info-section p-10  flex justify-center flex-row items-center flex-wrap lg:flex-nowrap  gap-10">
-
-          <div className="box1 bg-cyan-200 md:w-[450px]  md:h-70 w-[80vw] h-75  rounded-2xl ">
-            <h2 className='text-2xl font-bold  mx-10 mt-13 mb-2 '>Are you looking for a car, bike, scooter, truck ... ?</h2>
-            <h4 className='text-md font-semibold text-gray-600 mx-10 '> We provide a platform for easy and affordable solution for renting a vehicle</h4>
-            <button className=' bg-red-500  text-white font-bold px-3 py-2 mt-8 mx-10 rounded-xl'> Get Started</button>
-
-          </div> */}
-
-          {/* box-2's content must be changed */}
-          {/* <div className="box2 bg-amber-200 md:w-[450px] md:h-70  w-[80vw] h-85 rounded-2xl">
-            <h2 className='text-2xl font-bold  mx-10 mt-13 mb-2 '>Are you looking for a car, bike, scooter, truck ... ?</h2>
-            <h4 className='text-md font-semibold text-gray-600 mx-10 '> We provide a platform for easy and affordable solution for renting a vehicle</h4>
-            <button className=' bg-red-500  text-white font-bold px-3 py-2 mt-8 mx-10 rounded-xl'> Get Started</button>
-
-          </div> */}
-
-        {/* </div> */}
-
-      </div>
-        <FeatureSection/>
-        <ContactUs/>
-        <FAQPage />
-        <SubscriptionForm />
-      <Footer />
-      
-      {/* Profile Sidebar */}
-      <ProfileSidebar 
-        isOpen={isProfileSidebarOpen} 
-        onClose={handleCloseSidebar} 
-      />
-    </>
+    <div className="Home-page flex justify-center flex-col items-center">
+      <HeroSection />
+      <VehicleBrowse />
+      <PopularDest />
+      <FeatureSection/>
+      <ContactUs/>
+      <FAQPage />
+    </div>
   );
-} 
+}
 
 export function FeatureSection() {
   const features = [
@@ -82,19 +36,38 @@ export function FeatureSection() {
       title: "Upgraded fleet every year",
       description: "Take a break from routine with the latest vehicle models on the market",
     },
+    {
+      icon: <FaBrain className="text-3xl text-red-600" />,
+      title: "Smart Recommendations",
+      description: "AI-powered content filtering to find vehicles that match your preferences perfectly",
+      isNew: true,
+    },
   ];
 
   return (
     <section className=" my-10 px-10 w-full">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {features.map((feature, index) => (
           <div
             key={index}
-            className="bg-white rounded-lg border-1 border-gray-200 shadow-sm p-6 text-center hover:shadow-md transition-shadow"
+            className="bg-white rounded-lg border-1 border-gray-200 shadow-sm p-6 text-center hover:shadow-md transition-shadow relative"
           >
+            {feature.isNew && (
+              <div className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                NEW
+              </div>
+            )}
             <div className="flex justify-center mb-4">{feature.icon}</div>
             <h3 className="text-lg font-semibold text-gray-800 mb-2">{feature.title}</h3>
-            <p className="text-sm text-gray-600">{feature.description}</p>
+            <p className="text-sm text-gray-600 mb-4">{feature.description}</p>
+            {feature.isNew && (
+              <Link 
+                to="/content-filtering-demo" 
+                className="inline-block bg-blue-500 text-white px-4 py-2 rounded-md text-xs hover:bg-blue-600 transition-colors"
+              >
+                Learn More
+              </Link>
+            )}
           </div>
         ))}
       </div>

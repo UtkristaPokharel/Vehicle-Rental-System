@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { getApiUrl, getImageUrl } from "../../../config/api";
 
 export default function EditVehicleForm({ initialData = null, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
@@ -8,7 +9,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
     brand: "",
     price: "",
     location: "",
-    seats: "",
+    capacity: "",
     fuelType: "",
     mileage: "",
     transmission: "",
@@ -25,6 +26,27 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
+  // Helper functions for dynamic labels
+  const getMileageLabel = () => {
+    return formData.fuelType === "Electric" ? "Range (KM)" : "Mileage (KMPL)";
+  };
+
+  const getMileagePlaceholder = () => {
+    return formData.fuelType === "Electric" ? "Range in Kilometers" : "Mileage (KMPL)";
+  };
+
+  const getSeatsLabel = () => {
+    return (formData.type === "pickup" || formData.type === "truck") ? "Capacity" : "Number of Seats";
+  };
+
+  const getSeatsPlaceholder = () => {
+    return (formData.type === "pickup" || formData.type === "truck") ? "Load Capacity" : "Number of Seats";
+  };
+
+  const getMaxCapacity = () => {
+    return (formData.type === "pickup" || formData.type === "truck") ? "10000" : "50";
+  };
+
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -33,7 +55,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         brand: initialData.brand || "",
         price: initialData.price || "",
         location: initialData.location || "",
-        seats: initialData.seats || "",
+        capacity: initialData.capacity || initialData.seats || "",
         fuelType: initialData.fuelType || "",
         mileage: initialData.mileage || "",
         transmission: initialData.transmission || "",
@@ -47,15 +69,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
       });
 
       if (initialData.image) {
-        let imageUrl;
-        if (initialData.image.startsWith('http')) {
-          imageUrl = initialData.image;
-        } else if (initialData.image.startsWith('uploads/')) {
-          imageUrl = `http://localhost:3001/${initialData.image}`;
-        } else {
-          imageUrl = `http://localhost:3001/uploads/vehicles/${initialData.image}`;
-        }
-        setImagePreview(imageUrl);
+        setImagePreview(getImageUrl(initialData.image));
       }
     }
   }, [initialData]);
@@ -86,23 +100,42 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
 
     if (!formData.location.trim()) newErrors.location = "Location is required.";
 
-    if (!formData.seats || parseInt(formData.seats) < 1) newErrors.seats = "Seats must be at least 1.";
+    if (!formData.capacity || parseInt(formData.capacity) < 1) {
+      if (formData.type === "pickup" || formData.type === "truck") {
+        newErrors.capacity = "Capacity must be at least 1.";
+      } else {
+        newErrors.capacity = "Seats must be at least 1.";
+      }
+    } else if (formData.type === "pickup" || formData.type === "truck") {
+      if (parseInt(formData.capacity) > 10000) {
+        newErrors.capacity = "Capacity cannot exceed 10000 for trucks and pickups.";
+      }
+    } else if (parseInt(formData.capacity) > 50) {
+      newErrors.capacity = "Seats cannot exceed 50 for passenger vehicles.";
+    }
 
     if (!formData.fuelType.trim()) newErrors.fuelType = "Fuel type is required.";
 
-    if (!formData.mileage || parseFloat(formData.mileage) <= 0) newErrors.mileage = "Mileage must be positive.";
+    if (!formData.mileage || parseFloat(formData.mileage) <= 0) {
+      if (formData.fuelType === "Electric") {
+        newErrors.mileage = "Range must be positive.";
+      } else {
+        newErrors.mileage = "Mileage must be positive.";
+      }
+    }
 
     if (!formData.transmission.trim()) newErrors.transmission = "Transmission type is required.";
 
     // Image validation only for add mode (when initialData is null)
     if (!initialData && !image) {
       newErrors.image = "Image is required.";
-    } else if (!initialData && image) {
+    } else if (image) {
+      // Validate image if one is selected (for both add and edit modes)
       const allowed = ['image/jpeg', 'image/png', 'image/jpg'];
       if (!allowed.includes(image.type)) {
         newErrors.image = "Invalid image type.";
-      } else if (image.size > 5 * 1024 * 1024) {
-        newErrors.image = "Image must be < 5MB.";
+      } else if (image.size > 10 * 1024 * 1024) {
+        newErrors.image = "Image must be < 10MB.";
       }
     }
 
@@ -148,50 +181,6 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         ...prev,
         image: undefined
       }));
-    }
-  };
-
-  const handleToggleStatus = async () => {
-    if (!initialData) return; // Only for edit mode
-    
-    const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
-    if (!token) {
-      toast.error("Login required");
-      return;
-    }
-
-    const newStatus = !formData.isActive;
-    
-    try {
-      const res = await fetch(`http://localhost:3001/api/toggle-vehicle-status/${initialData._id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ isActive: newStatus }),
-      });
-
-      const data = await res.json();
-      
-      if (res.ok) {
-        // Update local state
-        setFormData(prev => ({
-          ...prev,
-          isActive: newStatus
-        }));
-        
-        toast.success(data.message);
-        
-        if (onSubmit) {
-          onSubmit(data.vehicle);
-        }
-      } else {
-        throw new Error(data.message || "Failed to update status");
-      }
-    } catch (error) {
-      console.error("Error toggling status:", error);
-      toast.error("Error updating vehicle status: " + error.message);
     }
   };
 
@@ -249,11 +238,11 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         const updateData = {
           ...formData,
           _id: initialData._id,
-          seats: parseInt(formData.seats),
+          capacity: parseInt(formData.capacity),
           mileage: parseFloat(formData.mileage),
         };
 
-        const res = await fetch("http://localhost:3001/api/update-vehicle", {
+        const res = await fetch(getApiUrl("api/update-vehicle"), {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -265,7 +254,35 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Update failed");
 
-        toast.success("Vehicle updated successfully");
+        // If there's a new image to upload
+        if (image) {
+          try {
+            const imageFormData = new FormData();
+            imageFormData.append("vehicleImage", image);
+            imageFormData.append("vehicleId", initialData._id);
+
+            const imageRes = await fetch(getApiUrl("api/update-vehicle-image"), {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              body: imageFormData,
+            });
+
+            const imageData = await imageRes.json();
+            if (!imageRes.ok) {
+              throw new Error(imageData.message || "Image update failed");
+            }
+            
+            toast.success("Vehicle and image updated successfully");
+          } catch (imageError) {
+            console.error("Image update error:", imageError);
+            toast.error("Vehicle updated but image update failed: " + imageError.message);
+          }
+        } else {
+          toast.success("Vehicle updated successfully");
+        }
+
         onSubmit(updateData);
       } else {
         // Create new vehicle
@@ -275,7 +292,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         submission.append("brand", formData.brand);
         submission.append("price", formData.price);
         submission.append("location", formData.location);
-        submission.append("seats", formData.seats);
+        submission.append("capacity", formData.capacity);
         submission.append("fuelType", formData.fuelType);
         submission.append("mileage", formData.mileage);
         submission.append("transmission", formData.transmission);
@@ -286,7 +303,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
         submission.append("createdById", userId || "admin");
         submission.append("isActive", true); // Always set to true for admin-created vehicles
 
-        const res = await fetch("http://localhost:3001/api/user/add-vehicle", {
+        const res = await fetch(getApiUrl("api/user/add-vehicle"), {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -311,7 +328,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
             brand: "",
             price: "",
             location: "",
-            seats: "",
+            capacity: "",
             fuelType: "",
             mileage: "",
             transmission: "",
@@ -346,7 +363,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
 
   return (
     <div className="bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg w-full overflow-y-auto">
+      <div className="bg-white rounded-lg w-full overflow-y-auto hide-scrollbar">
         <div className="px-6 py-2">
           <Toaster />
           <div className="flex justify-between items-center mb-4">
@@ -368,29 +385,6 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
               <div className="flex justify-between items-start mb-2">
                 <h3 className="text-lg font-semibold text-blue-800">Editing Vehicle</h3>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-600">Status:</span>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      formData.isActive 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {formData.isActive ? '✓ Active' : '✗ Inactive'}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleToggleStatus}
-                    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                      formData.isActive
-                        ? 'bg-red-100 text-red-700 hover:bg-red-200 border border-red-300'
-                        : 'bg-green-100 text-green-700 hover:bg-green-200 border border-green-300'
-                    }`}
-                  >
-                    {formData.isActive ? 'Deactivate' : 'Activate'}
-                  </button>
-                </div>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
@@ -455,22 +449,33 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
             {/* Vehicle Specifications */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {getSeatsLabel()} *
+                </label>
                 <input
                   type="number"
-                  name="seats"
-                  placeholder="Number of Seats"
-                  value={formData.seats}
+                  name="capacity"
+                  placeholder={getSeatsPlaceholder()}
+                  value={formData.capacity}
                   onChange={handleChange}
                   className="border p-2 rounded w-full"
                   min="1"
-                  max="50"
+                  max={getMaxCapacity()}
                 />
-                {errors.seats && (
-                  <p className="text-red-500 text-sm">{errors.seats}</p>
+                {(formData.type === "pickup" || formData.type === "truck") && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    For pickup/truck: Enter load capacity or passenger count (max 10,000)
+                  </p>
+                )}
+                {errors.capacity && (
+                  <p className="text-red-500 text-sm">{errors.capacity}</p>
                 )}
               </div>
               
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Fuel Type *
+                </label>
                 <select
                   name="fuelType"
                   value={formData.fuelType}
@@ -479,7 +484,8 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
                   required
                 >
                   <option value="">Select Fuel Type</option>
-                  <option value="Gas">Gas</option>
+                  <option value="Petrol">Petrol</option>
+                  <option value="Diesel">Diesel</option>
                   <option value="Electric">Electric</option>
                   <option value="Hybrid">Hybrid</option>
                 </select>
@@ -489,22 +495,33 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {getMileageLabel()} *
+                </label>
                 <input
                   type="number"
                   name="mileage"
-                  placeholder="Mileage (MPG)"
+                  placeholder={getMileagePlaceholder()}
                   value={formData.mileage}
                   onChange={handleChange}
                   className="border p-2 rounded w-full"
                   min="1"
                   step="0.1"
                 />
+                {formData.fuelType === "Electric" && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Electric vehicles: Enter driving range in kilometers
+                  </p>
+                )}
                 {errors.mileage && (
                   <p className="text-red-500 text-sm">{errors.mileage}</p>
                 )}
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Transmission *
+                </label>
                 <select
                   name="transmission"
                   value={formData.transmission}
@@ -608,7 +625,7 @@ export default function EditVehicleForm({ initialData = null, onSubmit, onCancel
                             <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                           </svg>
                           <p className="text-sm text-blue-700">
-                            Upload a clear, high-quality image of your vehicle. Supported formats: JPG, PNG. Max size: 5MB.
+                            Upload a clear, high-quality image of your vehicle. Supported formats: JPG, PNG. Max size: 10MB.
                           </p>
                         </div>
                       </div>

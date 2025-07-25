@@ -1,24 +1,8 @@
 const multer = require('multer');
 const path = require('path');
+const { vehicleStorage, profileStorage, licenseStorage } = require('../utils/cloudinary');
 
-const profileStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/profiles/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-
-const vehicleStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/vehicles/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-
+// Removed local storage configurations as we're using Cloudinary
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg','image/avif'];
   if (allowedTypes.includes(file.mimetype)) {
@@ -29,15 +13,21 @@ const fileFilter = (req, file, cb) => {
 };
 
 const profileUpload = multer({
-  storage: profileStorage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  storage: profileStorage, // Use profile-specific storage
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
   fileFilter,
 });
 
 const vehicleUpload = multer({
-  storage: vehicleStorage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  storage: vehicleStorage, // Use vehicle-specific storage
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
   fileFilter,
 });
 
-module.exports = { profileUpload, vehicleUpload };
+const licenseUpload = multer({
+  storage: licenseStorage, // Use license-specific storage
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter,
+});
+
+module.exports = { profileUpload, vehicleUpload, licenseUpload };

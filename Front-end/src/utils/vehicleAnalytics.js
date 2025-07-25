@@ -1,8 +1,9 @@
 // Utility functions for vehicle analytics and content-based filtering
+import { getApiUrl } from '../config/api';
 
 export const trackVehicleClick = async (vehicleId) => {
   try {
-    const response = await fetch(`http://localhost:3001/api/public/track-click/${vehicleId}`, {
+    const response = await fetch(getApiUrl(`api/public/track-click/${vehicleId}`), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -23,7 +24,7 @@ export const trackVehicleClick = async (vehicleId) => {
 
 export const getPopularVehicles = async (limit = 10) => {
   try {
-    const response = await fetch(`http://localhost:3001/api/public/popular?limit=${limit}`);
+    const response = await fetch(getApiUrl(`api/public/popular?limit=${limit}`));
     
     if (!response.ok) {
       throw new Error('Failed to fetch popular vehicles');

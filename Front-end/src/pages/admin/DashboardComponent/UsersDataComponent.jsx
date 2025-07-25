@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import axios from "axios";
 import toast,{ Toaster } from "react-hot-toast";
+import { getApiUrl, getProfileImageUrl } from "../../../config/api";
 // UserDetailModal component
+
 function UserDetailModal({ user, onClose, onUserUpdate }) {
   const defaultProfileImg = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
   
@@ -18,7 +20,7 @@ function UserDetailModal({ user, onClose, onUserUpdate }) {
     try {
       const newVerifiedStatus = !user.isVerified;
       
-      const response = await fetch(`http://localhost:3001/api/fetch/users/verify/${user._id}`, {
+      const response = await fetch(getApiUrl(`api/fetch/users/verify/${user._id}`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -27,58 +29,47 @@ function UserDetailModal({ user, onClose, onUserUpdate }) {
         body: JSON.stringify({ verified: newVerifiedStatus })
       });
 
-      if (response.status === 200) {
-        toast.success(response.data.message);
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.message || "Verification status updated successfully");
         // Call the callback to refresh the user data
         if (onUserUpdate) {
           onUserUpdate();
         }
         onClose(); // Close the modal to refresh the view
       } else {
-        toast.error(response.data.message || "Failed to update verification status");
+        toast.error(data.message || "Failed to update verification status");
       }
     } catch (err) {
       console.error('Verification error details:', err);
       
       // Handle specific error types
-      if (err.code === 'ERR_NETWORK' || err.message.includes('Network Error')) {
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
         toast.error("Network error. Please check if the server is running.");
-      } else if (err.response?.status === 401) {
-        toast.error("Unauthorized. Please log in as admin.");
-      } else if (err.response?.status === 403) {
-        toast.error("Access denied. Admin privileges required.");
-      } else if (err.response?.status === 404) {
-        toast.error("User not found.");
-      } else if (err.message.includes('CORS')) {
-        toast.error("Server configuration error. Please contact administrator.");
+      } else if (err.message.includes('Network Error')) {
+        toast.error("Network error. Please check if the server is running.");
       } else {
-        toast.error(err.response?.data?.message || "Error updating verification status");
+        toast.error("Error updating verification status. Please try again.");
       }
     }
   };
   
   // Handle different image URL formats
   const getImageUrl = (imgUrl) => {
-    console.log("User image URL:", imgUrl); // Debug log
     if (!imgUrl) return defaultProfileImg;
-    if (imgUrl.startsWith('http')) return imgUrl;
-    // For profile images, they're stored as filenames and need the full path
-    const fullUrl = `http://localhost:3001/uploads/profiles/${imgUrl}`;
-    console.log("Constructed profile image URL:", fullUrl); // Debug log
-    return fullUrl;
+    return getProfileImageUrl(imgUrl) || defaultProfileImg;
   };
 
   // Handle license image URL construction
   const getLicenseImageUrl = (licenseImg) => {
     if (!licenseImg) return null;
-    if (licenseImg.startsWith('http')) return licenseImg;
-    // For license images, they're stored as filenames and need the full path
-    return `http://localhost:3001/uploads/profiles/${licenseImg}`;
+    return getProfileImageUrl(licenseImg);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-      <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
+      <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto hide-scrollbar relative">
         <button onClick={onClose} className="absolute top-2 right-4 text-2xl text-gray-400 hover:text-gray-700">&times;</button>
         
         <div className="flex flex-col gap-6">
@@ -264,7 +255,7 @@ function UsersDataComponent() {
     },[])
 
     const fetchUsers = () => {
-        axios.get("http://localhost:3001/api/fetch/users")
+        axios.get(getApiUrl("api/fetch/users"))
         .then(res=>setUsers(res.data.reverse()))
         .catch(err=>toast.error("Error fetching users:", err));
     };
@@ -300,7 +291,7 @@ function UsersDataComponent() {
             return;
         }
         try {
-            const response = await axios.delete(`http://localhost:3001/api/fetch/users/delete-user/${userToDelete._id}`, {
+            const response = await axios.delete(getApiUrl(`api/fetch/users/delete-user/${userToDelete._id}`), {
                 headers: { Authorization: `Bearer ${token}` },
             });
             if (response.status === 200) {
@@ -326,7 +317,7 @@ function UsersDataComponent() {
     };
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto hide-scrollbar">
         <table className='w-full'>
             <thead>
          <tr className="text-left text-sm font-medium text-gray-500 border-b">
@@ -346,13 +337,8 @@ function UsersDataComponent() {
                 const defaultProfileImg = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
                 
                 const getImageUrl = (imgUrl) => {
-                  console.log("Table row - User image URL:", imgUrl); // Debug log
                   if (!imgUrl) return defaultProfileImg;
-                  if (imgUrl.startsWith('http')) return imgUrl;
-                  // For profile images, they're stored as filenames and need the full path
-                  const fullUrl = `http://localhost:3001/uploads/profiles/${imgUrl}`;
-                  console.log("Table row - Constructed profile image URL:", fullUrl); // Debug log
-                  return fullUrl;
+                  return getProfileImageUrl(imgUrl) || defaultProfileImg;
                 };
 
                 return (

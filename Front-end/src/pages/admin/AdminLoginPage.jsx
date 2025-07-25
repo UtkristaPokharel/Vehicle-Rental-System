@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast,{ Toaster } from "react-hot-toast";
+import { getApiUrl } from "../../config/api";
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState("");
@@ -17,7 +18,7 @@ export default function AdminLoginPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:3001/admin/login", {
+      const res = await fetch(getApiUrl("admin/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -54,34 +55,42 @@ export default function AdminLoginPage() {
   }
 
   return (
-  <>
-    <div className="flex flex-col items-center justify-center  mt-20">
-      <h2 className="text-2xl font-bold mb-4">Admin Login</h2>
-      <form onSubmit={handleLogin} className="flex flex-col gap-4 w-[300px]">
-        <input
-          type="text"
-          placeholder="Username"
-          className=" border-gray-500 rounded-xl border-2 p-2"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="border-2 border-gray-500 p-2 rounded-xl"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button className="bg-red-600 text-white font-bold py-2 rounded-xl">Login</button>
-       
-        {/* {error && <p className="text-red-500">{error}</p>} */}
-      </form>
+    <>
+      <div className="min-h-screen flex flex-col items-center justify-center px-4">
+        <div className="w-full max-w-md space-y-6">
+          <h2 className="text-2xl font-bold text-center">Admin Login</h2>
+          
+          <form onSubmit={handleLogin} className="flex flex-col gap-4">
+            <input
+              type="text"
+              placeholder="Username"
+              className="border-gray-500 rounded-xl border-2 p-2"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              className="border-2 border-gray-500 p-2 rounded-xl"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button className="bg-red-600 text-white font-bold py-2 rounded-xl">
+              Login
+            </button>
+          </form>
 
-        <div className="relative top-10 left-0 ">
-       <button onClick={()=>handleLogout()} className=" px-4 py-2 border-red-500 border-1 rounded-xl hover:bg-red-500 hover:text-white"> Logout</button>
-       </div>
-    </div>
-  
+          <div className="text-center">
+            <button 
+              onClick={() => handleLogout()} 
+              className="px-4 py-2 border-red-500 border rounded-xl hover:bg-red-500 hover:text-white transition-colors"
+            > 
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+      <Toaster />
     </>
   );
 }

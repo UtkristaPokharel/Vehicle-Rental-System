@@ -5,6 +5,7 @@ import { MdSubscriptions } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
 import axios from "axios";
 import Logout from "../pages/Api/Logout.jsx";
+import { getApiUrl } from "../config/api";
 
 const defaultProfile = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
 
@@ -23,6 +24,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [isHost, setIsHost] = useState(false);
   const fileInputRef = useRef(null);
   const sidebarRef = useRef(null);
 
@@ -33,19 +35,26 @@ export default function ProfileSidebar({ isOpen, onClose }) {
         const token = localStorage.getItem("token") || localStorage.getItem("adminToken");
         if (!token) return;
         try {
-          const res = await axios.get("http://localhost:3001/api/fetch/users/me", {
+          const res = await axios.get(getApiUrl("api/fetch/users/me"), {
             headers: { Authorization: `Bearer ${token}` },
           });
-          setName(res.data.name);
-          setEmail(res.data.email);
-          setProfileImg(res.data.imgUrl || defaultProfile);
-          setProfileImagePreview(res.data.imgUrl || defaultProfile);
-          if (res.data.licenseFront) setLicenseFrontPreview(res.data.licenseFront);
-          if (res.data.licenseBack) setLicenseBackPreview(res.data.licenseBack);
+          
+          // Handle both old and new response structures
+          const userData = res.data.data || res.data;
+          
+          setName(userData.name || "");
+          setEmail(userData.email || "");
+          setProfileImg(userData.imgUrl || defaultProfile);
+          setProfileImagePreview(userData.imgUrl || defaultProfile);
+          if (userData.licenseFront) setLicenseFrontPreview(userData.licenseFront);
+          if (userData.licenseBack) setLicenseBackPreview(userData.licenseBack);
+          
+          // Set host status from user data
+          setIsHost(userData.isHost || false);
           
           // Update localStorage and notify navbar if profile image exists
-          if (res.data.imgUrl) {
-            localStorage.setItem("profileImg", res.data.imgUrl);
+          if (userData.imgUrl) {
+            localStorage.setItem("profileImg", userData.imgUrl);
             window.dispatchEvent(new Event('profileImageUpdated'));
           }
         } catch (err) {
@@ -56,20 +65,23 @@ export default function ProfileSidebar({ isOpen, onClose }) {
     }
   }, [isOpen]);
 
-  // Handle click outside to close sidebar (only for desktop)
+  // Handle click outside to close sidebar
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Only close on outside click for desktop (md and above)
-      if (window.innerWidth >= 768 && sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-        onClose();
-        setIsEdit(false); 
+      // Close on outside click when clicking outside the sidebar
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        // Check if the click was on the main content area (not on other UI elements)
+        const mainContent = document.querySelector('main, .main-content, #root > div');
+        if (mainContent && mainContent.contains(event.target)) {
+          onClose();
+          setIsEdit(false);
+        }
       }
     };
 
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
-              setIsEdit(false); 
-
+      setIsEdit(false); 
     }
 
     return () => {
@@ -135,7 +147,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
         if (email) updateData.email = email;
         if (password) updateData.password = password;
         
-        await axios.put("http://localhost:3001/api/fetch/users/me", updateData, {
+        await axios.put(getApiUrl("api/fetch/users/me"), updateData, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
@@ -145,12 +157,13 @@ export default function ProfileSidebar({ isOpen, onClose }) {
         const formData = new FormData();
         formData.append("profileImage", profileImage);
         const res = await axios.post(
-          "http://localhost:3001/api/fetch/users/upload-profile",
+          getApiUrl("api/fetch/users/upload-profile"),
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (res.data.imgUrl) {
           setProfileImg(res.data.imgUrl);
+          setProfileImagePreview(res.data.imgUrl);
           localStorage.setItem("profileImg", res.data.imgUrl);
           window.dispatchEvent(new Event('profileImageUpdated'));
         }
@@ -161,11 +174,19 @@ export default function ProfileSidebar({ isOpen, onClose }) {
         const formData = new FormData();
         if (licenseFront) formData.append("licenseFront", licenseFront);
         if (licenseBack) formData.append("licenseBack", licenseBack);
-        await axios.post(
-          "http://localhost:3001/api/fetch/users/upload-license",
+        const res = await axios.post(
+          getApiUrl("api/fetch/users/upload-license"),
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        if (res.data.uploadedFiles) {
+          if (res.data.uploadedFiles.licenseFront) {
+            setLicenseFrontPreview(res.data.uploadedFiles.licenseFront);
+          }
+          if (res.data.uploadedFiles.licenseBack) {
+            setLicenseBackPreview(res.data.uploadedFiles.licenseBack);
+          }
+        }
       }
       setSuccessMsg("Profile updated successfully!");
       setPassword("");
@@ -185,24 +206,13 @@ export default function ProfileSidebar({ isOpen, onClose }) {
 
   return (
     <>
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-opacity-50 z-40" 
-        onClick={() => {
-          // On mobile, allow backdrop click to close
-          if (window.innerWidth < 768) {
-            onClose();
-          }
-        }}
-      />
-      
       {/* Sidebar */}
       <div
         ref={sidebarRef}
         className={`fixed top-0 right-0 h-full bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
-          w-full md:w-96 lg:w-[420px]
-          md:max-w-md lg:max-w-lg`}
+          w-full sm:w-80 md:w-96 lg:w-[420px]
+          max-w-full sm:max-w-md md:max-w-md lg:max-w-lg`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 sticky top-0 z-10">
@@ -219,7 +229,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
         </div>
 
         {/* Content */}
-        <div className="h-full overflow-y-auto pb-20">
+        <div className="h-full overflow-y-auto pb-20 hide-scrollbar">
           {isEdit ? (
             <div className="p-4 md:p-6">
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -376,8 +386,8 @@ export default function ProfileSidebar({ isOpen, onClose }) {
                   className="w-20 h-20 rounded-full object-cover border-4 border-gray-200 shadow-lg"
                 />
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-800">{name}</h3>
-                  <p className="text-sm text-gray-500">{email.split("@")[0]}</p>
+                  <h3 className="text-lg font-semibold text-gray-800">{name || 'User'}</h3>
+                  <p className="text-sm text-gray-500">{email ? email.split("@")[0] : 'No email'}</p>
                   <button
                     onClick={() => setIsEdit(true)}
                     className="mt-2 px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition"
@@ -422,7 +432,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
 
               {/* Settings Menu */}
               <div className="space-y-1">
-                <SidebarSettingsMenu />
+                <SidebarSettingsMenu isHost={isHost} />
                 <div className="pt-4 flex justify-center
                 ">
 
@@ -437,6 +447,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
   );
 }
 
+// eslint-disable-next-line no-unused-vars
 function SidebarSettingsItem({ icon: Icon, label, to }) {
   if (label !== 'Logout') {
     return (
@@ -456,16 +467,25 @@ function SidebarSettingsItem({ icon: Icon, label, to }) {
 }
 
 const sidebarMenuItems = [
-  { label: "Favourites", to: "/favourites", icon: FaHeart },
-  { label: "Your  vehicles" , icon: FaMapMarkerAlt },
+  { label: "Favourites", to: "/favorites", icon: FaHeart },
+
+  { label: "Your vehicles", to: "/add-vehicle", icon: FaMapMarkerAlt },
+  { label: "Booking History", to: "/booking-history", icon: FaHistory },
   { label: "Clear cache", to: "/", icon: FaTrashAlt },
-  { label: "Bookin History", to: "/", icon: FaHistory },
+
 ];
 
-function SidebarSettingsMenu() {
+function SidebarSettingsMenu({ isHost }) {
+  const menuItems = [...sidebarMenuItems];
+  
+  // Add Host Dashboard for hosts
+  if (isHost) {
+    menuItems.splice(1, 0, { label: "Host Dashboard", to: "/host-dashboard", icon: FaMapMarkerAlt });
+  }
+  
   return (
     <div className="space-y-1">
-      {sidebarMenuItems.map((item, index) => (
+      {menuItems.map((item, index) => (
         <SidebarSettingsItem
           key={index}
           label={item.label}
