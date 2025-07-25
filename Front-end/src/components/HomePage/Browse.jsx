@@ -4,9 +4,9 @@ import { RiMotorbikeFill } from "react-icons/ri";
 import { FaCar, FaBus } from "react-icons/fa";
 import { PiTruckTrailerFill } from "react-icons/pi";
 import { PiTruckFill } from "react-icons/pi";
-import VehicleCard from "../components/VehicleCard";
+import VehicleCard from "../VehicleCard";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
-import { getApiUrl } from "../config/api";
+import { getApiUrl } from "../../config/api";
 
 
 const vehicleTypes = [
@@ -51,16 +51,16 @@ export default function VehicleBrowse() {
   };
 
   return (
-    <div className="vehicle-browse flex justify-center items-center flex-col my-10 p-3  w-[90vw] md:w-[80vw]">
-      <h2 className="text-3xl font-bold text-center m-12">
+    <div className="vehicle-browse flex justify-center items-center flex-col my-10 p-3  w-full md:w-[80vw]">
+      <h2 className="text-3xl font-bold text-center mb-7">
         Browse Our Vehicles
       </h2>
 
-      <ul className="flex flex-wrap justify-center items-center gap-20 list-none mb-4 text-2xl">
+      <ul className="flex flex-wrap justify-center items-center gap-15 lg:gap-30 md:gap-20  list-none mb-4 text-2xl">
         {vehicleTypes.map((vehicle, index) => (
           <li
             key={index}
-            className="text-center cursor-pointer  flex flex-col items-center "
+            className="text-center cursor-pointer flex flex-col items-center hover:text-red-600 transition-transform duration-200 transform hover:scale-110"
             onClick={() => handleClick(vehicle.name)}
           >
             {vehicle.icon}
