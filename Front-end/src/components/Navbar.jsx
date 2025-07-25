@@ -147,11 +147,7 @@ export default function Navbar() {
                     <img
                         src={imgUrl}
                         onError={(e) => {
-                            console.log('Navbar Mobile - Image load error, src was:', e.currentTarget.src);
                             e.currentTarget.src = defaultProfile;
-                        }}
-                        onLoad={() => {
-                            console.log('Navbar Mobile - Image loaded successfully:', imgUrl);
                         }}
                         className='w-9 h-9 rounded-full bg-white'
                         alt="profile"

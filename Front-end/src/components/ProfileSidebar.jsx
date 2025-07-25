@@ -38,21 +38,23 @@ export default function ProfileSidebar({ isOpen, onClose }) {
           const res = await axios.get(getApiUrl("api/fetch/users/me"), {
             headers: { Authorization: `Bearer ${token}` },
           });
-          setName(res.data.name);
-          setEmail(res.data.email);
-          setProfileImg(res.data.imgUrl || defaultProfile);
-          setProfileImagePreview(res.data.imgUrl || defaultProfile);
-          if (res.data.licenseFront) setLicenseFrontPreview(res.data.licenseFront);
-          if (res.data.licenseBack) setLicenseBackPreview(res.data.licenseBack);
+          
+          // Handle both old and new response structures
+          const userData = res.data.data || res.data;
+          
+          setName(userData.name || "");
+          setEmail(userData.email || "");
+          setProfileImg(userData.imgUrl || defaultProfile);
+          setProfileImagePreview(userData.imgUrl || defaultProfile);
+          if (userData.licenseFront) setLicenseFrontPreview(userData.licenseFront);
+          if (userData.licenseBack) setLicenseBackPreview(userData.licenseBack);
           
           // Set host status from user data
-          if (res.data.data) {
-            setIsHost(res.data.data.isHost || false);
-          }
+          setIsHost(userData.isHost || false);
           
           // Update localStorage and notify navbar if profile image exists
-          if (res.data.imgUrl) {
-            localStorage.setItem("profileImg", res.data.imgUrl);
+          if (userData.imgUrl) {
+            localStorage.setItem("profileImg", userData.imgUrl);
             window.dispatchEvent(new Event('profileImageUpdated'));
           }
         } catch (err) {
@@ -384,8 +386,8 @@ export default function ProfileSidebar({ isOpen, onClose }) {
                   className="w-20 h-20 rounded-full object-cover border-4 border-gray-200 shadow-lg"
                 />
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-800">{name}</h3>
-                  <p className="text-sm text-gray-500">{email ? email.split("@")[0] : 'User'}</p>
+                  <h3 className="text-lg font-semibold text-gray-800">{name || 'User'}</h3>
+                  <p className="text-sm text-gray-500">{email ? email.split("@")[0] : 'No email'}</p>
                   <button
                     onClick={() => setIsEdit(true)}
                     className="mt-2 px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition"
@@ -468,7 +470,7 @@ const sidebarMenuItems = [
   { label: "Favourites", to: "/favorites", icon: FaHeart },
 
   { label: "Your vehicles", to: "/add-vehicle", icon: FaMapMarkerAlt },
-  { label: "Booking History", to: "/bookings", icon: FaHistory },
+  { label: "Booking History", to: "/booking-history", icon: FaHistory },
   { label: "Clear cache", to: "/", icon: FaTrashAlt },
 
 ];

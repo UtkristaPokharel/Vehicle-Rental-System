@@ -32,18 +32,8 @@ const transactionSchema = new mongoose.Schema({
     location: String
   },
   vehicleData: {
-    id: String,
-    vehicleId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Vehicle',
-      required: true
-    },
-    name: String,
-    price: Number,
-    image: String,
-    model: String,
-    type: String,
-    location: String
+    type: mongoose.Schema.Types.Mixed,
+    required: false
   },
   billingAddress: {
     address: String,

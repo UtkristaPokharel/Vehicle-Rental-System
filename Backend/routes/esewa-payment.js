@@ -57,11 +57,29 @@ const generateEsewaSignature = (data, secretKey) => {
 router.post('/initiate', async (req, res) => {
   try {
     console.log('eSewa payment initiation request:', req.body);
+    console.log('Vehicle data received:', JSON.stringify(req.body.vehicleData, null, 2));
     const { amount, bookingData, vehicleData, billingAddress, userInfo } = req.body;
 
     // Generate unique transaction UUID
     const transactionUuid = uuidv4();
     const productCode = 'EPAYTEST'; // Use 'EPAYTEST' for testing
+    
+    // Properly structure vehicle data for transaction storage
+    const structuredVehicleData = {
+      id: vehicleData?.id || vehicleData?._id,
+      vehicleId: vehicleData?.id || vehicleData?._id, // Keep as string initially, will be converted to ObjectId by Mongoose
+      name: vehicleData?.name || 'Unknown Vehicle',
+      price: vehicleData?.price || 0,
+      image: vehicleData?.image || '',
+      model: vehicleData?.model || vehicleData?.brand || '',
+      type: vehicleData?.type || 'Car',
+      location: vehicleData?.location || 'Unknown Location',
+      brand: vehicleData?.brand || '',
+      capacity: vehicleData?.capacity || vehicleData?.seats || 0,
+      seats: vehicleData?.seats || vehicleData?.capacity || 0
+    };
+    
+    console.log('Structured vehicle data:', structuredVehicleData);
     
     // Store transaction details in database
     const transactionData = {
@@ -70,7 +88,7 @@ router.post('/initiate', async (req, res) => {
       status: 'pending',
       paymentMethod: 'esewa',
       bookingData,
-      vehicleData,
+      vehicleData: structuredVehicleData,
       billingAddress,
       userInfo: userInfo || null,
       // Store user information in main fields as well for compatibility
@@ -260,19 +278,19 @@ router.get('/success', async (req, res) => {
           console.log('Retrieved transaction for booking creation:', transaction ? 'Found' : 'Not found');
           
           if (transaction) {
-            // Create booking record (same as before)
+            // Create booking record with properly structured vehicle data
             const bookingRecord = {
               userName: transaction.userInfo?.name || transaction.billingAddress?.name || 'Guest User',
               userEmail: transaction.userInfo?.email || transaction.billingAddress?.email || 'guest@example.com',
               userPhone: transaction.userInfo?.phone || transaction.billingAddress?.phone || '',
               userId: transaction.userInfo?.userId || null,
-              vehicleId: transaction.vehicleData._id || transaction.vehicleData.id || '000000000000000000000000', // Use valid ObjectId format as fallback
-              vehicleName: transaction.vehicleData.name || 'Unknown Vehicle',
-              vehicleModel: transaction.vehicleData.model || '',
-              vehicleType: transaction.vehicleData.type || 'Car',
-              vehicleLocation: transaction.bookingData?.location || transaction.vehicleData.location || 'Unknown',
-              vehicleImage: transaction.vehicleData.image || '',
-              pricePerDay: transaction.vehicleData.price || 0,
+              vehicleId: transaction.vehicleData?.vehicleId || transaction.vehicleData?.id || '000000000000000000000000',
+              vehicleName: transaction.vehicleData?.name || 'Unknown Vehicle',
+              vehicleModel: transaction.vehicleData?.model || '',
+              vehicleType: transaction.vehicleData?.type || 'Car',
+              vehicleLocation: transaction.vehicleData?.location || transaction.bookingData?.location || 'Unknown',
+              vehicleImage: transaction.vehicleData?.image || '',
+              pricePerDay: transaction.vehicleData?.price || 0,
               startDate: new Date(transaction.bookingData.startDate),
               endDate: new Date(transaction.bookingData.endDate),
               startTime: transaction.bookingData.startTime,
@@ -963,19 +981,19 @@ router.post('/debug/create-bookings', async (req, res) => {
           continue;
         }
         
-        // Create booking record
+        // Create booking record with properly structured vehicle data
         const bookingRecord = {
           userName: transaction.userInfo?.name || transaction.billingAddress?.name || 'Guest User',
           userEmail: transaction.userInfo?.email || transaction.billingAddress?.email || 'guest@example.com',
           userPhone: transaction.userInfo?.phone || transaction.billingAddress?.phone || '',
           userId: transaction.userInfo?.userId || null,
-          vehicleId: transaction.vehicleData._id || transaction.vehicleData.id || '000000000000000000000000', // Use valid ObjectId format as fallback
-          vehicleName: transaction.vehicleData.name || 'Unknown Vehicle',
-          vehicleModel: transaction.vehicleData.model || '',
-          vehicleType: transaction.vehicleData.type || 'Car',
-          vehicleLocation: transaction.bookingData?.location || 'Unknown',
-          vehicleImage: transaction.vehicleData.image || '',
-          pricePerDay: transaction.vehicleData.price || 0,
+          vehicleId: transaction.vehicleData?.vehicleId || transaction.vehicleData?.id || '000000000000000000000000',
+          vehicleName: transaction.vehicleData?.name || 'Unknown Vehicle',
+          vehicleModel: transaction.vehicleData?.model || '',
+          vehicleType: transaction.vehicleData?.type || 'Car',
+          vehicleLocation: transaction.vehicleData?.location || transaction.bookingData?.location || 'Unknown',
+          vehicleImage: transaction.vehicleData?.image || '',
+          pricePerDay: transaction.vehicleData?.price || 0,
           startDate: new Date(transaction.bookingData?.startDate || new Date()),
           endDate: new Date(transaction.bookingData?.endDate || new Date()),
           startTime: transaction.bookingData?.startTime || '00:00',
