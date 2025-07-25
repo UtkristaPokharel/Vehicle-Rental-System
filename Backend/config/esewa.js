@@ -44,6 +44,14 @@ module.exports = {
     return `${backendUrl}/api/payment/esewa/failure`;
   },
   
+  // Frontend URL helper - for redirecting to frontend after payment
+  getFrontendUrl() {
+    return process.env.FRONTEND_URL || 
+           (process.env.NODE_ENV === 'production' 
+             ? 'https://vehicle-rental-system-lwna.vercel.app' // Your actual Vercel domain (no trailing slash)
+             : 'http://localhost:5173');
+  },
+  
   // Legacy properties for backward compatibility
   get successUrl() {
     return this.getSuccessUrl();
@@ -51,6 +59,10 @@ module.exports = {
   
   get failureUrl() {
     return this.getFailureUrl();
+  },
+  
+  get frontendUrl() {
+    return this.getFrontendUrl();
   },
   
   // Payment configuration
