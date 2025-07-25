@@ -47,6 +47,23 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Vehicle'
   }],
+  role: {
+    type: String,
+    enum: ['user', 'host', 'admin'],
+    default: 'user'
+  },
+  isHost: {
+    type: Boolean,
+    default: false
+  },
+  hostSince: {
+    type: Date,
+    default: null
+  },
+  vehiclesOwned: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Vehicle'
+  }],
   isActive: {
     type: Boolean,
     default: true,

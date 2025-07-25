@@ -223,6 +223,7 @@ export default function AddVehicle({ onSubmit }) {
       submission.append("vehicleImage", image);
       submission.append("createdBy", name || "admin");
       submission.append("createdById", userId || "admin");
+      submission.append("userId", userId || "admin");
       submission.append("isActive", formData.isActive);
 
       const res = await fetch(getApiUrl("api/user/add-vehicle"), {

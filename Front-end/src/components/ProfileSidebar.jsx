@@ -24,6 +24,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [isHost, setIsHost] = useState(false);
   const fileInputRef = useRef(null);
   const sidebarRef = useRef(null);
 
@@ -44,6 +45,11 @@ export default function ProfileSidebar({ isOpen, onClose }) {
           if (res.data.licenseFront) setLicenseFrontPreview(res.data.licenseFront);
           if (res.data.licenseBack) setLicenseBackPreview(res.data.licenseBack);
           
+          // Set host status from user data
+          if (res.data.data) {
+            setIsHost(res.data.data.isHost || false);
+          }
+          
           // Update localStorage and notify navbar if profile image exists
           if (res.data.imgUrl) {
             localStorage.setItem("profileImg", res.data.imgUrl);
@@ -57,20 +63,23 @@ export default function ProfileSidebar({ isOpen, onClose }) {
     }
   }, [isOpen]);
 
-  // Handle click outside to close sidebar (only for desktop)
+  // Handle click outside to close sidebar
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Only close on outside click for desktop (md and above)
-      if (window.innerWidth >= 768 && sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-        onClose();
-        setIsEdit(false); 
+      // Close on outside click when clicking outside the sidebar
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        // Check if the click was on the main content area (not on other UI elements)
+        const mainContent = document.querySelector('main, .main-content, #root > div');
+        if (mainContent && mainContent.contains(event.target)) {
+          onClose();
+          setIsEdit(false);
+        }
       }
     };
 
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
-              setIsEdit(false); 
-
+      setIsEdit(false); 
     }
 
     return () => {
@@ -195,24 +204,13 @@ export default function ProfileSidebar({ isOpen, onClose }) {
 
   return (
     <>
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-opacity-50 z-40" 
-        onClick={() => {
-          // On mobile, allow backdrop click to close
-          if (window.innerWidth < 768) {
-            onClose();
-          }
-        }}
-      />
-      
       {/* Sidebar */}
       <div
         ref={sidebarRef}
         className={`fixed top-0 right-0 h-full bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
-          w-full md:w-96 lg:w-[420px]
-          md:max-w-md lg:max-w-lg`}
+          w-full sm:w-80 md:w-96 lg:w-[420px]
+          max-w-full sm:max-w-md md:max-w-md lg:max-w-lg`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 sticky top-0 z-10">
@@ -387,7 +385,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
                 />
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-800">{name}</h3>
-                  <p className="text-sm text-gray-500">{email.split("@")[0]}</p>
+                  <p className="text-sm text-gray-500">{email ? email.split("@")[0] : 'User'}</p>
                   <button
                     onClick={() => setIsEdit(true)}
                     className="mt-2 px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition"
@@ -432,7 +430,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
 
               {/* Settings Menu */}
               <div className="space-y-1">
-                <SidebarSettingsMenu />
+                <SidebarSettingsMenu isHost={isHost} />
                 <div className="pt-4 flex justify-center
                 ">
 
@@ -447,6 +445,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
   );
 }
 
+// eslint-disable-next-line no-unused-vars
 function SidebarSettingsItem({ icon: Icon, label, to }) {
   if (label !== 'Logout') {
     return (
@@ -467,15 +466,24 @@ function SidebarSettingsItem({ icon: Icon, label, to }) {
 
 const sidebarMenuItems = [
   { label: "Favourites", to: "/favorites", icon: FaHeart },
-  { label: "Your vehicles" , icon: FaMapMarkerAlt },
+
+  { label: "Your vehicles", to: "/add-vehicle", icon: FaMapMarkerAlt },
+  { label: "Booking History", to: "/bookings", icon: FaHistory },
   { label: "Clear cache", to: "/", icon: FaTrashAlt },
-  { label: "Booking History", to: "/booking-history", icon: FaHistory },
+
 ];
 
-function SidebarSettingsMenu() {
+function SidebarSettingsMenu({ isHost }) {
+  const menuItems = [...sidebarMenuItems];
+  
+  // Add Host Dashboard for hosts
+  if (isHost) {
+    menuItems.splice(1, 0, { label: "Host Dashboard", to: "/host-dashboard", icon: FaMapMarkerAlt });
+  }
+  
   return (
     <div className="space-y-1">
-      {sidebarMenuItems.map((item, index) => (
+      {menuItems.map((item, index) => (
         <SidebarSettingsItem
           key={index}
           label={item.label}

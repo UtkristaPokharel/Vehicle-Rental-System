@@ -67,6 +67,22 @@ function PaymentPage() {
 
 	const priceBreakdown = calculateTotalPrice();
 
+	// Set user info from localStorage if user is logged in
+	useEffect(() => {
+		const name = localStorage.getItem("name");
+		const email = localStorage.getItem("email");
+		const userId = localStorage.getItem("userId");
+		
+		if (name || email || userId) {
+			setUserInfo(prev => ({
+				...prev,
+				name: name || prev.name,
+				email: email || prev.email,
+				userId: userId || null
+			}));
+		}
+	}, []);
+
 	// Fetch vehicle data if not available in location.state
 	useEffect(() => {
 		const fetchVehicleData = async () => {
