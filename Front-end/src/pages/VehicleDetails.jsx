@@ -117,11 +117,17 @@ function VehicleDetails() {
       state: {
         bookingData: bookingData,
         vehicleData: {
+          ...vehicleData, // Pass all vehicle data
           name: vehicleData?.name,
           price: vehicleData?.price,
           image: vehicleData?.image,
           id: vehicleData?._id || vehicleData?.id,
-          dateRange: vehicleData?.dateRange
+          _id: vehicleData?._id || vehicleData?.id, // Ensure both id formats are available
+          dateRange: vehicleData?.dateRange,
+          type: vehicleData?.type,
+          brand: vehicleData?.brand,
+          location: vehicleData?.location,
+          capacity: vehicleData?.capacity
         },
         totalPrice: `रु${totalPrice.toLocaleString()}`,
         originalPrice: typeof vehicleData?.price === 'string' ? vehicleData.price : `रु${basePrice.toLocaleString()}`,

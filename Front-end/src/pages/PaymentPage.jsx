@@ -195,12 +195,20 @@ function PaymentPage() {
 		// Handle eSewa payment
 		if (paymentMethod === "esewa") {
 			try {
-				console.log('Initiating eSewa payment with data:', {
+				console.log('=== eSewa Payment Debug ===');
+				console.log('Current vehicle data:', JSON.stringify(currentVehicleData, null, 2));
+				console.log('Booking data:', JSON.stringify(bookingData, null, 2));
+				console.log('User info:', JSON.stringify(userInfo, null, 2));
+				
+				const payloadData = {
 					amount: priceBreakdown.total,
 					bookingData,
 					vehicleData: currentVehicleData,
-					billingAddress
-				});
+					billingAddress,
+					userInfo
+				};
+				
+				console.log('Sending payload to backend:', JSON.stringify(payloadData, null, 2));
 
 				const apiUrl = getApiUrl('api/payment/esewa/initiate');
 				console.log('API URL:', apiUrl);
@@ -210,13 +218,7 @@ function PaymentPage() {
 					headers: {
 						'Content-Type': 'application/json',
 					},
-					body: JSON.stringify({
-						amount: priceBreakdown.total,
-						bookingData,
-						vehicleData: currentVehicleData,
-						billingAddress,
-						userInfo
-					})
+					body: JSON.stringify(payloadData)
 				});
 
 				console.log('Response status:', response.status);
