@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Jeep from '../../images/Offroad.png';
+import Jeep from '../../images/offroad.png';
 import SUV from '../../images/jeep.png';
 import Sedan from '../../images/suv.png';
 import Offroad from '../../images/sedan.png';

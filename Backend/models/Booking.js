@@ -166,6 +166,67 @@ const bookingSchema = new mongoose.Schema({
     required: false
   },
   
+  // Enhanced transaction data storage
+  transactionData: {
+    // Original transaction amount and currency
+    originalAmount: {
+      type: Number,
+      required: false
+    },
+    currency: {
+      type: String,
+      default: 'NPR'
+    },
+    
+    // Gateway specific data
+    gatewayResponse: {
+      type: mongoose.Schema.Types.Mixed,
+      required: false
+    },
+    
+    // Processing details
+    processingFee: {
+      type: Number,
+      default: 0
+    },
+    
+    // Payment gateway information
+    gateway: {
+      type: String,
+      enum: ['esewa', 'stripe', 'paypal', 'razorpay', 'khalti'],
+      required: false
+    },
+    
+    // Transaction timestamps
+    initiatedAt: {
+      type: Date,
+      default: Date.now
+    },
+    completedAt: {
+      type: Date,
+      required: false
+    },
+    
+    // Failure information
+    failureReason: {
+      type: String,
+      required: false
+    },
+    
+    // Refund information
+    refundData: {
+      refundId: String,
+      refundAmount: Number,
+      refundDate: Date,
+      refundReason: String,
+      refundStatus: {
+        type: String,
+        enum: ['pending', 'completed', 'failed'],
+        default: 'pending'
+      }
+    }
+  },
+  
   // Booking status
   bookingStatus: {
     type: String,

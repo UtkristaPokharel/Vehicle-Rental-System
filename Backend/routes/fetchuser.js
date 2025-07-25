@@ -27,6 +27,30 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET current user info
+router.get('/me', verifyToken, async (req, res) => {
+  try {
+    const userId = req.user?.id || req.admin?.id;
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+    
+    const user = await User.findById(userId)
+      .populate('vehiclesOwned', 'name type price isActive')
+      .select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    res.json({
+      success: true,
+      data: user
+    });
+  } catch (err) {
+    console.error('Error fetching user info:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 router.delete('/delete-user/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     const { id } = req.params;
