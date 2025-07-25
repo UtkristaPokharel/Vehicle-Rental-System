@@ -39,12 +39,8 @@ const Sidebar = ({ selectedMenu, setSelectedMenu }) => {
 };
 
 const VehicleListing = () => (
-  <div className="p-6">
-    <h2 className="text-2xl font-bold mb-4">Vehicle Listing</h2>
-    <div className="bg-white p-4 rounded-lg shadow">
-          <VehicleDataComponent/>
-
-    </div>
+  <div>
+    <VehicleDataComponent/>
   </div>
 );
 
