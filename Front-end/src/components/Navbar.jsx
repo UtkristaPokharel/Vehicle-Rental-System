@@ -116,7 +116,7 @@ export default function Navbar() {
     return (
         <nav className='sticky top-0 left-0 w-full h-14 md:h-16 bg-black flex justify-between items-center px-3 sm:px-4 xl:px-10 z-50'>
             {/* Logo */}
-            <div className='h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 flex-shrink-0 cursor-pointer touch-manipulation' onClick={handleLogoClick}>
+            <div className='h-20 w-20 sm:h-18 sm:w-18 md:h-24 md:w-24 flex-shrink-0 cursor-pointer touch-manipulation ml-4 sm:ml-3 md:ml-4' onClick={handleLogoClick}>
                 <img src="/logo.png" alt="EasyWheels Logo" className="h-full w-full object-cover" />
             </div>
 
