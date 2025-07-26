@@ -184,7 +184,7 @@ export default function Navbar() {
                 >
                     <button 
                         onClick={handleToggle} 
-                        className="absolute top-4 right-4 text-white text-2xl sm:text-3xl p-2 touch-manipulation hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
+                        className="absolute top-4 right-4 text-white text-2xl sm:text-3xl p-2 touch-manipulation hover:bg-opacity-20 rounded-full transition-colors"
                         aria-label="Close menu"
                     >
                         <IoClose />
