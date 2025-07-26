@@ -278,18 +278,18 @@ export const SuggestedVehicle = () => {
           <h3 className="text-xl font-semibold text-gray-800">
             {isPersonalized ? "Trending & Discover More" : "Featured Vehicles"}
           </h3>
-          <button
+          {/* <button
             onClick={refreshSuggestions}
             className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
           >
             Refresh
-          </button>
+          </button> */}
         </div>
-        {isPersonalized && (
+        {/* {isPersonalized && (
           <p className="text-sm text-gray-600 mt-5">
             Most popular vehicles + new discoveries • Click refresh to update
           </p>
-        )}
+        )} */}
       </div>
 
       <button
@@ -310,16 +310,16 @@ export const SuggestedVehicle = () => {
               type={formatVehicleType(vehicle.type)}
               onVehicleClick={handleVehicleClick}
             />
-            {isPersonalized && vehicle.clickCount > 0 && (
+            {/* {isPersonalized && vehicle.clickCount > 0 && (
               <div className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-400 to-red-500 text-white text-xs px-2 py-1 rounded-full">
                 🔥 {vehicle.clickCount} {vehicle.clickCount === 1 ? 'view' : 'views'}
               </div>
-            )}
-            {isPersonalized && vehicle.clickCount === 0 && (
+            )} */}
+            {/* {isPersonalized && vehicle.clickCount === 0 && (
               <div className="absolute -top-2 -right-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white text-xs px-2 py-1 rounded-full">
                 ✨ New
               </div>
-            )}
+            )} */}
           </div>
         ))}
       </div>

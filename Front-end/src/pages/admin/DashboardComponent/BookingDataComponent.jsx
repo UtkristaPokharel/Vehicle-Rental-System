@@ -267,11 +267,11 @@ const BookingDataComponent = () => {
       {/* Statistics Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
-          { status: 'all', label: 'Total', icon: '📊', color: 'from-blue-500 to-blue-600' },
-          { status: 'confirmed', label: 'Confirmed', icon: '✅', color: 'from-green-500 to-green-600' },
-          { status: 'pending', label: 'Pending', icon: '⏳', color: 'from-yellow-500 to-yellow-600' },
-          { status: 'completed', label: 'Completed', icon: '🎉', color: 'from-purple-500 to-purple-600' },
-          { status: 'cancelled', label: 'Cancelled', icon: 'X', color: 'from-red-500 to-red-600' }
+          { status: 'all', label: 'Total', icon: '📊', color: 'from-blue-600 to-blue-500' },
+          { status: 'confirmed', label: 'Confirmed', icon: '✅', color: 'from-green-600 to-green-500' },
+          { status: 'pending', label: 'Pending', icon: '⏳', color: 'from-yellow-600 to-yellow-500' },
+          { status: 'completed', label: 'Completed', icon: '🎉', color: 'from-purple-600 to-purple-500' },
+          { status: 'cancelled', label: 'Cancelled', icon: 'X', color: 'from-red-600 to-red-500' }
         ].map(({ status, label, icon, color }) => {
           const count = status === 'all' 
             ? bookings.length 
