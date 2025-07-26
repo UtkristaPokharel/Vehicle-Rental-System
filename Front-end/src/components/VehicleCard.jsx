@@ -2,6 +2,7 @@ import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getApiUrl, getImageUrl } from "../config/api";
+import toast from 'react-hot-toast';
 
 const VehicleCard = ({ vehicle, type, onVehicleClick }) => {
   const [liked, setLiked] = useState(false);
@@ -92,6 +93,17 @@ const VehicleCard = ({ vehicle, type, onVehicleClick }) => {
     }
   };
 
+  const handleClick = (e) => {
+    // Check if vehicle is available
+    if (!vehicle.isAvailable) {
+      e.preventDefault();
+      toast.error("This vehicle is currently not available for booking.");
+      return;
+    }
+    
+    trackClick();
+  };
+
   return (
     <Link
       to={`/vehicle/${type}/${vehicle._id}`}
@@ -102,10 +114,19 @@ const VehicleCard = ({ vehicle, type, onVehicleClick }) => {
         dateRange: vehicle.dateRange,
         price: vehicle.price,
       }}
-      onClick={trackClick}
+      onClick={handleClick}
     >
-      <div className="vehicle-card group w-full rounded-3xl bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden relative">
+      <div className={`vehicle-card group w-full rounded-3xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden relative ${
+        !vehicle.isAvailable ? 'opacity-60' : ''
+      }`}>
         <div className="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
+        
+        {/* Availability Status Badge */}
+        {!vehicle.isAvailable && (
+          <div className="absolute top-3 left-3 z-30 bg-red-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
+            Not Available
+          </div>
+        )}
         
         <div className="relative">
           <img
@@ -148,8 +169,12 @@ const VehicleCard = ({ vehicle, type, onVehicleClick }) => {
               <p className="text-sm text-gray-400">per day • Before taxes</p>
             </div>
             
-            <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg hover:scale-105 transition-transform duration-200">
-              Book Now
+            <div className={`px-4 py-2 rounded-full text-sm font-semibold shadow-lg transition-all duration-200 ${
+              vehicle.isAvailable 
+                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:scale-105' 
+                : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+            }`}>
+              {vehicle.isAvailable ? 'Book Now' : 'Not Available'}
             </div>
           </div>
         </div>

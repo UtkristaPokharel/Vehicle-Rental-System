@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FaHeart, FaDownload, FaLanguage, FaMapMarkerAlt, FaTrashAlt, FaHistory, FaSignOutAlt } from "react-icons/fa";
+import { FaHeart,  FaCar, FaMapMarkerAlt, FaAngleRight , FaHistory, FaSignOutAlt } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import axios from "axios";
 import Logout from "../pages/Api/Logout.jsx";
@@ -215,7 +215,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
       >
         {/* Header */}
         <div className="flex items-center justify-between p-3 md:p-4 border-b border-gray-200 bg-gray-50 sticky top-0 z-10">
-          <h2 className="text-lg md:text-xl font-bold text-gray-800">
+          <h2 className="text-2xl md:text-2xl font-bold text-gray-800">
             {isEdit ? "Edit Profile" : "Profile"}
           </h2>
           <button
@@ -223,7 +223,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
             className="p-2 rounded-full hover:bg-gray-200 transition-colors touch-manipulation"
             aria-label="Close profile sidebar"
           >
-            <IoClose className="text-xl md:text-2xl text-gray-600" />
+            <IoClose className="text-2xl md:text-3xl text-gray-600" />
           </button>
         </div>
 
@@ -238,7 +238,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
                     <img
                       src={profileImagePreview}
                       alt="Profile"
-                      className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-4 border-gray-200 shadow-lg"
+                      className="w-40 h-20 md:w-24 md:h-24 rounded-full object-cover border-4 border-gray-200 shadow-lg"
                     />
                     <button
                       type="button"
@@ -263,32 +263,32 @@ export default function ProfileSidebar({ isOpen, onClose }) {
                 {/* Form Fields */}
                 <div className="space-y-3 md:space-y-4">
                   <div>
-                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">Name</label>
+                    <label className="block text-sm md:text-base font-medium text-gray-700 mb-1">Name</label>
                     <input
                       type="text"
                       value={name}
                       onChange={e => setName(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm md:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base md:text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <label className="block text-sm md:text-base font-medium text-gray-700 mb-1">Email</label>
                     <input
                       type="email"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm md:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base md:text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <label className="block text-sm md:text-base font-medium text-gray-700 mb-1">Password</label>
                     <input
                       type="password"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm md:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base md:text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Leave blank to keep current password"
                     />
                   </div>
@@ -296,12 +296,12 @@ export default function ProfileSidebar({ isOpen, onClose }) {
 
                 {/* License Upload Section */}
                 <div className="space-y-2 md:space-y-3">
-                  <label className="block text-xs md:text-sm font-medium text-gray-700">License Images</label>
+                  <label className="block text-sm md:text-base font-medium text-gray-700">License Images</label>
                   <div className="grid grid-cols-2 gap-2 md:gap-4">
                     <div className="space-y-1 md:space-y-2">
-                      <span className="text-xs text-gray-500">Front</span>
+                      <span className="text-sm text-gray-500">Front</span>
                       <div 
-                        className="relative w-full h-16 md:h-20 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer hover:border-gray-400 transition touch-manipulation"
+                        className="relative w-full h-40 md:h-20 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer hover:border-gray-400 transition touch-manipulation"
                         onClick={() => document.getElementById('licenseFrontInput').click()}
                       >
                         {licenseFrontPreview ? (
@@ -311,7 +311,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
                             <svg className="w-4 h-4 md:w-6 md:h-6 text-gray-400 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
-                            <span className="text-xs text-gray-400">Add Front</span>
+                            <span className="text-sm text-gray-400">Add Front</span>
                           </div>
                         )}
                       </div>
@@ -324,10 +324,10 @@ export default function ProfileSidebar({ isOpen, onClose }) {
                       />
                     </div>
                     
-                    <div className="space-y-1 md:space-y-2">
-                      <span className="text-xs text-gray-500">Back</span>
+                    <div className="space-y-1  md:space-y-2">
+                      <span className="text-sm text-gray-500">Back</span>
                       <div 
-                        className="relative w-full h-16 md:h-20 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer hover:border-gray-400 transition touch-manipulation"
+                        className="relative w-full h-40 md:h-20 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer hover:border-gray-400 transition touch-manipulation"
                         onClick={() => document.getElementById('licenseBackInput').click()}
                       >
                         {licenseBackPreview ? (
@@ -337,7 +337,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
                             <svg className="w-4 h-4 md:w-6 md:h-6 text-gray-400 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
-                            <span className="text-xs text-gray-400">Add Back</span>
+                            <span className="text-sm text-gray-400">Add Back</span>
                           </div>
                         )}
                       </div>
@@ -382,21 +382,25 @@ export default function ProfileSidebar({ isOpen, onClose }) {
                 <img
                   src={profileImg}
                   alt="Profile"
-                  className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-4 border-gray-200 shadow-lg"
+                  className="w-25 h-25 md:w-20 md:h-20 rounded-full object-cover border-4 border-gray-200 shadow-lg"
                 />
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-base md:text-lg font-semibold text-gray-800 truncate">{name || 'User'}</h3>
-                  <p className="text-xs md:text-sm text-gray-500 truncate">{email ? email.split("@")[0] : 'No email'}</p>
+                  <h3 className="text-xl md:text-lg font-semibold text-gray-800 truncate">{name || 'User'}</h3>
+                  <p className="text-md md:text-sm text-gray-500 truncate">{email ? email.split("@")[0] : 'No email'}</p>
                   <button
                     onClick={() => setIsEdit(true)}
-                    className="mt-1 md:mt-2 px-2 md:px-3 py-1 text-xs md:text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition touch-manipulation"
+                    className="mt-1 md:mt-2 px-2 md:px-3 py-1 text-md  md:text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition touch-manipulation"
                   >
                     Edit Profile
                   </button>
                 </div>
               </div>
-
-              {/* License Display */}
+           
+              {/* Settings Menu */}
+              <div className="space-y-1 pt-5">
+                  <hr className="border-gray-200 mb-4 md:mb-6" />
+                <SidebarSettingsMenu isHost={isHost} onClose={onClose} />
+                   {/* License Display */}
               {(licenseFrontPreview || licenseBackPreview) && (
                 <div className="mb-4 md:mb-6">
                   <h4 className="text-xs md:text-sm font-medium text-gray-700 mb-2 md:mb-3">Driving License</h4>
@@ -404,7 +408,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
                     {licenseFrontPreview && (
                       <div className="space-y-1">
                         <span className="text-xs text-gray-500">Front</span>
-                        <div className="w-full h-24 md:h-36 border border-gray-200 rounded-lg overflow-hidden">
+                        <div className="w-full h-40 md:h-36 border border-gray-200 rounded-lg overflow-hidden">
                           <img 
                             src={licenseFrontPreview} 
                             alt="License Front" 
@@ -416,7 +420,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
                     {licenseBackPreview && (
                       <div className="space-y-1">
                         <span className="text-xs text-gray-500">Back</span>
-                        <div className="w-full h-24 md:h-36 border border-gray-200 rounded-lg overflow-hidden">
+                        <div className="w-full h-40 md:h-36 border border-gray-200 rounded-lg overflow-hidden">
                           <img 
                             src={licenseBackPreview} 
                             alt="License Back" 
@@ -429,9 +433,6 @@ export default function ProfileSidebar({ isOpen, onClose }) {
                 </div>
               )}
 
-              {/* Settings Menu */}
-              <div className="space-y-1">
-                <SidebarSettingsMenu isHost={isHost} onClose={onClose} />
                 <div className="pt-3 md:pt-4 flex justify-center">
                   <Logout />
                 </div>
@@ -448,17 +449,21 @@ export default function ProfileSidebar({ isOpen, onClose }) {
 function SidebarSettingsItem({ icon: Icon, label, to, onClose }) {
   if (label !== 'Logout') {
     return (
+      <>
       <Link
         to={to}
         onClick={onClose}
-        className="flex items-center justify-between px-3 md:px-4 py-2.5 md:py-3 rounded-lg hover:bg-gray-100 transition touch-manipulation"
+        className="flex items-center justify-between px-3 md:px-4 py-1.5 md:py-3 rounded-lg  hover:bg-gray-100 transition touch-manipulation"
       >
-        <div className="flex items-center gap-2 md:gap-3 text-gray-700 min-w-0">
-          <Icon className="text-base md:text-lg flex-shrink-0" />
-          <span className="text-xs md:text-sm font-medium truncate">{label}</span>
+        <div className="flex items-center gap-2 md:gap-3 text-3xl text-gray-700 min-w-0 ">
+          <Icon className=" md:text-lg flex-shrink-0 text-xl " />
+          <span className="text-lg pl-2 md:text-sm font-medium truncate"> {label}</span>
         </div>
-        <span className="text-gray-400 text-xs md:text-sm flex-shrink-0">{">"}</span>
+        <span className="text-gray-400 text-xs md:text-sm flex-shrink-0">{<FaAngleRight/>}</span>
+
       </Link>
+      <hr className="border-gray-200 my-2 md:my-3" />
+      </>
     );
   }
   return null;
@@ -466,11 +471,8 @@ function SidebarSettingsItem({ icon: Icon, label, to, onClose }) {
 
 const sidebarMenuItems = [
   { label: "Favourites", to: "/favorites", icon: FaHeart },
-
-  { label: "Your vehicles", to: "/add-vehicle", icon: FaMapMarkerAlt },
+  { label: "Add Vehicle", to: "/add-vehicle", icon:FaCar }, 
   { label: "Booking History", to: "/booking-history", icon: FaHistory },
-  { label: "Clear cache", to: "/", icon: FaTrashAlt },
-
 ];
 
 function SidebarSettingsMenu({ isHost, onClose }) {

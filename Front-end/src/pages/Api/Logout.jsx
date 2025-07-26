@@ -62,7 +62,7 @@ function Logout() {
       {showPrompt && (
         <div
           ref={promptRef}
-          className="absolute mt-2 top-[-100px] w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-4"
+          className="absolute bottom-full mb-2 right-0 w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-4"
         >
           <p className="text-gray-800 font-medium mb-4">Are you sure you want to logout?</p>
           <div className="flex justify-end gap-2">
