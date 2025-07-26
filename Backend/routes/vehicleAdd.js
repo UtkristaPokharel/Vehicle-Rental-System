@@ -42,6 +42,7 @@ router.post('/add-vehicle', vehicleUpload.single('vehicleImage'), async (req, re
       image,
       description,
       isActive: isActive !== undefined ? isActive : true, // Default to true if not provided
+      isAvailable: true, // New vehicles are available by default
       clickCount: 0, 
       createdBy: req.body.createdBy || 'user',
       createdById: vehicleOwnerId || 'admin',

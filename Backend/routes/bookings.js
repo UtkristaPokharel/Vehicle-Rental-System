@@ -198,6 +198,157 @@ router.get('/admin/statistics', async (req, res) => {
   }
 });
 
+// Get bookings for a host's vehicles
+router.get('/host/:hostId', async (req, res) => {
+  try {
+    const { hostId } = req.params;
+    console.log('Fetching bookings for host:', hostId);
+    
+    // First, find all vehicles owned by this host
+    const hostVehicles = await Vehicle.find({ createdById: hostId });
+    console.log('Found host vehicles:', hostVehicles.length);
+    
+    if (hostVehicles.length === 0) {
+      return res.status(200).json({
+        success: true,
+        count: 0,
+        data: [],
+        message: 'No vehicles found for this host'
+      });
+    }
+    
+    // Extract vehicle IDs
+    const vehicleIds = hostVehicles.map(vehicle => vehicle._id);
+    console.log('Vehicle IDs:', vehicleIds);
+    
+    // Find all bookings for these vehicles
+    const bookings = await Booking.find({ vehicleId: { $in: vehicleIds } })
+      .populate('vehicleId', 'name type brand location image price')
+      .populate('userId', 'name email phone')
+      .sort({ createdAt: -1 });
+      
+    console.log('Found bookings:', bookings.length);
+    
+    // Add additional vehicle details to each booking
+    const enrichedBookings = bookings.map(booking => {
+      const bookingObj = booking.toObject();
+      return {
+        ...bookingObj,
+        vehicleName: bookingObj.vehicleName || bookingObj.vehicleId?.name,
+        vehicleModel: bookingObj.vehicleModel || bookingObj.vehicleId?.model,
+        vehicleType: bookingObj.vehicleType || bookingObj.vehicleId?.type,
+        vehicleImage: bookingObj.vehicleImage || bookingObj.vehicleId?.image,
+        vehicleLocation: bookingObj.vehicleLocation || bookingObj.vehicleId?.location
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      count: enrichedBookings.length,
+      data: enrichedBookings,
+      hostVehicles: hostVehicles.length
+    });
+  } catch (error) {
+    console.error('Error fetching host bookings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch host bookings',
+      error: error.message
+    });
+  }
+});
+
+// Get booking statistics for a specific host
+router.get('/host/:hostId/statistics', async (req, res) => {
+  try {
+    const { hostId } = req.params;
+    
+    // Find all vehicles owned by this host
+    const hostVehicles = await Vehicle.find({ createdById: hostId });
+    const vehicleIds = hostVehicles.map(vehicle => vehicle._id);
+    
+    if (vehicleIds.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          totalBookings: 0,
+          confirmedBookings: 0,
+          pendingBookings: 0,
+          completedBookings: 0,
+          cancelledBookings: 0,
+          totalRevenue: 0,
+          recentBookings: []
+        }
+      });
+    }
+    
+    // Calculate statistics for host's vehicles
+    const totalBookings = await Booking.countDocuments({ vehicleId: { $in: vehicleIds } });
+    const confirmedBookings = await Booking.countDocuments({ 
+      vehicleId: { $in: vehicleIds }, 
+      bookingStatus: 'confirmed' 
+    });
+    const pendingBookings = await Booking.countDocuments({ 
+      vehicleId: { $in: vehicleIds }, 
+      bookingStatus: 'pending' 
+    });
+    const completedBookings = await Booking.countDocuments({ 
+      vehicleId: { $in: vehicleIds }, 
+      bookingStatus: 'completed' 
+    });
+    const cancelledBookings = await Booking.countDocuments({ 
+      vehicleId: { $in: vehicleIds }, 
+      bookingStatus: 'cancelled' 
+    });
+    
+    // Revenue calculation for host's vehicles
+    const revenueData = await Booking.aggregate([
+      { 
+        $match: { 
+          vehicleId: { $in: vehicleIds },
+          bookingStatus: { $in: ['completed', 'confirmed'] },
+          paymentStatus: 'completed'
+        } 
+      },
+      { 
+        $group: { 
+          _id: null, 
+          totalRevenue: { $sum: '$pricing.totalAmount' } 
+        } 
+      }
+    ]);
+
+    const totalRevenue = revenueData.length > 0 ? revenueData[0].totalRevenue : 0;
+
+    // Recent bookings for host's vehicles
+    const recentBookings = await Booking.find({ vehicleId: { $in: vehicleIds } })
+      .populate('vehicleId', 'name type brand')
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalBookings,
+        confirmedBookings,
+        pendingBookings,
+        completedBookings,
+        cancelledBookings,
+        totalRevenue,
+        recentBookings
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching host booking statistics:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch host booking statistics',
+      error: error.message
+    });
+  }
+});
+
 // Get bookings for a specific user
 router.get('/user/:userId', async (req, res) => {
   try {

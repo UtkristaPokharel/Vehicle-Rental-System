@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaHeart, FaDownload, FaLanguage, FaMapMarkerAlt, FaTrashAlt, FaHistory, FaSignOutAlt } from "react-icons/fa";
-import { MdSubscriptions } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
 import axios from "axios";
 import Logout from "../pages/Api/Logout.jsx";
