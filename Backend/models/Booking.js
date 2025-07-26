@@ -335,7 +335,7 @@ bookingSchema.index({ bookingStatus: 1 });
 bookingSchema.index({ paymentStatus: 1 });
 bookingSchema.index({ startDate: 1, endDate: 1 });
 bookingSchema.index({ createdAt: -1 });
-bookingSchema.index({ bookingId: 1 }, { unique: true });
+// Note: bookingId index is automatically created due to unique: true in schema definition
 
 // Virtual for booking duration in a readable format
 bookingSchema.virtual('durationText').get(function() {

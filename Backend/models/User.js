@@ -100,8 +100,7 @@ userSchema.pre('save', function(next) {
   next();
 });
 
-// Create indexes
-userSchema.index({ email: 1 });
-userSchema.index({ googleId: 1 });
+// Note: Indexes for email and googleId are automatically created due to unique: true
+// in the schema definition, so no need for explicit index creation
 
 module.exports = mongoose.model('User', userSchema);
