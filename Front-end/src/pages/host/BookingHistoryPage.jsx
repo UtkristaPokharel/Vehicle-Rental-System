@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { getApiUrl, getImageUrl } from '../config/api';
+import { getApiUrl, getImageUrl } from '../../config/api';
 import { FaCalendarAlt, FaCar, FaMapMarkerAlt, FaMoneyBillWave, FaClock, FaUser, FaPhone, FaEnvelope } from 'react-icons/fa';
 import { MdCancel, MdCheckCircle, MdAccessTime, MdDone } from 'react-icons/md';
 

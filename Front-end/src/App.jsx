@@ -14,13 +14,13 @@ import AdminLoginPage from './pages/admin/AdminLoginPage.jsx';
 import PaymentPage from './pages/PaymentPage.jsx';
 import PaymentSuccess from './pages/PaymentSuccess.jsx';
 import PaymentFailure from './pages/PaymentFailure.jsx';
-import HostDashboard from './pages/HostDashboard.jsx';
+import HostDashboard from './pages/host/Dashboard.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import { Toaster } from 'react-hot-toast';
 import ProfileSidebar from './components/ProfileSidebar.jsx';
 import Layout from './components/Layout.jsx';
 import FavoritesPage from './pages/FavoritesPage.jsx';
-import BookingHistoryPage from './pages/BookingHistoryPage.jsx';
+import BookingHistoryPage from './pages/host/BookingHistoryPage.jsx';
 import Logout from './pages/Api/Logout.jsx';
 import { UserProvider } from "./context/UserContext.jsx"
 import { ProfileSidebarProvider, useProfileSidebar } from "./context/ProfileSidebarContext.jsx"

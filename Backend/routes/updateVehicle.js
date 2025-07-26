@@ -100,6 +100,137 @@ router.patch("/toggle-vehicle-status/:id", verifyToken, isAdmin, async (req, res
   }
 });
 
+// Host-specific route to toggle their own vehicle status (no admin required)
+router.patch("/vehicles/:id/toggle", verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isActive } = req.body;
+    const userId = req.user?.id || req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({ message: "User ID not found in token" });
+    }
+
+    if (typeof isActive !== 'boolean') {
+      return res.status(400).json({ message: "isActive must be a boolean value" });
+    }
+
+    // Find vehicle and verify ownership
+    const vehicle = await Vehicle.findById(id);
+    if (!vehicle) {
+      return res.status(404).json({ message: "Vehicle not found" });
+    }
+
+    // Check if user owns this vehicle
+    const userIdStr = userId.toString();
+    if (vehicle.createdById !== userId && vehicle.createdById !== userIdStr) {
+      return res.status(403).json({ message: "You can only manage your own vehicles" });
+    }
+
+    // Update the vehicle
+    const updated = await Vehicle.findByIdAndUpdate(
+      id,
+      { isActive },
+      { new: true }
+    );
+
+    res.status(200).json({ 
+      message: `Vehicle ${isActive ? 'activated' : 'deactivated'} successfully`, 
+      vehicle: updated 
+    });
+  } catch (err) {
+    console.error("Host toggle vehicle status error:", err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// Host-specific route to toggle vehicle availability
+router.patch("/vehicles/:id/availability", verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isAvailable } = req.body;
+    const userId = req.user?.id || req.user?.userId;
+
+    console.log('🔍 Toggle availability - User object:', req.user);
+    console.log('🔍 Toggle availability - User ID from token:', userId);
+
+    if (!userId) {
+      return res.status(401).json({ message: "User ID not found in token" });
+    }
+
+    if (typeof isAvailable !== 'boolean') {
+      return res.status(400).json({ message: "isAvailable must be a boolean value" });
+    }
+
+    // Find vehicle and verify ownership
+    const vehicle = await Vehicle.findById(id);
+    if (!vehicle) {
+      return res.status(404).json({ message: "Vehicle not found" });
+    }
+
+    console.log('🚗 Vehicle createdById:', vehicle.createdById);
+    console.log('👤 User ID from token:', userId);
+    console.log('🔍 IDs match (strict):', vehicle.createdById === userId);
+    console.log('🔍 IDs match (string):', vehicle.createdById === userId.toString());
+
+    // Check if user owns this vehicle - handle both string and ObjectId comparisons
+    const userIdStr = userId.toString();
+    if (vehicle.createdById !== userId && vehicle.createdById !== userIdStr) {
+      console.log('❌ Ownership check failed');
+      return res.status(403).json({ message: "You can only manage your own vehicles" });
+    }
+
+    console.log('✅ Ownership verified, updating vehicle...');
+
+    // Update the vehicle
+    const updated = await Vehicle.findByIdAndUpdate(
+      id,
+      { isAvailable },
+      { new: true }
+    );
+
+    res.status(200).json({ 
+      message: `Vehicle ${isAvailable ? 'made available' : 'made unavailable'} successfully`, 
+      vehicle: updated 
+    });
+  } catch (err) {
+    console.error("Host toggle vehicle availability error:", err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// Host-specific route to delete their own vehicle
+router.delete("/vehicles/:id", verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id || req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({ message: "User ID not found in token" });
+    }
+
+    // Find vehicle and verify ownership
+    const vehicle = await Vehicle.findById(id);
+    if (!vehicle) {
+      return res.status(404).json({ message: "Vehicle not found" });
+    }
+
+    // Check if user owns this vehicle
+    const userIdStr = userId.toString();
+    if (vehicle.createdById !== userId && vehicle.createdById !== userIdStr) {
+      return res.status(403).json({ message: "You can only delete your own vehicles" });
+    }
+
+    // Delete the vehicle
+    await Vehicle.findByIdAndDelete(id);
+    
+    res.status(200).json({ message: "Vehicle deleted successfully" });
+  } catch (err) {
+    console.error("Host delete vehicle error:", err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 router.delete("/delete-vehicle/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     const { id } = req.params;

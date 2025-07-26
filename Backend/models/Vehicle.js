@@ -96,6 +96,10 @@ const vehicleSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  isAvailable: {
+    type: Boolean,
+    default: true,
+  },
   clickCount: {
     type: Number,
     default: 0,
