@@ -19,16 +19,16 @@ const Sidebar = ({ selectedMenu, setSelectedMenu }) => {
   ];
 
   return (
-    <div className="w-64 bg-blue-400 text-white h-screen fixed top-0 left-0">
-      <div className="p-4 text-2xl font-bold border-b border-gray-700">
+    <div className="w-64 bg-black text-white h-screen fixed top-0 left-0">
+      <div className="p-4 text-2xl font-bold ">
         Admin Dashboard
       </div>
       <nav className="mt-4">
         {menuItems.map((item) => (
           <button
             key={item.id}
-            className={`w-full text-left p-4 hover:bg-gray-700 transition-colors ${
-              selectedMenu === item.id ? 'bg-gray-700' : ''
+            className={`w-full text-left p-4 hover:bg-red-600 transition-colors ${
+              selectedMenu === item.id ? 'bg-red-600' : ''
             }`}
             onClick={() => setSelectedMenu(item.id)}
           >
