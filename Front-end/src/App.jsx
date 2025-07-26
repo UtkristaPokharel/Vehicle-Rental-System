@@ -30,6 +30,7 @@ import Map from "./utils/map.jsx"
 
 import FAQPage from './components/HomePage/FAQPage.jsx';
 import AddVehiclePage from './pages/renter/AddVehiclePage.jsx';
+import NotFound from './pages/NotFound.jsx';
 
 function AppContent() {
   const { isProfileSidebarOpen, closeProfileSidebar } = useProfileSidebar();
@@ -66,6 +67,9 @@ function AppContent() {
         <Route path="/admin-login" element={<AdminLoginPage />} />
         <Route path="/dashboard" element={<AdminDashboard />} />
         <Route path="/logout" element={<Logout/>} />
+        
+        {/* 404 Catch-all route - must be last */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
 
       {/* Global ProfileSidebar */}

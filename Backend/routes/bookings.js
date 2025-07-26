@@ -198,7 +198,6 @@ router.get('/admin/statistics', async (req, res) => {
   }
 });
 
-// Get bookings for a host's vehicles
 router.get('/host/:hostId', async (req, res) => {
   try {
     const { hostId } = req.params;
