@@ -382,4 +382,155 @@ router.post('/create-from-transaction', async (req, res) => {
   }
 });
 
+// Submit cancellation request (User can request, admin approves)
+router.post('/:bookingId/cancel-request', async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const { reason, requestedAt } = req.body;
+    
+    const booking = await Booking.findOne({ bookingId });
+    
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
+      });
+    }
+
+    // Check if booking can be cancelled
+    if (!['confirmed', 'pending', 'in-progress'].includes(booking.bookingStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: 'This booking cannot be cancelled'
+      });
+    }
+
+    // Check if there's already a pending cancel request
+    if (booking.cancelRequest && booking.cancelRequest.status === 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: 'A cancellation request is already pending for this booking'
+      });
+    }
+
+    // Add cancel request to booking
+    booking.cancelRequest = {
+      status: 'pending',
+      reason: reason || 'No reason provided',
+      requestedAt: requestedAt || new Date(),
+      requestedBy: req.user ? req.user.userId : booking.userId
+    };
+
+    await booking.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Cancellation request submitted successfully',
+      data: {
+        bookingId: booking.bookingId,
+        cancelRequest: booking.cancelRequest
+      }
+    });
+  } catch (error) {
+    console.error('Error submitting cancellation request:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to submit cancellation request',
+      error: error.message
+    });
+  }
+});
+
+// Get all pending cancellation requests (Admin only)
+router.get('/admin/cancel-requests', async (req, res) => {
+  try {
+    const bookingsWithCancelRequests = await Booking.find({
+      'cancelRequest.status': 'pending'
+    })
+    .populate('vehicleId', 'name model type location images')
+    .populate('userId', 'name email phone')
+    .sort({ 'cancelRequest.requestedAt': -1 });
+
+    res.status(200).json({
+      success: true,
+      count: bookingsWithCancelRequests.length,
+      data: bookingsWithCancelRequests
+    });
+  } catch (error) {
+    console.error('Error fetching cancel requests:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch cancel requests',
+      error: error.message
+    });
+  }
+});
+
+// Approve or reject cancellation request (Admin only)
+router.patch('/:bookingId/cancel-request/:action', async (req, res) => {
+  try {
+    const { bookingId, action } = req.params;
+    const { adminNotes } = req.body;
+    
+    if (!['approve', 'reject'].includes(action)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid action. Use "approve" or "reject"'
+      });
+    }
+
+    const booking = await Booking.findOne({ bookingId });
+    
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
+      });
+    }
+
+    if (!booking.cancelRequest || booking.cancelRequest.status !== 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: 'No pending cancellation request found for this booking'
+      });
+    }
+
+    if (action === 'approve') {
+      // Approve cancellation - change booking status to cancelled
+      booking.bookingStatus = 'cancelled';
+      booking.cancelRequest.status = 'approved';
+      booking.cancelRequest.approvedAt = new Date();
+      booking.cancelRequest.adminNotes = adminNotes;
+      booking.metadata = booking.metadata || {};
+      booking.metadata.cancellationDate = new Date();
+      booking.metadata.cancellationReason = booking.cancelRequest.reason;
+      booking.metadata.approvedBy = req.user ? req.user.userId : 'admin';
+    } else {
+      // Reject cancellation - keep original status
+      booking.cancelRequest.status = 'rejected';
+      booking.cancelRequest.rejectedAt = new Date();
+      booking.cancelRequest.adminNotes = adminNotes;
+    }
+
+    await booking.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Cancellation request ${action}d successfully`,
+      data: {
+        bookingId: booking.bookingId,
+        bookingStatus: booking.bookingStatus,
+        cancelRequest: booking.cancelRequest
+      }
+    });
+  } catch (error) {
+    console.error('Error processing cancellation request:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to process cancellation request',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

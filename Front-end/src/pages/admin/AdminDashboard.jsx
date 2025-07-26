@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import UsersDataComponent from "./DashboardComponent/UsersDataComponent.jsx";
 import VehicleDataComponent from './DashboardComponent/VehicleDataComponent.jsx';
 import BookingDataComponent from './DashboardComponent/BookingDataComponent.jsx';
+import CancelRequestsComponent from './DashboardComponent/CancelRequestsComponent.jsx';
 import AddVehicleForm from '../renter/AddVehicleForm.jsx';
 import EditVehicleForm from './DashboardComponent/EditVehiclePage.jsx'; // Reusable Add/Edit form
 import VehicleAnalyticsDashboard from '../../components/VehicleAnalyticsDashboard.jsx';
@@ -13,7 +14,8 @@ const Sidebar = ({ selectedMenu, setSelectedMenu }) => {
     { id: 'users', name: 'Users' },
     { id: 'analytics', name: 'Analytics' },
     { id: 'add-vehicle', name: 'Add Vehicle' },
-    {id: "vehicle-booking", name:"Vehicle Booking"},
+    { id: "vehicle-booking", name:"Vehicle Booking"},
+    { id: "cancel-requests", name:"Cancel Requests"},
   ];
 
   return (
@@ -81,6 +83,12 @@ const VehicleBooking = () => (
   </div>
 );
 
+const CancelRequests = () => (
+  <div className="p-6">
+    <CancelRequestsComponent />
+  </div>
+);
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   useEffect(() => {
@@ -105,6 +113,8 @@ const AdminDashboard = () => {
         return <AddVehicle  />;
       case 'vehicle-booking':
         return <VehicleBooking />;
+      case 'cancel-requests':
+        return <CancelRequests />;
       default:
         return <VehicleListing  />;
     }

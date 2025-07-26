@@ -61,37 +61,38 @@ The cancel button logic is working perfectly - you just need the right user acco
         throw new Error('No authentication token found. Please log in.');
       }
 
-      const apiUrl = getApiUrl(`api/payment/esewa/booking/${bookingId}/status`);
-      console.log('🚫 Cancelling booking:', bookingId);
+      // Send cancel request to admin instead of direct cancellation
+      const apiUrl = getApiUrl(`api/payment/esewa/booking/${bookingId}/cancel-request`);
+      console.log('� Submitting cancel request for booking:', bookingId);
       
       const response = await fetch(apiUrl, {
-        method: 'PATCH',
+        method: 'POST',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          status: 'cancelled',
-          reason: reason
+          reason: reason,
+          requestedAt: new Date().toISOString()
         })
       });
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ Failed to cancel booking:', response.status, errorText);
-        throw new Error(`Failed to cancel booking: ${response.status} ${response.statusText}`);
+        console.error('❌ Failed to submit cancel request:', response.status, errorText);
+        throw new Error(`Failed to submit cancel request: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
-      console.log('✅ Booking cancelled successfully');
+      console.log('✅ Cancel request submitted successfully');
       
-      // Refresh bookings after successful cancellation
+      // Refresh bookings after successful request submission
       fetchUserBookings();
       
       return data;
     } catch (err) {
-      console.error('❌ Error cancelling booking:', err);
+      console.error('❌ Error submitting cancel request:', err);
       throw err;
     }
   };
@@ -150,31 +151,37 @@ The cancel button logic is working perfectly - you just need the right user acco
 
   // Helper function to check if booking can be cancelled
   const canCancelBooking = (booking) => {
-    const cancellableStatuses = ['confirmed', 'pending'];
-    const startDate = new Date(booking.startDate);
-    const now = new Date();
-    const hoursUntilStart = (startDate - now) / (1000 * 60 * 60);
+    const cancellableStatuses = ['confirmed', 'pending', 'in-progress'];
     
-    // Can cancel if booking is in cancellable status and starts more than 24 hours from now
-    return cancellableStatuses.includes(booking.bookingStatus) && hoursUntilStart > 24;
+    // Debug: Log the booking status
+    console.log('🔍 Cancel Booking Debug:', {
+      bookingId: booking.bookingId,
+      status: booking.bookingStatus,
+      canCancel: cancellableStatuses.includes(booking.bookingStatus),
+      cancelRequestExists: booking.cancelRequest?.status
+    });
+    
+    // Can cancel if booking is in cancellable status and no pending cancel request
+    return cancellableStatuses.includes(booking.bookingStatus) && !booking.cancelRequest;
   };
 
   // Handle cancel booking with confirmation
   const handleCancelBooking = async (booking) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to cancel the booking for ${booking.vehicleName}?\n\n` +
+    const reason = prompt(
+      `Submit a cancellation request for ${booking.vehicleName}?\n\n` +
       `Booking ID: ${booking.bookingId}\n` +
       `Start Date: ${formatDate(booking.startDate)}\n` +
       `Amount: ${formatCurrency(booking.pricing.totalAmount)}\n\n` +
-      `This action cannot be undone.`
+      `Please provide a reason for cancellation (optional):`,
+      'Change of plans'
     );
     
-    if (confirmed) {
+    if (reason !== null) { // User clicked OK (even if empty)
       try {
-        await cancelBooking(booking.bookingId);
-        alert('Booking cancelled successfully!');
+        await cancelBooking(booking.bookingId, reason || 'No reason provided');
+        alert('✅ Cancellation request submitted successfully!\n\nYour request has been sent to the admin for review. You will be notified once it\'s processed.');
       } catch (error) {
-        alert('Failed to cancel booking: ' + error.message);
+        alert('❌ Failed to submit cancellation request: ' + error.message);
       }
     }
   };
@@ -595,17 +602,34 @@ The cancel button logic is working perfectly - you just need the right user acco
 
                       {/* Cancel Button or Status Info */}
                       {canCancelBooking(booking) ? (
-                        <div className="bg-red-50 rounded-xl p-4 border border-red-100">
+                        <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
                           <button
                             onClick={() => handleCancelBooking(booking)}
-                            className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+                            className="w-full bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
                           >
                             <MdCancel className="w-4 h-4" />
-                            Cancel Booking
+                            Request Cancellation
                           </button>
-                          <p className="text-xs text-red-600 mt-2 text-center">
-                            Cancel up to 24h before start time
+                          <p className="text-xs text-orange-600 mt-2 text-center">
+                            Submit request to admin for review
                           </p>
+                        </div>
+                      ) : booking.cancelRequest ? (
+                        <div className="bg-yellow-50 rounded-xl p-4 border border-yellow-100">
+                          <div className="text-center">
+                            <div className="flex items-center justify-center gap-2 text-yellow-700 text-sm mb-2">
+                              <MdAccessTime className="w-4 h-4" />
+                              Cancel Request Pending
+                            </div>
+                            <p className="text-xs text-yellow-600">
+                              Submitted: {formatDate(booking.cancelRequest.requestedAt)}
+                            </p>
+                            {booking.cancelRequest.reason && (
+                              <p className="text-xs text-yellow-600 mt-1">
+                                Reason: {booking.cancelRequest.reason}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       ) : booking.bookingStatus === 'cancelled' ? (
                         <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
@@ -622,24 +646,11 @@ The cancel button logic is working perfectly - you just need the right user acco
                           </div>
                         </div>
                       ) : (
-                        <div className="bg-yellow-50 rounded-xl p-4 border border-yellow-100">
-                          <div className="text-center text-yellow-700 text-xs">
-                            {booking.bookingStatus === 'in-progress' 
-                              ? 'Trip in progress - Cannot cancel'
-                              : (() => {
-                                  const startDate = new Date(booking.startDate);
-                                  const now = new Date();
-                                  const hoursUntilStart = (startDate - now) / (1000 * 60 * 60);
-                                  
-                                  if (hoursUntilStart < 0) {
-                                    return 'Booking has already started\n(Cannot cancel past bookings)';
-                                  } else if (hoursUntilStart < 24) {
-                                    return 'Cancellation not available\n(Less than 24h to start)';
-                                  } else {
-                                    return 'Cancellation not available';
-                                  }
-                                })()
-                            }
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                          <div className="text-center text-gray-700 text-xs">
+                            Cannot request cancellation
+                            <br />
+                            <span className="text-gray-500">Status: {booking.bookingStatus}</span>
                           </div>
                         </div>
                       )}

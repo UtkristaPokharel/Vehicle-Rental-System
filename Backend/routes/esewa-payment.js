@@ -1224,4 +1224,76 @@ router.get('/test-success-redirect', (req, res) => {
   res.redirect(successUrl);
 });
 
+// Submit cancellation request (User can request, admin approves)
+router.post('/booking/:bookingId/cancel-request', authMiddleware, async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const { reason, requestedAt } = req.body;
+    const userId = req.user.userId;
+    
+    console.log('Cancel request received:', { bookingId, reason, userId });
+    
+    const booking = await Booking.findOne({ bookingId });
+    
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
+      });
+    }
+
+    // Check if this booking belongs to the user (unless admin)
+    if (booking.userId.toString() !== userId && !req.user.isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only request cancellation for your own bookings'
+      });
+    }
+
+    // Check if booking can be cancelled
+    if (!['confirmed', 'pending', 'in-progress'].includes(booking.bookingStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: 'This booking cannot be cancelled'
+      });
+    }
+
+    // Check if there's already a pending cancel request
+    if (booking.cancelRequest && booking.cancelRequest.status === 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: 'A cancellation request is already pending for this booking'
+      });
+    }
+
+    // Add cancel request to booking
+    booking.cancelRequest = {
+      status: 'pending',
+      reason: reason || 'No reason provided',
+      requestedAt: requestedAt || new Date(),
+      requestedBy: userId
+    };
+
+    await booking.save();
+
+    console.log('Cancel request submitted successfully for booking:', bookingId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Cancellation request submitted successfully',
+      data: {
+        bookingId: booking.bookingId,
+        cancelRequest: booking.cancelRequest
+      }
+    });
+  } catch (error) {
+    console.error('Error submitting cancellation request:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to submit cancellation request',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
