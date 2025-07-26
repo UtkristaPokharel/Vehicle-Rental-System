@@ -1229,9 +1229,12 @@ router.post('/booking/:bookingId/cancel-request', authMiddleware, async (req, re
   try {
     const { bookingId } = req.params;
     const { reason, requestedAt } = req.body;
-    const userId = req.user.userId;
     
-    console.log('Cancel request received:', { bookingId, reason, userId });
+    // Handle both user and admin authentication
+    const userId = req.user?.id || req.admin?.id;
+    const isAdmin = !!req.admin;
+    
+    console.log('Cancel request received:', { bookingId, reason, userId, isAdmin });
     
     const booking = await Booking.findOne({ bookingId });
     
@@ -1243,7 +1246,8 @@ router.post('/booking/:bookingId/cancel-request', authMiddleware, async (req, re
     }
 
     // Check if this booking belongs to the user (unless admin)
-    if (booking.userId.toString() !== userId && !req.user.isAdmin) {
+    // Handle case where userId might be null in older bookings
+    if (booking.userId && booking.userId.toString() !== userId && !isAdmin) {
       return res.status(403).json({
         success: false,
         message: 'You can only request cancellation for your own bookings'
