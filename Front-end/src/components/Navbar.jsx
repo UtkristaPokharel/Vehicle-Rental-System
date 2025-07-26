@@ -132,7 +132,7 @@ export default function Navbar() {
                     <li><button onClick={handleFAQClick} className="hover:underline decoration-3 hover:decoration-red-600 hover:underline-offset-8">FAQ</button></li>
                 </ul>
 
-                <button onClick={() => { handleToggle(); navigate("/add-vehicle")}}  className="border-0 px-3 lg:px-4 py-2 bg-red-600 text-white text-xs lg:text-sm rounded-2xl hover:scale-110 transition-transform duration-200 whitespace-nowrap">
+                <button onClick={() => { navigate("/add-vehicle")}}  className="border-0 px-3 lg:px-4 py-2 bg-red-600 text-white text-xs lg:text-sm rounded-2xl hover:scale-110 transition-transform duration-200 whitespace-nowrap">
                     Become a host
                 </button>
 
@@ -184,7 +184,7 @@ export default function Navbar() {
                 >
                     <button 
                         onClick={handleToggle} 
-                        className="absolute top-4 right-4 text-white text-2xl sm:text-3xl p-2 touch-manipulation hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
+                        className="absolute top-4 right-4 text-white text-2xl sm:text-3xl p-2 touch-manipulation hover:bg-opacity-20 rounded-full transition-colors"
                         aria-label="Close menu"
                     >
                         <IoClose />
