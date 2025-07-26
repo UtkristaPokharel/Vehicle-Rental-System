@@ -75,7 +75,7 @@ const transactionSchema = new mongoose.Schema({
 });
 
 // Create indexes
-transactionSchema.index({ uuid: 1 });
+// Note: uuid index is automatically created due to unique: true in schema definition
 transactionSchema.index({ status: 1 });
 transactionSchema.index({ createdAt: -1 });
 transactionSchema.index({ userId: 1 });
