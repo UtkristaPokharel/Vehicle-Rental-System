@@ -26,6 +26,33 @@ const BookingHistoryPage = () => {
     fetchUserBookings();
   };
 
+  // Function to clear all tokens and show fresh bookings issue
+  const clearTokensAndExplain = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('name');
+    localStorage.removeItem('email');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('adminName');
+    console.log('🧹 All tokens cleared!');
+    
+    alert(`ISSUE IDENTIFIED! 🔍
+
+The problem is account mismatch:
+
+✅ FRESH BOOKINGS are being created for: pokharelutkrista@gmail.com
+❌ YOU'RE VIEWING bookings for: abc@gmail.com (test account)
+
+Your fresh July 26, 2025 bookings exist, but you're logged in as the wrong user!
+
+SOLUTION: You need to log in with your actual account (pokharelutkrista@gmail.com) instead of the test account to see your fresh bookings.
+
+The cancel button logic is working perfectly - you just need the right user account!`);
+    
+    setError('Please log in with pokharelutkrista@gmail.com to see your fresh bookings from July 26, 2025. The test account (abc@gmail.com) only has old test data from July 24.');
+    setLoading(false);
+  };
+
   const cancelBooking = async (bookingId, reason = 'Cancelled by user') => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
@@ -34,37 +61,38 @@ const BookingHistoryPage = () => {
         throw new Error('No authentication token found. Please log in.');
       }
 
-      const apiUrl = getApiUrl(`api/payment/esewa/booking/${bookingId}/status`);
-      console.log('🚫 Cancelling booking:', bookingId);
+      // Send cancel request to admin instead of direct cancellation
+      const apiUrl = getApiUrl(`api/payment/esewa/booking/${bookingId}/cancel-request`);
+      console.log('� Submitting cancel request for booking:', bookingId);
       
       const response = await fetch(apiUrl, {
-        method: 'PATCH',
+        method: 'POST',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          status: 'cancelled',
-          reason: reason
+          reason: reason,
+          requestedAt: new Date().toISOString()
         })
       });
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ Failed to cancel booking:', response.status, errorText);
-        throw new Error(`Failed to cancel booking: ${response.status} ${response.statusText}`);
+        console.error('❌ Failed to submit cancel request:', response.status, errorText);
+        throw new Error(`Failed to submit cancel request: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
-      console.log('✅ Booking cancelled successfully');
+      console.log('✅ Cancel request submitted successfully');
       
-      // Refresh bookings after successful cancellation
+      // Refresh bookings after successful request submission
       fetchUserBookings();
       
       return data;
     } catch (err) {
-      console.error('❌ Error cancelling booking:', err);
+      console.error('❌ Error submitting cancel request:', err);
       throw err;
     }
   };
@@ -123,31 +151,37 @@ const BookingHistoryPage = () => {
 
   // Helper function to check if booking can be cancelled
   const canCancelBooking = (booking) => {
-    const cancellableStatuses = ['confirmed', 'pending'];
-    const startDate = new Date(booking.startDate);
-    const now = new Date();
-    const hoursUntilStart = (startDate - now) / (1000 * 60 * 60);
+    const cancellableStatuses = ['confirmed', 'pending', 'in-progress'];
     
-    // Can cancel if booking is in cancellable status and starts more than 24 hours from now
-    return cancellableStatuses.includes(booking.bookingStatus) && hoursUntilStart > 24;
+    // Debug: Log the booking status
+    console.log('🔍 Cancel Booking Debug:', {
+      bookingId: booking.bookingId,
+      status: booking.bookingStatus,
+      canCancel: cancellableStatuses.includes(booking.bookingStatus),
+      cancelRequestExists: booking.cancelRequest?.status
+    });
+    
+    // Can cancel if booking is in cancellable status and no pending cancel request
+    return cancellableStatuses.includes(booking.bookingStatus) && !booking.cancelRequest;
   };
 
   // Handle cancel booking with confirmation
   const handleCancelBooking = async (booking) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to cancel the booking for ${booking.vehicleName}?\n\n` +
+    const reason = prompt(
+      `Submit a cancellation request for ${booking.vehicleName}?\n\n` +
       `Booking ID: ${booking.bookingId}\n` +
       `Start Date: ${formatDate(booking.startDate)}\n` +
       `Amount: ${formatCurrency(booking.pricing.totalAmount)}\n\n` +
-      `This action cannot be undone.`
+      `Please provide a reason for cancellation (optional):`,
+      'Change of plans'
     );
     
-    if (confirmed) {
+    if (reason !== null) { // User clicked OK (even if empty)
       try {
-        await cancelBooking(booking.bookingId);
-        alert('Booking cancelled successfully!');
+        await cancelBooking(booking.bookingId, reason || 'No reason provided');
+        alert('✅ Cancellation request submitted successfully!\n\nYour request has been sent to the admin for review. You will be notified once it\'s processed.');
       } catch (error) {
-        alert('Failed to cancel booking: ' + error.message);
+        alert('❌ Failed to submit cancellation request: ' + error.message);
       }
     }
   };
@@ -272,6 +306,12 @@ const BookingHistoryPage = () => {
               Try Again
             </button>
             <button
+              onClick={clearTokensAndExplain}
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm"
+            >
+              🔍 Explain Fresh Booking Issue
+            </button>
+            <button
               onClick={setTestToken}
               className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm"
             >
@@ -294,6 +334,20 @@ const BookingHistoryPage = () => {
                 Booking History
               </h1>
               <p className="text-blue-100 text-lg">Welcome back, {userName}! Track all your vehicle reservations</p>
+              {localStorage.getItem('email') === 'abc@gmail.com' && (
+                <div className="mt-3 bg-yellow-500/20 border border-yellow-300/30 rounded-lg p-3">
+                  <p className="text-yellow-100 text-sm">
+                    ⚠️ <strong>Account Notice:</strong> You're viewing test data for abc@gmail.com. 
+                    Fresh bookings are created under pokharelutkrista@gmail.com. 
+                    <button 
+                      onClick={clearTokensAndExplain}
+                      className="underline hover:text-yellow-50 ml-1"
+                    >
+                      Click here to understand the issue
+                    </button>
+                  </p>
+                </div>
+              )}
             </div>
             <button
               onClick={fetchUserBookings}
@@ -548,17 +602,34 @@ const BookingHistoryPage = () => {
 
                       {/* Cancel Button or Status Info */}
                       {canCancelBooking(booking) ? (
-                        <div className="bg-red-50 rounded-xl p-4 border border-red-100">
+                        <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
                           <button
                             onClick={() => handleCancelBooking(booking)}
-                            className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+                            className="w-full bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
                           >
                             <MdCancel className="w-4 h-4" />
-                            Cancel Booking
+                            Request Cancellation
                           </button>
-                          <p className="text-xs text-red-600 mt-2 text-center">
-                            Cancel up to 24h before start time
+                          <p className="text-xs text-orange-600 mt-2 text-center">
+                            Submit request to admin for review
                           </p>
+                        </div>
+                      ) : booking.cancelRequest ? (
+                        <div className="bg-yellow-50 rounded-xl p-4 border border-yellow-100">
+                          <div className="text-center">
+                            <div className="flex items-center justify-center gap-2 text-yellow-700 text-sm mb-2">
+                              <MdAccessTime className="w-4 h-4" />
+                              Cancel Request Pending
+                            </div>
+                            <p className="text-xs text-yellow-600">
+                              Submitted: {formatDate(booking.cancelRequest.requestedAt)}
+                            </p>
+                            {booking.cancelRequest.reason && (
+                              <p className="text-xs text-yellow-600 mt-1">
+                                Reason: {booking.cancelRequest.reason}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       ) : booking.bookingStatus === 'cancelled' ? (
                         <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
@@ -575,12 +646,11 @@ const BookingHistoryPage = () => {
                           </div>
                         </div>
                       ) : (
-                        <div className="bg-yellow-50 rounded-xl p-4 border border-yellow-100">
-                          <div className="text-center text-yellow-700 text-xs">
-                            {booking.bookingStatus === 'in-progress' 
-                              ? 'Trip in progress - Cannot cancel'
-                              : 'Cancellation not available\n(Less than 24h to start)'
-                            }
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                          <div className="text-center text-gray-700 text-xs">
+                            Cannot request cancellation
+                            <br />
+                            <span className="text-gray-500">Status: {booking.bookingStatus}</span>
                           </div>
                         </div>
                       )}

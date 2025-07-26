@@ -274,6 +274,52 @@ const bookingSchema = new mongoose.Schema({
     insuranceIncluded: {
       type: Boolean,
       default: true
+    },
+    cancellationDate: {
+      type: Date,
+      required: false
+    },
+    cancellationReason: {
+      type: String,
+      required: false
+    },
+    approvedBy: {
+      type: String,
+      required: false
+    }
+  },
+
+  // Cancel request information
+  cancelRequest: {
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      required: false
+    },
+    reason: {
+      type: String,
+      required: false
+    },
+    requestedAt: {
+      type: Date,
+      required: false
+    },
+    requestedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: false
+    },
+    approvedAt: {
+      type: Date,
+      required: false
+    },
+    rejectedAt: {
+      type: Date,
+      required: false
+    },
+    adminNotes: {
+      type: String,
+      required: false
     }
   }
 }, {

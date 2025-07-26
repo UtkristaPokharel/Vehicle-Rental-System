@@ -464,7 +464,12 @@ export default function VehicleDataComponent() {
         <>
           {/* Statistics Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <button
+              onClick={() => setFilterStatus('all')}
+              className={`bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer focus:outline-none focus:ring-4 focus:ring-white/50 ${
+                filterStatus === 'all' ? 'ring-4 ring-white/70 scale-105' : ''
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-3xl font-bold mb-1">{vehicles.length}</div>
@@ -472,9 +477,14 @@ export default function VehicleDataComponent() {
                 </div>
                 <FaCar className="text-2xl opacity-80" />
               </div>
-            </div>
+            </button>
             
-            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <button
+              onClick={() => setFilterStatus('active')}
+              className={`bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer focus:outline-none focus:ring-4 focus:ring-white/50 ${
+                filterStatus === 'active' ? 'ring-4 ring-white/70 scale-105' : ''
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-3xl font-bold mb-1">{vehicles.filter(v => v.isActive).length}</div>
@@ -484,9 +494,14 @@ export default function VehicleDataComponent() {
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               </div>
-            </div>
+            </button>
             
-            <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <button
+              onClick={() => setFilterStatus('inactive')}
+              className={`bg-gradient-to-br from-red-500 to-red-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer focus:outline-none focus:ring-4 focus:ring-white/50 ${
+                filterStatus === 'inactive' ? 'ring-4 ring-white/70 scale-105' : ''
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-3xl font-bold mb-1">{vehicles.filter(v => !v.isActive).length}</div>
@@ -496,7 +511,7 @@ export default function VehicleDataComponent() {
                   <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
               </div>
-            </div>
+            </button>
             
             <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
               <div className="flex items-center justify-between">

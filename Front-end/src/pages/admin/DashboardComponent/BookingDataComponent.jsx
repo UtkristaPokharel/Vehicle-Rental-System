@@ -276,8 +276,15 @@ const BookingDataComponent = () => {
           const count = status === 'all' 
             ? bookings.length 
             : bookings.filter(b => b.bookingStatus === status).length;
+          const isActive = filterStatus === status;
           return (
-            <div key={status} className={`bg-gradient-to-br ${color} rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105`}>
+            <button
+              key={status}
+              onClick={() => setFilterStatus(status)}
+              className={`bg-gradient-to-br ${color} rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer focus:outline-none focus:ring-4 focus:ring-white/50 ${
+                isActive ? 'ring-4 ring-white/70 scale-105' : ''
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-3xl font-bold mb-1">{count}</div>
@@ -285,7 +292,7 @@ const BookingDataComponent = () => {
                 </div>
                 <div className="text-2xl opacity-80">{icon}</div>
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
