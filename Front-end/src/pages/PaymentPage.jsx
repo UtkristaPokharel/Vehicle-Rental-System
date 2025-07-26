@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaLock, FaCheck, FaCreditCard, FaPaypal, FaApplePay, FaGooglePay } from "react-icons/fa";
+import { FaLock, FaCheck, FaCreditCard } from "react-icons/fa";
 import { MdSecurity, MdInfo } from "react-icons/md";
 import { getApiUrl, getImageUrl as getVehicleImageUrl } from "../config/api";
 import BackButton from "../components/BackButton";
@@ -379,7 +379,7 @@ function PaymentPage() {
 								<div className="bg-white rounded-lg shadow-sm p-6">
 									<h2 className="text-xl font-semibold mb-4">Payment Method</h2>
 
-									<div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+									<div className="grid grid-cols-2 gap-4 mb-6">
 										<button
 											type="button"
 											onClick={() => setPaymentMethod("card")}
@@ -392,41 +392,6 @@ function PaymentPage() {
 											<span className="text-sm font-medium">Credit Card</span>
 										</button>
 
-										<button
-											type="button"
-											onClick={() => setPaymentMethod("paypal")}
-											className={`p-4 border rounded-lg flex flex-col items-center justify-center ${paymentMethod === "paypal"
-												? "border-blue-500 bg-blue-50"
-												: "border-gray-300 hover:border-gray-400"
-												}`}
-										>
-											<FaPaypal className="text-2xl mb-2 text-blue-600" />
-											<span className="text-sm font-medium">PayPal</span>
-										</button>
-
-										<button
-											type="button"
-											onClick={() => setPaymentMethod("apple")}
-											className={`p-4 border rounded-lg flex flex-col items-center justify-center ${paymentMethod === "apple"
-												? "border-blue-500 bg-blue-50"
-												: "border-gray-300 hover:border-gray-400"
-												}`}
-										>
-											<FaApplePay className="text-2xl mb-2" />
-											<span className="text-sm font-medium">Apple Pay</span>
-										</button>
-
-										<button
-											type="button"
-											onClick={() => setPaymentMethod("google")}
-											className={`p-4 border rounded-lg flex flex-col items-center justify-center ${paymentMethod === "google"
-												? "border-blue-500 bg-blue-50"
-												: "border-gray-300 hover:border-gray-400"
-												}`}
-										>
-											<FaGooglePay className="text-2xl mb-2" />
-											<span className="text-sm font-medium">Google Pay</span>
-										</button>
 										<button
 											type="button"
 											onClick={() => setPaymentMethod("esewa")}
@@ -518,28 +483,6 @@ function PaymentPage() {
 													<p className="text-red-500 text-sm mt-1">{errors.cardholderName}</p>
 												)}
 											</div>
-										</div>
-									)}
-
-									{/* Alternative Payment Methods */}
-									{paymentMethod === "paypal" && (
-										<div className="text-center py-8">
-											<FaPaypal className="text-6xl text-blue-600 mx-auto mb-4" />
-											<p className="text-gray-600">You will be redirected to PayPal to complete your payment</p>
-										</div>
-									)}
-
-									{paymentMethod === "apple" && (
-										<div className="text-center py-8">
-											<FaApplePay className="text-6xl mx-auto mb-4" />
-											<p className="text-gray-600">Use Touch ID or Face ID to pay with Apple Pay</p>
-										</div>
-									)}
-
-									{paymentMethod === "google" && (
-										<div className="text-center py-8">
-											<FaGooglePay className="text-6xl mx-auto mb-4" />
-											<p className="text-gray-600">Pay quickly and securely with Google Pay</p>
 										</div>
 									)}
 
