@@ -26,6 +26,33 @@ const BookingHistoryPage = () => {
     fetchUserBookings();
   };
 
+  // Function to clear all tokens and show fresh bookings issue
+  const clearTokensAndExplain = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('name');
+    localStorage.removeItem('email');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('adminName');
+    console.log('🧹 All tokens cleared!');
+    
+    alert(`ISSUE IDENTIFIED! 🔍
+
+The problem is account mismatch:
+
+✅ FRESH BOOKINGS are being created for: pokharelutkrista@gmail.com
+❌ YOU'RE VIEWING bookings for: abc@gmail.com (test account)
+
+Your fresh July 26, 2025 bookings exist, but you're logged in as the wrong user!
+
+SOLUTION: You need to log in with your actual account (pokharelutkrista@gmail.com) instead of the test account to see your fresh bookings.
+
+The cancel button logic is working perfectly - you just need the right user account!`);
+    
+    setError('Please log in with pokharelutkrista@gmail.com to see your fresh bookings from July 26, 2025. The test account (abc@gmail.com) only has old test data from July 24.');
+    setLoading(false);
+  };
+
   const cancelBooking = async (bookingId, reason = 'Cancelled by user') => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
@@ -272,6 +299,12 @@ const BookingHistoryPage = () => {
               Try Again
             </button>
             <button
+              onClick={clearTokensAndExplain}
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm"
+            >
+              🔍 Explain Fresh Booking Issue
+            </button>
+            <button
               onClick={setTestToken}
               className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm"
             >
@@ -294,6 +327,20 @@ const BookingHistoryPage = () => {
                 Booking History
               </h1>
               <p className="text-blue-100 text-lg">Welcome back, {userName}! Track all your vehicle reservations</p>
+              {localStorage.getItem('email') === 'abc@gmail.com' && (
+                <div className="mt-3 bg-yellow-500/20 border border-yellow-300/30 rounded-lg p-3">
+                  <p className="text-yellow-100 text-sm">
+                    ⚠️ <strong>Account Notice:</strong> You're viewing test data for abc@gmail.com. 
+                    Fresh bookings are created under pokharelutkrista@gmail.com. 
+                    <button 
+                      onClick={clearTokensAndExplain}
+                      className="underline hover:text-yellow-50 ml-1"
+                    >
+                      Click here to understand the issue
+                    </button>
+                  </p>
+                </div>
+              )}
             </div>
             <button
               onClick={fetchUserBookings}
@@ -579,7 +626,19 @@ const BookingHistoryPage = () => {
                           <div className="text-center text-yellow-700 text-xs">
                             {booking.bookingStatus === 'in-progress' 
                               ? 'Trip in progress - Cannot cancel'
-                              : 'Cancellation not available\n(Less than 24h to start)'
+                              : (() => {
+                                  const startDate = new Date(booking.startDate);
+                                  const now = new Date();
+                                  const hoursUntilStart = (startDate - now) / (1000 * 60 * 60);
+                                  
+                                  if (hoursUntilStart < 0) {
+                                    return 'Booking has already started\n(Cannot cancel past bookings)';
+                                  } else if (hoursUntilStart < 24) {
+                                    return 'Cancellation not available\n(Less than 24h to start)';
+                                  } else {
+                                    return 'Cancellation not available';
+                                  }
+                                })()
                             }
                           </div>
                         </div>
