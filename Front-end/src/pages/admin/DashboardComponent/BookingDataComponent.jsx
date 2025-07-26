@@ -271,7 +271,7 @@ const BookingDataComponent = () => {
           { status: 'confirmed', label: 'Confirmed', icon: '✅', color: 'from-green-500 to-green-600' },
           { status: 'pending', label: 'Pending', icon: '⏳', color: 'from-yellow-500 to-yellow-600' },
           { status: 'completed', label: 'Completed', icon: '🎉', color: 'from-purple-500 to-purple-600' },
-          { status: 'cancelled', label: 'Cancelled', icon: '❌', color: 'from-red-500 to-red-600' }
+          { status: 'cancelled', label: 'Cancelled', icon: 'X', color: 'from-red-500 to-red-600' }
         ].map(({ status, label, icon, color }) => {
           const count = status === 'all' 
             ? bookings.length 
