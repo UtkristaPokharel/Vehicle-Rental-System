@@ -50,7 +50,7 @@ export default function Footer() {
 							<img src={linkedin} alt="LinkedIn" className="w-6 h-6 mr-2 invert" />
 							LinkedIn
 						</a>
-						<a href="#" className="flex items-center hover:underline">
+						<a href="https://www.instagram.com/utkrista_pokharel?igsh=MTVmYzVoeXY2enZ3Zw%3D%3D&utm_source=qr" className="flex items-center hover:underline">
 							<img src={instagram} alt="Instagram" className="w-6 h-6 mr-2" />
 							Instagram
 						</a>
