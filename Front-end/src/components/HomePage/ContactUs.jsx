@@ -178,15 +178,16 @@ const ContactUs = () => {
 						<div className="flex items-start">
 							<FaWhatsapp className="text-[#2bc055] mt-1" />
 							<span className="ml-3">
-								+977 9806418493
+								+977 9806418493<br />
+								+977 9804439499
 							</span>
 						</div>
 						<div className="flex items-start">
 							<FaEnvelope className="text-[#d11919] mt-1" />
 							<span className="ml-3">
-								info@easywheels.com.np<br />
-								pokharelutkrista@gmail.com
+								utkrista@utkristapokharel.com.np<br />
 								bhuwan626282@gmail.com
+								rokeypandey6@gmail.com
 							</span>
 						</div>
 					</div>
