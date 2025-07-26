@@ -4,6 +4,7 @@ import { FaLock, FaCheck, FaCreditCard } from "react-icons/fa";
 import { MdSecurity, MdInfo } from "react-icons/md";
 import { getApiUrl, getImageUrl as getVehicleImageUrl } from "../config/api";
 import BackButton from "../components/BackButton";
+import esewaLogo from "../images/esewa.png";
 
 function PaymentPage() {
 	const location = useLocation();
@@ -400,10 +401,12 @@ function PaymentPage() {
 												: "border-gray-300 hover:border-gray-400"
 												}`}
 										>
-											<div className="w-8 h-8 mb-2 bg-green-600 text-white rounded flex items-center justify-center font-bold text-sm">
-												e
-											</div>
-											<span className="text-sm font-medium">eSewa</span>
+											<img 
+												src={esewaLogo} 
+												alt="eSewa" 
+												className="w-25 h-10 mb-2 object-contain"
+											/>
+											{/* <span className="text-sm font-medium">eSewa</span> */}
 										</button>
 
 									</div>
@@ -488,9 +491,11 @@ function PaymentPage() {
 
 									{paymentMethod === "esewa" && (
 										<div className="text-center py-8">
-											<div className="w-20 h-20 bg-green-600 text-white rounded-lg flex items-center justify-center font-bold text-3xl mx-auto mb-4">
-												e
-											</div>
+											<img 
+												src={esewaLogo} 
+												alt="eSewa" 
+												className="w-20 h-20 mx-auto mb-4 object-contain"
+											/>
 											<h3 className="text-lg font-semibold mb-2">eSewa Payment</h3>
 											<p className="text-gray-600 mb-4">You will be redirected to eSewa to complete your payment securely</p>
 											<div className="bg-green-50 p-4 rounded-lg">
