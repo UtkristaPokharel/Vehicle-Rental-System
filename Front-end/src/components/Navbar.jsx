@@ -114,6 +114,8 @@ export default function Navbar() {
     };
 
     return (
+
+
         <nav className='sticky top-0 left-0 w-full h-14 md:h-16 bg-black flex justify-between items-center px-3 sm:px-4 xl:px-10 z-50'>
             {/* Logo */}
             <div className='h-20 w-20 sm:h-18 sm:w-18 md:h-24 md:w-24 flex-shrink-0 cursor-pointer touch-manipulation ml-4 sm:ml-3 md:ml-4' onClick={handleLogoClick}>
@@ -140,7 +142,11 @@ export default function Navbar() {
                         onError={(e) => {
                             e.currentTarget.src = defaultProfile;
                         }}
+
+
+
                         className='w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-white border-2 border-gray-300'
+
                         alt="profile"
                     />
                 </button>
@@ -154,13 +160,19 @@ export default function Navbar() {
                         onError={(e) => {
                             e.currentTarget.src = defaultProfile;
                         }}
+
+
+
                         className='w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border-2 border-gray-300'
+
                         alt="profile"
                     />
                 </button>
 
+
                 <button className='text-white p-1 touch-manipulation' onClick={handleToggle} aria-label="Toggle menu">
                     {isOpen ? <IoClose className="text-2xl sm:text-3xl" /> : <IoMenu className="text-2xl sm:text-3xl" />}
+
                 </button>
             </div>
 

@@ -152,6 +152,8 @@ const ContactUs = () => {
 			{/* <div className="bg-white min-h-screen"> */}
 			<div className="w-full flex flex-col justify-center items-center" id="contactus-section">
 			
+
+
 			<div className="w-[95vw] md:w-[85vw] rounded-t-lg shadow-xl bg-blue-700 text-white py-8 md:py-10 px-4 md:px-10 mt-6 md:mt-10 text-center md:text-left relative max-w-screen-2xl mx-auto">			
 				<div className="flex flex-col items-center md:items-start w-full md:w-1/2 md:ml-10">
 					<h1 className="text-2xl md:text-4xl font-bold">Contact us</h1>
