@@ -67,26 +67,27 @@ export default function ProfileSidebar({ isOpen, onClose }) {
   // Handle click outside to close sidebar
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Close on outside click when clicking outside the sidebar
       if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-        // Check if the click was on the main content area (not on other UI elements)
-        const mainContent = document.querySelector('main, .main-content, #root > div');
-        if (mainContent && mainContent.contains(event.target)) {
-          onClose();
-          setIsEdit(false);
-        }
+        onClose();
+        setIsEdit(false);
       }
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      setIsEdit(false); 
+      // Add a small delay to prevent immediate closing when opening
+      const timeoutId = setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+      }, 100);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-    
   }, [isOpen, onClose]);
 
   // Handle ESC key to close sidebar

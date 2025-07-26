@@ -2,7 +2,6 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { LocationPicker } from './LocationPicker';
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { useState, useEffect } from "react";
-import { FaPen, FaSpinner } from "react-icons/fa";
 import toast,{ Toaster } from "react-hot-toast";
 import { getApiUrl, getImageUrl as getVehicleImageUrl } from "../config/api";
 import BackButton from "../components/BackButton";
@@ -170,11 +169,11 @@ function VehicleDetails() {
       <div className="detail-page flex justify-center items-center md:mb-5 mb-20">
         <div className="w-full md:w-[90vw] lg:w-[85vw] xl:w-[80vw] px-4 md:px-6 lg:px-10 mt-8 md:mt-12">
           {/* Back Button */}
-          <div className="mb-4">
+          <div className="absolute top-25 left-4 z-10">
             <BackButton />
           </div>
           
-          <div className="py-4 md:py-6 flex justify-center items-center">
+          <div className="py-2 md:py-6 flex justify-center items-center">
             <img 
               className="w-full max-w-[600px] lg:max-w-[650px] h-auto object-cover rounded-lg shadow-md" 
               src={imageUrl} 
