@@ -42,10 +42,7 @@ const MONGODB_URI =
   process.env.MONGODB_URI || "mongodb://localhost:27017/easywheels";
 
 mongoose
-  .connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(MONGODB_URI)
   .then(() => {
     console.log("✅ Connected to MongoDB Atlas");
     console.log(`📊 Database: ${mongoose.connection.db.databaseName}`);
