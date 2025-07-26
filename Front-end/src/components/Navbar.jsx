@@ -109,7 +109,7 @@ export default function Navbar() {
     };
 
     return (
-        <nav className='sticky top-0 left-0 w-full h-16 bg-black flex justify-around md:px:10 sm:justify-between items-center px-2 sm:px-4   xl:px-10 z-50'>
+        <nav className='sticky top-0 left-0 w-full h-16 bg-black flex justify-between  md:px-10 sm:justify-between items-center px-2 sm:px-4   xl:px-30 z-50'>
             {/* Logo */}
             <div className='h-20 w-20 sm:h-20 sm:w-20'>
                 <img src="/logo.png" alt="EasyWheels Logo" className="h-full w-full object-cover" />
@@ -135,7 +135,7 @@ export default function Navbar() {
                         onError={(e) => {
                             e.currentTarget.src = defaultProfile;
                         }}
-                        className='w-10 h-10 rounded-full bg-white'
+                        className='w-12 h-12 rounded-full bg-white'
                         alt="profile"
                     />
                 </button>
@@ -149,13 +149,13 @@ export default function Navbar() {
                         onError={(e) => {
                             e.currentTarget.src = defaultProfile;
                         }}
-                        className='w-9 h-9 rounded-full bg-white'
+                        className='w-12 h-12 rounded-full bg-white'
                         alt="profile"
                     />
                 </button>
 
                 <button className='text-white mr-1' onClick={handleToggle}>
-                    {isOpen ? <IoClose className="text-3xl" /> : <IoMenu className="text-3xl" />}
+                    {isOpen ? <IoClose className="text-4xl"  /> : <IoMenu className="text-4xl" />}
                 </button>
             </div>
 

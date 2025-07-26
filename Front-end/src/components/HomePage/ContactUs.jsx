@@ -153,7 +153,7 @@ const ContactUs = () => {
 			<div className=" w-full flex flex-col justify-center items-center " id="contactus-section">
 			
 			<div className="w-[90vw] md:w-[85vw] rounded-t-lg shadow-xl md:flex-row bg-blue-700 text-white py-10 px-4 md:px-10 mt-10 text-center md:text-left relative max-w-screen-2xl mx-auto" >			
-				<div className="flex flex-col ml-10 items-center md:items-start w-full md:w-1/2">
+				<div className="flex flex-col items-center md:items-start w-full md:w-1/2 md:ml-10">
 					<h1 className="text-3xl md:text-4xl font-bold">Contact us</h1>
 					<p className="text-base md:text-lg mt-2">Ask your queries with us for free.</p>
 				</div>
