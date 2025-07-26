@@ -1234,7 +1234,7 @@ router.post('/booking/:bookingId/cancel-request', authMiddleware, async (req, re
     const userId = req.user?.id || req.admin?.id;
     const isAdmin = !!req.admin;
     
-    // Fixed: Handle both user and admin auth + null userId safety
+    // Fixed: Handle both user and admin auth + null userId safety - v2
     console.log('Cancel request received:', { bookingId, reason, userId, isAdmin });
     
     const booking = await Booking.findOne({ bookingId });
