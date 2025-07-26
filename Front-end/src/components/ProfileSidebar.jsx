@@ -432,7 +432,7 @@ export default function ProfileSidebar({ isOpen, onClose }) {
 
               {/* Settings Menu */}
               <div className="space-y-1">
-                <SidebarSettingsMenu isHost={isHost} />
+                <SidebarSettingsMenu isHost={isHost} onClose={onClose} />
                 <div className="pt-3 md:pt-4 flex justify-center">
                   <Logout />
                 </div>
@@ -446,11 +446,12 @@ export default function ProfileSidebar({ isOpen, onClose }) {
 }
 
 // eslint-disable-next-line no-unused-vars
-function SidebarSettingsItem({ icon: Icon, label, to }) {
+function SidebarSettingsItem({ icon: Icon, label, to, onClose }) {
   if (label !== 'Logout') {
     return (
       <Link
         to={to}
+        onClick={onClose}
         className="flex items-center justify-between px-3 md:px-4 py-2.5 md:py-3 rounded-lg hover:bg-gray-100 transition touch-manipulation"
       >
         <div className="flex items-center gap-2 md:gap-3 text-gray-700 min-w-0">
@@ -473,7 +474,7 @@ const sidebarMenuItems = [
 
 ];
 
-function SidebarSettingsMenu({ isHost }) {
+function SidebarSettingsMenu({ isHost, onClose }) {
   const menuItems = [...sidebarMenuItems];
   
   // Add Host Dashboard for hosts
@@ -489,6 +490,7 @@ function SidebarSettingsMenu({ isHost }) {
           label={item.label}
           to={item.to}
           icon={item.icon}
+          onClose={onClose}
         />
       ))}
     </div>
