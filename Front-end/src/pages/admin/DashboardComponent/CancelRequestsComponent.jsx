@@ -5,9 +5,35 @@ import { MdCancel, MdCheckCircle, MdAccessTime, MdClose, MdCheck } from 'react-i
 
 const CancelRequestsComponent = () => {
   const [cancelRequests, setCancelRequests] = useState([]);
+  const [filteredRequests, setFilteredRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [processingBookingId, setProcessingBookingId] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filter requests based on status and search term
+  useEffect(() => {
+    let filtered = [...cancelRequests];
+
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(request =>
+        request.bookingId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        request.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        request.vehicleName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        request.userEmail.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by status (for future status filtering if needed)
+    if (filterStatus !== 'all') {
+      // Add status filtering logic here if different types of cancel requests exist
+      // For now, all are pending cancellation requests
+    }
+
+    setFilteredRequests(filtered);
+  }, [cancelRequests, filterStatus, searchTerm]);
 
   // Fetch cancel requests from API
   const fetchCancelRequests = async () => {
@@ -115,8 +141,9 @@ const CancelRequestsComponent = () => {
     if (adminNotes !== null) { // User clicked OK
       try {
         await processCancelRequest(booking.bookingId, 'approve', adminNotes || '');
-      } catch (error) {
+      } catch (err) {
         // Error already handled in processCancelRequest
+        console.error('Error approving cancellation:', err);
       }
     }
   };
@@ -139,8 +166,9 @@ const CancelRequestsComponent = () => {
       }
       try {
         await processCancelRequest(booking.bookingId, 'reject', adminNotes);
-      } catch (error) {
+      } catch (err) {
         // Error already handled in processCancelRequest
+        console.error('Error rejecting cancellation:', err);
       }
     }
   };
@@ -207,7 +235,7 @@ const CancelRequestsComponent = () => {
           <div className="flex items-center gap-4">
             <div className="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
               <div className="text-2xl font-bold">{cancelRequests.length}</div>
-              <div className="text-sm opacity-90">Pending Requests</div>
+              <div className="text-sm opacity-90">Total Requests</div>
             </div>
             <button
               onClick={fetchCancelRequests}
@@ -219,18 +247,89 @@ const CancelRequestsComponent = () => {
         </div>
       </div>
 
+      {/* Search and Filter Section */}
+      <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+          <svg className="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          Search Requests
+        </h3>
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search by booking ID, customer, or vehicle..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
+          />
+          <svg className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <button
+          onClick={() => setFilterStatus('all')}
+          className={`bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer focus:outline-none focus:ring-4 focus:ring-white/50 ${
+            filterStatus === 'all' ? 'ring-4 ring-white/70 scale-105' : ''
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-3xl font-bold mb-1">{cancelRequests.length}</div>
+              <div className="text-sm opacity-90">Total Requests</div>
+            </div>
+            <MdCancel className="text-2xl opacity-80" />
+          </div>
+        </button>
+        
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-3xl font-bold mb-1">{filteredRequests.length}</div>
+              <div className="text-sm opacity-90">Filtered Results</div>
+            </div>
+            <svg className="text-2xl opacity-80 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z" />
+            </svg>
+          </div>
+        </div>
+        
+        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-3xl font-bold mb-1">
+                {cancelRequests.reduce((sum, req) => sum + (req.pricing?.totalAmount || 0), 0).toLocaleString('en-NP')}
+              </div>
+              <div className="text-sm opacity-90">Total Amount (NPR)</div>
+            </div>
+            <FaMoneyBillWave className="text-2xl opacity-80" />
+          </div>
+        </div>
+      </div>
+
       {/* Cancel Requests List */}
-      {cancelRequests.length === 0 ? (
+      {filteredRequests.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 text-center shadow-lg">
           <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
             <MdCheckCircle className="w-12 h-12 text-gray-400" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">No Pending Cancel Requests</h3>
-          <p className="text-gray-500">All cancellation requests have been processed or there are no new requests.</p>
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            {cancelRequests.length === 0 ? 'No Pending Cancel Requests' : 'No Matching Results'}
+          </h3>
+          <p className="text-gray-500">
+            {cancelRequests.length === 0 
+              ? 'All cancellation requests have been processed or there are no new requests.'
+              : 'No cancel requests match your current search criteria.'
+            }
+          </p>
         </div>
       ) : (
         <div className="space-y-6">
-          {cancelRequests.map((booking) => (
+          {filteredRequests.map((booking) => (
             <div key={booking._id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
               <div className="p-6">
                 <div className="flex flex-col lg:flex-row gap-6">
