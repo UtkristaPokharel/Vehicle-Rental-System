@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FaHeart,  FaCar, FaMapMarkerAlt, FaAngleRight , FaHistory, FaSignOutAlt } from "react-icons/fa";
+import { FaHeart,  FaCar, FaMapMarkerAlt, FaAngleRight , FaHistory, } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
+import { MdDashboardCustomize } from "react-icons/md";
+
 import axios from "axios";
 import Logout from "../pages/Api/Logout.jsx";
 import { getApiUrl } from "../config/api";
-
 const defaultProfile = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";
 
 export default function ProfileSidebar({ isOpen, onClose }) {
@@ -454,7 +455,7 @@ function SidebarSettingsItem({ icon: Icon, label, to, onClose }) {
       <Link
         to={to}
         onClick={onClose}
-        className="flex items-center justify-between px-3 md:px-4 py-1.5 md:py-3 rounded-lg  hover:bg-gray-100 transition touch-manipulation"
+        className="flex items-center justify-between px-3 md:px-4 py-1  rounded-lg  hover:bg-gray-300 transition touch-manipulation"
       >
         <div className="flex items-center gap-2 md:gap-3 text-3xl text-gray-700 min-w-0 ">
           <Icon className=" md:text-lg flex-shrink-0 text-xl " />
@@ -481,7 +482,7 @@ function SidebarSettingsMenu({ isHost, onClose }) {
   
   // Add Host Dashboard for hosts
   if (isHost) {
-    menuItems.splice(1, 0, { label: "Host Dashboard", to: "/host-dashboard", icon: FaMapMarkerAlt });
+    menuItems.splice(1, 0, { label: "Host Dashboard", to: "/host-dashboard", icon: MdDashboardCustomize });
   }
   
   return (
