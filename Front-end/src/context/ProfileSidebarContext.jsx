@@ -36,3 +36,5 @@ export const useProfileSidebar = () => {
   }
   return context;
 };
+
+export default ProfileSidebarContext;

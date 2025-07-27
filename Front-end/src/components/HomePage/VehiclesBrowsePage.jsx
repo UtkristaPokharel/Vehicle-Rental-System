@@ -4,6 +4,7 @@ import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { getApiUrl, getImageUrl } from "../../config/api";
 import VehicleFilter from '../VehicleFilter';
+import toast from 'react-hot-toast';
 
 const VehicleCard = ({ vehicle }) => {
 	const navigate = useNavigate();
@@ -91,6 +92,12 @@ const VehicleCard = ({ vehicle }) => {
 	};
 
 	const handleRentNow = async () => {
+		// Check if vehicle is available
+		if (!vehicle.isAvailable) {
+			toast.error("This vehicle is currently not available for booking.");
+			return;
+		}
+
 		await trackClick(); // Track the click
 		const type = vehicle.type === 'two-wheeler' ? 'two-wheeler' : vehicle.type.toLowerCase();
 		navigate(`/vehicle/${type}/${vehicle._id}`, {
@@ -122,12 +129,21 @@ const VehicleCard = ({ vehicle }) => {
 
 	return (
 		<Motion.div
-			className="vehicle-card group w-full rounded-3xl bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden relative"
+			className={`vehicle-card group w-full rounded-3xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden relative ${
+				!vehicle.isAvailable ? 'opacity-60' : ''
+			}`}
 			initial={{ opacity: 0, y: 50 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.5 }}
 		>
 			<div className="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
+			
+			{/* Availability Status Badge */}
+			{!vehicle.isAvailable && (
+				<div className="absolute top-3 left-3 z-30 bg-red-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
+					Not Available
+				</div>
+			)}
 			
 			<div className="relative">
 				<img 
@@ -139,7 +155,7 @@ const VehicleCard = ({ vehicle }) => {
 				<div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 				
 				{/* Popularity badge */}
-				{vehicle.clickCount > 0 && (
+				{vehicle.clickCount > 0 && vehicle.isAvailable && (
 					<div className="absolute top-3 left-3 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
 						🔥 {vehicle.clickCount} views
 					</div>
@@ -206,9 +222,14 @@ const VehicleCard = ({ vehicle }) => {
 					
 					<button
 						onClick={handleRentNow}
-						className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg hover:scale-105 transition-transform duration-200"
+						disabled={!vehicle.isAvailable}
+						className={`px-4 py-2 rounded-full text-sm font-semibold shadow-lg transition-all duration-200 ${
+							vehicle.isAvailable 
+								? 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:scale-105' 
+								: 'bg-gray-400 text-gray-200 cursor-not-allowed'
+						}`}
 					>
-						Rent Now
+						{vehicle.isAvailable ? 'Rent Now' : 'Not Available'}
 					</button>
 				</div>
 			</div>

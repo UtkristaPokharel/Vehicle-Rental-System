@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { IoMenu, IoClose } from "react-icons/io5";
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useProfileSidebar } from '../context/ProfileSidebarContext.jsx';
+import { useProfileSidebar } from '../context/ProfileSidebarContext';
 
 export default function Navbar() {
     const defaultProfile = "https://imgs.search.brave.com/XfEYZ8GiGdxGCdS_JsblVMJV7ufqdKMwU1a9uPFGtjg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvNS9Qcm9m/aWxlLVBORy1GcmVl/LUltYWdlLnBuZw";

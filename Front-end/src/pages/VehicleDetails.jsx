@@ -1,8 +1,7 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { LocationPicker } from './LocationPicker';
+import { LocationPicker } from '../components/LocationPicker';
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { useState, useEffect } from "react";
-import { FaPen, FaSpinner } from "react-icons/fa";
 import toast,{ Toaster } from "react-hot-toast";
 import { getApiUrl, getImageUrl as getVehicleImageUrl } from "../config/api";
 import BackButton from "../components/BackButton";
@@ -24,7 +23,14 @@ function VehicleDetails() {
     startTime: '',
     endDate: '',
     endTime: '',
-    location: 'Butwal'
+    location: 'Butwal',
+    coordinates: {
+      lat: null,
+      lng: null
+    },
+    distance: null,
+    city: null,
+    locationName: null
   });
 
   useEffect(() => {
@@ -72,6 +78,12 @@ function VehicleDetails() {
     console.log("Booking data:", bookingData);
     console.log("Price data:", vehicleData?.price, "Type:", typeof vehicleData?.price);
     
+    // Check if vehicle is available
+    if (!vehicleData?.isAvailable) {
+      toast.error("This vehicle is currently not available for booking.");
+      return;
+    }
+
     // Basic validation
     if (!bookingData.startDate || !bookingData.startTime || !bookingData.endDate || !bookingData.endTime) {
 
@@ -115,7 +127,17 @@ function VehicleDetails() {
     // Navigate to payment page with all necessary data
     navigate('/payment', {
       state: {
-        bookingData: bookingData,
+        bookingData: {
+          ...bookingData,
+          // Ensure we have complete location data for transaction
+          pickupLocation: {
+            name: bookingData.location, // "Butwal, Traffic Chowk"
+            city: bookingData.city,
+            locationName: bookingData.locationName,
+            coordinates: bookingData.coordinates,
+            distance: bookingData.distance
+          }
+        },
         vehicleData: {
           ...vehicleData, // Pass all vehicle data
           name: vehicleData?.name,
@@ -160,15 +182,15 @@ function VehicleDetails() {
 
   return (
     <>
-      <Toaster />
+      
       <div className="detail-page flex justify-center items-center md:mb-5 mb-20">
         <div className="w-full md:w-[90vw] lg:w-[85vw] xl:w-[80vw] px-4 md:px-6 lg:px-10 mt-8 md:mt-12">
           {/* Back Button */}
-          <div className="mb-4">
+          <div className="absolute top-25 left-4 z-10">
             <BackButton />
           </div>
           
-          <div className="py-4 md:py-6 flex justify-center items-center">
+          <div className="py-2 md:py-6 flex justify-center items-center">
             <img 
               className="w-full max-w-[600px] lg:max-w-[650px] h-auto object-cover rounded-lg shadow-md" 
               src={imageUrl} 
@@ -190,6 +212,7 @@ function VehicleDetails() {
                 fuelType={vehicleData.fuelType}
                 mileage={vehicleData.mileage}
                 transmission={vehicleData.transmission}
+                isAvailable={vehicleData.isAvailable}
               />
               <VehicleDescription vehicleData={vehicleData} />
             </div>
@@ -201,6 +224,7 @@ function VehicleDetails() {
               <BookingSection 
                 price={vehicleData.price} 
                 location={vehicleData.location}
+                vehicleData={vehicleData}
                 onBookingChange={setBookingData}
                 onContinue={handleContinueToPayment}
               />
@@ -224,7 +248,7 @@ function VehicleDetails() {
 
 export default VehicleDetails;
 
-export const BasicFeatures = ({ name, type, capacity,seats, fuelType, mileage , transmission = "Automatic" }) => {
+export const BasicFeatures = ({ name, type, capacity,seats, fuelType, mileage , transmission = "Automatic", isAvailable = true }) => {
   const formatType = (vehicleType) => {
     if (!vehicleType) return "Vehicle";
     return vehicleType === 'two-wheeler' ? 'Two Wheeler' : 
@@ -238,7 +262,16 @@ export const BasicFeatures = ({ name, type, capacity,seats, fuelType, mileage , 
 
   return (
     <section className="w-full p-4 md:p-6">
-      <h1 className="text-2xl md:text-3xl font-bold mb-2">{name}</h1>
+      <div className="flex items-start justify-between mb-2">
+        <h1 className="text-2xl md:text-3xl font-bold">{name}</h1>
+        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+          isAvailable 
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-red-100 text-red-800'
+        }`}>
+          {isAvailable ? '✓ Available' : '✗ Not Available'}
+        </span>
+      </div>
       <p className="text-gray-500 text-sm md:text-base mb-2">{formatType(type)}</p>
 
       <div className="flex flex-wrap gap-2 md:gap-3 mt-4">
@@ -307,6 +340,7 @@ const getCurrentTime = () =>
 export const BookingSection = ({
   price = "रु3,116",
   location = "Butwal, Nepal",
+  vehicleData,
   onBookingChange,
   onContinue
 }) => {
@@ -326,8 +360,24 @@ export const BookingSection = ({
     setBooking((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleLocationChange = (newLocation) => {
-    handleChange('location', newLocation);
+  const handleLocationChange = (locationData) => {
+    // locationData now contains: { name, coordinates: { lat, lng }, distance, city, locationName }
+    console.log("Location changed:", locationData);
+    
+    if (typeof locationData === 'string') {
+      // Backward compatibility for simple string location
+      handleChange('location', locationData);
+    } else if (locationData && locationData.name) {
+      // New structure with coordinates and detailed location info
+      setBooking((prev) => ({
+        ...prev,
+        location: locationData.name, // "Butwal, Traffic Chowk"
+        coordinates: locationData.coordinates || { lat: null, lng: null },
+        distance: locationData.distance || null,
+        city: locationData.city || null,
+        locationName: locationData.locationName || null
+      }));
+    }
   };
 
   // Format price for display
@@ -465,9 +515,14 @@ export const BookingSection = ({
           <button 
             onClick={testClick}
             type="button"
-            className="w-full my-5 hidden md:block bg-[#ee3b3b] text-white font-semibold py-3 px-5 rounded-xl hover:bg-[#d22525] transition-colors duration-200 cursor-pointer"
+            disabled={!vehicleData?.isAvailable}
+            className={`w-full my-5 hidden md:block font-semibold py-3 px-5 rounded-xl transition-colors duration-200 ${
+              vehicleData?.isAvailable 
+                ? 'bg-[#ee3b3b] text-white hover:bg-[#d22525] cursor-pointer' 
+                : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+            }`}
           >
-            Continue to Payment
+            {vehicleData?.isAvailable ? 'Continue to Payment' : 'Vehicle Not Available'}
           </button>
         </div>
       </div>
@@ -482,9 +537,14 @@ export const BookingSection = ({
           <button 
             onClick={testClick}
             type="button"
-            className="bg-[#5d3bee] text-white font-semibold py-3 px-6 rounded-xl hover:bg-[#4725d2] transition-colors duration-200 cursor-pointer"
+            disabled={!vehicleData?.isAvailable}
+            className={`font-semibold py-3 px-6 rounded-xl transition-colors duration-200 ${
+              vehicleData?.isAvailable 
+                ? 'bg-[#5d3bee] text-white hover:bg-[#4725d2] cursor-pointer' 
+                : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+            }`}
           >
-            Continue to Payment
+            {vehicleData?.isAvailable ? 'Continue to Payment' : 'Not Available'}
           </button>
         </div>
       </div>

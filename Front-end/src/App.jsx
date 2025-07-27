@@ -18,15 +18,15 @@ import HostDashboard from './pages/host/Dashboard.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import { Toaster } from 'react-hot-toast';
 import ProfileSidebar from './components/ProfileSidebar.jsx';
-import Layout from './components/Layout.jsx';
+import Layout from './components/Layout';
 import FavoritesPage from './pages/FavoritesPage.jsx';
 import BookingHistoryPage from './pages/host/BookingHistoryPage.jsx';
 import Logout from './pages/Api/Logout.jsx';
 import { UserProvider } from "./context/UserContext.jsx"
-import { ProfileSidebarProvider, useProfileSidebar } from "./context/ProfileSidebarContext.jsx"
+import { ProfileSidebarProvider, useProfileSidebar } from "./context/ProfileSidebarContext"
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 
-import Map from "./utils/map.jsx"
+import MapComponent from "./utils/map.jsx"
 
 import FAQPage from './components/HomePage/FAQPage.jsx';
 import AddVehiclePage from './pages/renter/AddVehiclePage.jsx';
@@ -59,7 +59,7 @@ function AppContent() {
           <Route path="booking-history" element={<BookingHistoryPage />} />
           <Route path="host-dashboard" element={<HostDashboard />} />
 
-          <Route path="map" element={<Map/>} />
+          <Route path="map" element={<MapComponent/>} />
         </Route>
         
         {/* Routes without Layout (Admin and Auth pages) */}

@@ -29,7 +29,17 @@ const transactionSchema = new mongoose.Schema({
     startTime: String,
     endDate: String,
     endTime: String,
-    location: String
+    location: String, // Format: "Butwal, Traffic Chowk"
+    pickupLocation: {
+      name: String, // "Butwal, Traffic Chowk"
+      city: String, // "Butwal" 
+      locationName: String, // "Traffic Chowk"
+      coordinates: {
+        lat: Number,
+        lng: Number
+      },
+      distance: Number
+    }
   },
   vehicleData: {
     type: mongoose.Schema.Types.Mixed,
