@@ -260,12 +260,56 @@ const bookingSchema = new mongoose.Schema({
   // Additional metadata
   metadata: {
     pickupLocation: {
-      type: String,
-      required: false
+      name: {
+        type: String, // "Butwal, Traffic Chowk"
+        required: false
+      },
+      city: {
+        type: String, // "Butwal"
+        required: false
+      },
+      locationName: {
+        type: String, // "Traffic Chowk"
+        required: false
+      },
+      coordinates: {
+        lat: {
+          type: Number,
+          required: false
+        },
+        lng: {
+          type: Number,
+          required: false
+        }
+      },
+      distance: {
+        type: Number,
+        required: false // Distance from user location in km
+      }
     },
     dropoffLocation: {
-      type: String,
-      required: false
+      name: {
+        type: String, // "Butwal, Traffic Chowk"
+        required: false
+      },
+      city: {
+        type: String, // "Butwal"
+        required: false
+      },
+      locationName: {
+        type: String, // "Traffic Chowk"
+        required: false
+      },
+      coordinates: {
+        lat: {
+          type: Number,
+          required: false
+        },
+        lng: {
+          type: Number,
+          required: false
+        }
+      }
     },
     driverRequired: {
       type: Boolean,

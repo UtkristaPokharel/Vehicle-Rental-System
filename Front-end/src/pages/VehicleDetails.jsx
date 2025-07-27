@@ -1,5 +1,5 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { LocationPicker } from './LocationPicker';
+import { LocationPicker } from '../components/LocationPicker';
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { useState, useEffect } from "react";
 import toast,{ Toaster } from "react-hot-toast";
@@ -23,7 +23,14 @@ function VehicleDetails() {
     startTime: '',
     endDate: '',
     endTime: '',
-    location: 'Butwal'
+    location: 'Butwal',
+    coordinates: {
+      lat: null,
+      lng: null
+    },
+    distance: null,
+    city: null,
+    locationName: null
   });
 
   useEffect(() => {
@@ -120,7 +127,17 @@ function VehicleDetails() {
     // Navigate to payment page with all necessary data
     navigate('/payment', {
       state: {
-        bookingData: bookingData,
+        bookingData: {
+          ...bookingData,
+          // Ensure we have complete location data for transaction
+          pickupLocation: {
+            name: bookingData.location, // "Butwal, Traffic Chowk"
+            city: bookingData.city,
+            locationName: bookingData.locationName,
+            coordinates: bookingData.coordinates,
+            distance: bookingData.distance
+          }
+        },
         vehicleData: {
           ...vehicleData, // Pass all vehicle data
           name: vehicleData?.name,
@@ -165,7 +182,7 @@ function VehicleDetails() {
 
   return (
     <>
-      <Toaster />
+      
       <div className="detail-page flex justify-center items-center md:mb-5 mb-20">
         <div className="w-full md:w-[90vw] lg:w-[85vw] xl:w-[80vw] px-4 md:px-6 lg:px-10 mt-8 md:mt-12">
           {/* Back Button */}
@@ -343,8 +360,24 @@ export const BookingSection = ({
     setBooking((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleLocationChange = (newLocation) => {
-    handleChange('location', newLocation);
+  const handleLocationChange = (locationData) => {
+    // locationData now contains: { name, coordinates: { lat, lng }, distance, city, locationName }
+    console.log("Location changed:", locationData);
+    
+    if (typeof locationData === 'string') {
+      // Backward compatibility for simple string location
+      handleChange('location', locationData);
+    } else if (locationData && locationData.name) {
+      // New structure with coordinates and detailed location info
+      setBooking((prev) => ({
+        ...prev,
+        location: locationData.name, // "Butwal, Traffic Chowk"
+        coordinates: locationData.coordinates || { lat: null, lng: null },
+        distance: locationData.distance || null,
+        city: locationData.city || null,
+        locationName: locationData.locationName || null
+      }));
+    }
   };
 
   // Format price for display

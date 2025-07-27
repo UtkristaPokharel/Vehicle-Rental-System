@@ -510,7 +510,30 @@ router.post('/create-from-transaction', async (req, res) => {
       paymentDate: transaction.completedAt,
 
       // Booking status
-      bookingStatus: 'confirmed'
+      bookingStatus: 'confirmed',
+
+      // Additional metadata including pickup location
+      metadata: {
+        pickupLocation: {
+          name: transaction.bookingData.pickupLocation?.name || transaction.bookingData.location,
+          city: transaction.bookingData.pickupLocation?.city || null,
+          locationName: transaction.bookingData.pickupLocation?.locationName || null,
+          coordinates: transaction.bookingData.pickupLocation?.coordinates || {
+            lat: null,
+            lng: null
+          },
+          distance: transaction.bookingData.pickupLocation?.distance || null
+        },
+        dropoffLocation: {
+          name: transaction.bookingData.pickupLocation?.name || transaction.bookingData.location,
+          city: transaction.bookingData.pickupLocation?.city || null,
+          locationName: transaction.bookingData.pickupLocation?.locationName || null,
+          coordinates: transaction.bookingData.pickupLocation?.coordinates || {
+            lat: null,
+            lng: null
+          }
+        }
+      }
     };
 
     const booking = new Booking(bookingData);

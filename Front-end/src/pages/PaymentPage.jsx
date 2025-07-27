@@ -748,8 +748,10 @@ function PaymentPage() {
 										<span>{bookingData?.endDate || "Today"} at {bookingData?.endTime || "18:00"}</span>
 									</div>
 									<div className="flex justify-between text-sm">
-										<span className="text-gray-600">Location</span>
-										<span>{currentVehicleData?.location || "Butwal, Nepal"}</span>
+										<span className="text-gray-600">Pickup Location</span>
+										<span>
+											{bookingData?.pickupLocation?.name || bookingData?.location || currentVehicleData?.location || "Butwal, Nepal"}
+										</span>
 									</div>
 								</div>
 
